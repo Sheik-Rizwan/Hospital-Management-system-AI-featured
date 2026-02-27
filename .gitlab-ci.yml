@@ -1,0 +1,21 @@
+stages:
+  - notify
+
+whatsapp-notification:
+  stage: notify
+  image: curlimages/curl:latest
+  only:
+    - master
+  script:
+    - |
+      curl -X POST "https://graph.facebook.com/v21.0/${PHONE_NUMBER_ID}/messages" \
+        -H "Authorization: Bearer ${WHATSAPP_TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "messaging_product": "whatsapp",
+          "to": "'"${NOTIFY_PHONE}"'",
+          "type": "text",
+          "text": {
+            "body": "✅ Hospital Management System updated on GitLab\n\nBranch: '"${CI_COMMIT_BRANCH}"'\nBy: '"${CI_COMMIT_AUTHOR}"'\nMessage: '"${CI_COMMIT_MESSAGE}"'\nTime: '"$(date +%Y-%m-%d\ %H:%M)"'"
+          }
+        }'
