@@ -1,0 +1,71 @@
+# ═══════════════════════════════════════════
+#  Hospital Management System - .gitignore
+# ═══════════════════════════════════════════
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── IDE ──
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+venv/
+.venv/
+env/
+backend/venv/
+
+# ── Logs ──
+*.log
+logs/
+backend/logs/
+
+# ── Environment Files (secrets) ──
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+backend/.env
+
+# ── Node.js ──
+node_modules/
+npm-debug.log
+yarn-error.log
+frontend/node_modules/
+frontend/dist/
+
+# ── MongoDB Data (local dev) ──
+mongo-data/
+backend/mongo-data/
+data/
+
+# ── Uploads (user content) ──
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# ── Testing & Coverage ──
+htmlcov/
+.coverage
+.coverage.*
+.pytest_cache/
+.tox/
+
+# ── Backups & Temp ──
+backups/
+*.bak
+*.tmp
+
+# ── Agent ──
+.agent/
