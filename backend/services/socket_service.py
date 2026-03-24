@@ -326,6 +326,13 @@ def notify_new_appointment(doctor_id, appointment_data):
     })
 
 
+def notify_schedule_updated(doctor_id):
+    """Notify all clients that a doctor's schedule was updated so UIs can refresh."""
+    payload = {'doctor_id': doctor_id}
+    for role in ['doctor', 'patient', 'nurse', 'super_admin']:
+        emit_to_role(role, 'schedule_updated', payload)
+
+
 # ── Inventory Events ──────────────────────────────────────
 
 def notify_inventory_updated(item_data, action='updated'):

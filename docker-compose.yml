@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: hospital_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: hospital_backend
+    ports:
+      - "5000:5000"
+    environment:
+      # Direct MongoDB to the mongo container name
+      - MONGODB_URI=mongodb://mongodb:27017/
+      - FLASK_ENV=production
+      - FLASK_DEBUG=False
+    # Mount the backend env file to load JWT_SECRET_KEY, GROQ_API_KEY, etc.
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/logs:/app/logs
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  frontend:
+    build: 
+      context: ./frontend
+      args:
+        # Defaulting to localhost:5000 so that a user's browser hitting the frontend on localhost 
+        # routes API calls directly to their local machine's exposed backend port.
+        - VITE_API_BASE=http://localhost:5000/api
+        - VITE_SOCKET_URL=http://localhost:5000
+    container_name: hospital_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:

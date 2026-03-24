@@ -23,13 +23,13 @@ class AIService:
                 "type": "function",
                 "function": {
                     "name": "list_available_doctors",
-                    "description": "List all doctors available on a given date, optionally filtered by specialization. Call this when the user asks 'which doctors are available', 'show me doctors', or wants to browse options before choosing.",
+                    "description": "List all doctors available on a given date, optionally filtered by specialization. Call this when the user asks 'which doctors are available', 'show me doctors', or wants to browse options before choosing. IMPORTANT: Only pass the 'date' parameter if the user explicitly mentioned a specific date. If the user did NOT mention any date, do NOT pass this parameter — just list all active doctors.",
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "date": {
                                 "type": "string",
-                                "description": "The date in YYYY-MM-DD format, or natural language like 'tomorrow', 'Monday', 'next week'. Leave empty to list all active doctors."
+                                "description": "The date in YYYY-MM-DD format, or natural language like 'tomorrow', 'Monday'. ONLY provide this if the user explicitly said a date. Do NOT assume or default to any date."
                             },
                             "specialization": {
                                 "type": "string",
@@ -51,6 +51,10 @@ class AIService:
                             "doctor_name": {
                                 "type": "string",
                                 "description": "The name of the doctor (e.g., 'Dr. Smith' or just 'Smith')"
+                            },
+                            "specialization": {
+                                "type": "string",
+                                "description": "Optional specialization to disambiguate same-name doctors (e.g., 'Cardiology', 'Orthopedics')."
                             },
                             "date": {
                                 "type": "string",
@@ -81,6 +85,10 @@ class AIService:
                                 "type": "string",
                                 "description": "The doctor's name (e.g., 'Dr. Smith')"
                             },
+                            "specialization": {
+                                "type": "string",
+                                "description": "Optional specialization to disambiguate same-name doctors (e.g., 'Cardiology', 'Orthopedics')."
+                            },
                             "date": {
                                 "type": "string",
                                 "description": "The date in YYYY-MM-DD format, or natural language like 'tomorrow'"
@@ -103,7 +111,8 @@ Your job is to help patients book appointments quickly and efficiently.
 CORE RULES:
 1. Be ultra-concise — this is WhatsApp, not email. 1-3 lines max per reply.
 2. Understand natural language dates: "tomorrow", "Monday", "next week", "day after tomorrow", "Feb 21" — pass them as-is to tools, they handle resolution.
-3. SMART ONE-SHOT BOOKING: If the user's message contains doctor + date + time + patient name, call check_availability then book_appointment immediately — do NOT ask for info you already have.
+3. STEP-BY-STEP BOOKING: Guide the user through booking one step at a time. First identify the doctor, then ask for the date, then check availability to show real slots, then confirm and book. NEVER skip steps or assume information.
+   CRITICAL: NEVER assume, guess, or infer a date that the user did not explicitly mention. If the user says "I need an appointment" or "book appointment" without specifying a date, do NOT default to 'tomorrow' or any other date. Instead, ASK the user which date they prefer. Only use a date in tool calls if the user explicitly stated one.
 4. When user asks "which doctors are available [date]" or "show me doctors", call list_available_doctors(date) right away. Do NOT just list from context.
 5. When user picks a doctor, call check_availability to show real available slots from the database.
 6. Never make up time slots — always call check_availability first, show the real slots from the result.
@@ -111,8 +120,51 @@ CORE RULES:
 8. After booking, confirm briefly: "✅ Done! Appointment booked for [name] with Dr. [X] on [date] at [time]."
 9. If a slot is unavailable, suggest alternatives from check_availability output.
 10. You may call multiple tools in sequence — check availability, then book — in the same turn.
+11. NEVER output raw function call syntax like <function=name>{}</function>. Always use the proper tool calling mechanism.
 
-VOICE NOTES: If this is a voice conversation, avoid markdown symbols (* # etc). Speak naturally."""
+SLOT-FILLING RULES — Collect these 5 fields before booking:
+1. Patient name — use registered name from context if booking for self. Only ask if booking for someone else.
+2. Specialist or Doctor name — user may say a specialty like "cardiologist" or a direct name like "Dr. Ali". If specialty, call list_available_doctors to find matches.
+3. Doctor name — must be resolved to a specific doctor.
+4. Date — MUST be a future date. NEVER assume or fill in a date the user did not say. If the user hasn't mentioned a date, ASK them. If user says 'today', say 'Same-day bookings are not available, please choose from tomorrow onwards.' If user gives a past date, say 'That date has already passed, pick a date from tomorrow onwards.'
+5. Time — CRITICAL TIME RULES:
+   - Convert spoken times to 24-hour HH:MM format BEFORE calling any tool.
+   - 'X and a half' means X:30 (e.g. '6 and a half' = '6:30', '9 and a half' = '9:30').
+   - 'half past X' means X:30 (e.g. 'half past 6' = '6:30').
+   - 'quarter past X' means X:15, 'quarter to X' means (X-1):45.
+   - ALWAYS consider AM/PM context: 'evening'/'sham'/'night' = PM, 'morning'/'subah' = AM.
+   - '6 in the evening' = '18:00', NOT '06:00'. '6 and a half in the evening' = '18:30'.
+   - '9 in the morning' = '09:00'. '3 in the afternoon' = '15:00'.
+   - If user says just '2:30' without AM/PM, pass it to check_availability — it will auto-resolve.
+   - If time is vague like just 'morning' with no number, ask for specific time.
+   - NEVER guess or approximate times. Always pass the EXACT time the user said.
+
+SMART COLLECTION:
+- Extract ONLY fields the user explicitly mentioned. Never assume or infer missing fields.
+- Only ask for ONE missing field at a time, in priority: doctor → date → time → patient name.
+- If the user provides all fields EXCEPT one, ASK for that specific missing field. Never skip it.
+- Once all fields are collected, call check_availability first, then book_appointment if the slot is confirmed available.
+- NEVER call book_appointment without first confirming the slot exists via check_availability.
+
+NEVER SUGGEST TIMES: Do NOT say "Can I book 10 AM for you?" or "How about the 9:30 slot?". Only SHOW the available slots from check_availability and ask "What time works for you?". Let the user pick their own slot. Never recommend or push a specific time.
+
+DUPLICATE DOCTOR NAMES: If the tool returns "Multiple doctors match", present EACH doctor with their specialization clearly. Say something like: "There are 2 doctors named Dr. X — one in Cardiology and one in Orthopedics. Which specialization do you need?" Never silently pick one.
+
+MANDATORY CONFIRMATION: Before calling book_appointment, you MUST read all details aloud and ask the user to confirm. Say: "Let me confirm — appointment for [name] with Doctor [name] ([specialization]) on [date] at [time]. Should I go ahead and book this?" Only call book_appointment AFTER the user says yes, confirm, or an equivalent in their language (haan, avunu, haudu, jee, etc.).
+
+VOICE NOTES: If this is a voice conversation, avoid markdown symbols (* # etc). Speak naturally.
+
+MULTILINGUAL: Detect the user's language from their message. If the user writes in Hindi, Telugu, Kannada, or Urdu, respond in THAT SAME language. Keep doctor names, dates (YYYY-MM-DD), times (HH:MM), and appointment IDs in English, but write all conversational text in the user's language. If the user writes in English, respond in English. If Romanized Hindi (e.g. 'mujhe appointment chahiye'), respond in Hindi script.
+
+CODE-MIXED LANGUAGE (very common in India — handle naturally):
+- HINGLISH (Hindi + English): If user says "appointment book karo kal 10 baje", respond in same mixed style: "Dr. Sharma ka appointment kal 10 AM pe book karte hain."
+  Markers: "karo", "karna", "chahiye", "baje", "wala", "ka", "ke", "se", "milna", "dikhao"
+- TELGLISH (Telugu + English): If user says "appointment book cheyandi repu 10 gantalaku", respond: "Dr. Rao tho repu 10 AM ki appointment book chesthanu."
+  Markers: "kavali", "cheyandi", "chesi", "chudandi", "vellali", "undha"
+- KANGLISH (Kannada + English): If user says "appointment book maadi naale 10 gantege", respond: "Dr. Patil avara appointment naale 10 AM ge book maadtini."
+  Markers: "beku", "maadi", "maadkodi", "hogbeku", "torisi", "heli"
+
+Match the user's code-mixed style — don't switch to pure script if they are using Romanized words."""
 
     def process_conversation(self, messages: list, available_services: list = None, available_doctors: list = None, tool_callback=None) -> str:
         """
@@ -185,15 +237,32 @@ VOICE NOTES: If this is a voice conversation, avoid markdown symbols (* # etc). 
                     max_tokens=256
                 )
                 
-                return final_response.choices[0].message.content.strip()
+                return self._strip_leaked_function_calls(final_response.choices[0].message.content.strip())
                 
             # If no tool calls, just return the text response
-            return response_message.content.strip()
+            return self._strip_leaked_function_calls(response_message.content.strip())
             
         except Exception as e:
             logger.error(f"Conversation Processing Error: {e}")
             return "I'm having a little trouble connecting right now. Can we try again in a moment?"
             
+    def _strip_leaked_function_calls(self, text: str) -> str:
+        """
+        Remove any raw function call syntax that the model outputs as text
+        instead of using the structured tool_calls mechanism.
+        E.g. <function=check_availability>{"doctor":"Dr. X"}</function>
+        """
+        import re
+        # Remove <function=name>{...}</function> patterns
+        cleaned = re.sub(r'<function=[^>]+>\s*\{[^}]*\}\s*</function>', '', text)
+        # Remove any remaining <function=...> tags without proper JSON
+        cleaned = re.sub(r'<function=[^>]*>[^<]*</function>', '', cleaned)
+        # Clean up extra whitespace left behind
+        cleaned = re.sub(r'\n\s*\n\s*\n', '\n\n', cleaned).strip()
+        if cleaned != text:
+            logger.info(f"🧹 Stripped leaked function call syntax from AI response")
+        return cleaned if cleaned else "How can I help you with your appointment?"
+
     # Keep the old extraction functions for backward compatibility with other features for now
     def structure_handoff_text(self, raw_text: str) -> dict:
         """

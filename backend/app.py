@@ -49,7 +49,11 @@ from routes.admin_routes import admin_bp
 from routes.doctor_routes import doctor_bp
 from routes.nurse_routes import nurse_bp
 from routes.patient_routes import patient_bp
-from routes.whatsapp_routes import whatsapp_bp
+from routes.whatsapp_routes import (
+    whatsapp_bp,
+    verify_token as whatsapp_verify_token,
+    handle_message as whatsapp_handle_message,
+)
 from routes.vendor_routes import vendor_bp
 from routes.procurement_routes import procurement_bp
 from routes.chat_routes import chat_bp
@@ -62,6 +66,10 @@ app.register_blueprint(whatsapp_bp, url_prefix='/api/whatsapp')
 app.register_blueprint(vendor_bp, url_prefix='/api/vendor')
 app.register_blueprint(procurement_bp, url_prefix='/api/procurement')
 app.register_blueprint(chat_bp, url_prefix='/api/chat')
+
+# Backward-compatible webhook aliases (some WhatsApp app configurations point to /webhook)
+app.add_url_rule('/webhook', 'whatsapp_verify_alias', whatsapp_verify_token, methods=['GET'])
+app.add_url_rule('/webhook', 'whatsapp_handle_alias', whatsapp_handle_message, methods=['POST'])
 
 
 # ── Static File Serving ──

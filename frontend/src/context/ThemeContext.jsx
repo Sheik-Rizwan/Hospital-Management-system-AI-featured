@@ -1,51 +1,40 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import ThemeCustom from '../theme';
 
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    const stored = localStorage.getItem('theme');
-    if (stored) return stored;
-    // Detect system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    return 'light';
-  });
+    const [mode, setMode] = useState(() => {
+        const stored = localStorage.getItem('theme');
+        if (stored) return stored;
+        if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark';
+        return 'light';
+    });
 
-  useEffect(() => {
-    const root = document.documentElement;
+    const theme = useMemo(() => ThemeCustom(mode), [mode]);
 
-    // Add transition class for smooth theme switch
-    root.classList.add('theme-transitioning');
+    const toggleTheme = () => {
+        setMode(prev => {
+            const next = prev === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            return next;
+        });
+    };
 
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-
-    localStorage.setItem('theme', theme);
-
-    // Remove transition class after animation completes
-    const timeout = setTimeout(() => {
-      root.classList.remove('theme-transitioning');
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [theme]);
-
-  const toggleTheme = () => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+    return (
+        <ThemeContext.Provider value={{ theme: mode, toggleTheme }}>
+            <MuiThemeProvider theme={theme}>
+                <CssBaseline />
+                {children}
+            </MuiThemeProvider>
+        </ThemeContext.Provider>
+    );
 }
 
 export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error('useTheme must be used within a ThemeProvider');
-  return ctx;
+    const ctx = useContext(ThemeContext);
+    if (!ctx) throw new Error('useTheme must be used within a ThemeProvider');
+    return ctx;
 }

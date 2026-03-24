@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import requests
 import os
 import json
+import re
 from mongodb_config import MongoDatabase
 from services.appointment_service import AppointmentService
 from services.patient_service import PatientService
@@ -12,9 +13,12 @@ from services.notification_service import NotificationService
 from services.speech_to_text import SpeechToTextRecorder
 from services.sarvam_service import SarvamService
 from services.local_voice_service import LocalVoiceService
+from services.stt_post_processor import post_process_stt
 from ai_service import AIService
 from logger_config import logger
 from services.booking_flow import SmartBookingEngine, BK_IDLE
+from services.booking_utils import resolve_date, resolve_time, resolve_ambiguous_time, validate_booking_date, get_doctor_weekly_schedule
+from services.language_utils import detect_language, get_language_name, get_response_language_instruction
 
 # Lazy import to avoid circular deps with Flask app context
 def _notify_doctor_new_appointment(doctor_id, appointment_data):
@@ -28,6 +32,198 @@ try:
     from config.settings import SARVAM_SUPPORTED_LANGUAGES
 except ImportError:
     SARVAM_SUPPORTED_LANGUAGES = {}
+
+# ═══════════════════════════════════════════
+#  SUPPORTED LANGUAGES & SCRIPT VALIDATION
+# ═══════════════════════════════════════════
+
+# Only these 6 languages are trained/supported
+TRAINED_LANGUAGES = {'te', 'hi', 'en', 'ta', 'kn', 'ur'}
+
+# Unicode ranges for supported scripts
+# Telugu: 0C00-0C7F, Hindi/Devanagari: 0900-097F, Tamil: 0B80-0BFF
+# Kannada: 0C80-0CFF, Urdu/Arabic: 0600-06FF (subset), English/Latin: 0000-007F
+SUPPORTED_SCRIPT_RANGES = [
+    (0x0000, 0x007F),   # Basic Latin (English)
+    (0x0900, 0x097F),   # Devanagari (Hindi)
+    (0x0B80, 0x0BFF),   # Tamil
+    (0x0C00, 0x0C7F),   # Telugu
+    (0x0C80, 0x0CFF),   # Kannada
+    (0x0600, 0x06FF),   # Arabic script (Urdu)
+    (0x0020, 0x0040),   # Basic punctuation and digits
+    (0x005B, 0x0060),   # More punctuation
+    (0x007B, 0x007E),   # Braces, etc.
+]
+
+# Unsupported scripts that indicate wrong language detection
+UNSUPPORTED_SCRIPT_RANGES = [
+    (0x4E00, 0x9FFF),   # CJK Unified Ideographs (Chinese)
+    (0x3040, 0x309F),   # Hiragana (Japanese)
+    (0x30A0, 0x30FF),   # Katakana (Japanese)
+    (0xAC00, 0xD7AF),   # Hangul (Korean)
+    (0x0400, 0x04FF),   # Cyrillic (Russian, etc.)
+    (0x0370, 0x03FF),   # Greek
+    (0x0E00, 0x0E7F),   # Thai
+    (0x1000, 0x109F),   # Myanmar
+    (0x0980, 0x09FF),   # Bengali (not trained yet)
+    (0x0A00, 0x0A7F),   # Gurmukhi/Punjabi (not trained yet)
+    (0x0A80, 0x0AFF),   # Gujarati (not trained yet)
+    (0x0D00, 0x0D7F),   # Malayalam (not trained yet)
+    (0x0D80, 0x0DFF),   # Sinhala (not trained yet)
+]
+
+def is_transcript_valid(transcript: str) -> tuple:
+    """
+    Check if transcript contains only characters from supported languages.
+    Returns: (is_valid: bool, detected_issue: str | None)
+    """
+    if not transcript or not transcript.strip():
+        return False, "empty_transcript"
+
+    transcript = transcript.strip()
+
+    # Check for unsupported script characters
+    for char in transcript:
+        code_point = ord(char)
+        for start, end in UNSUPPORTED_SCRIPT_RANGES:
+            if start <= code_point <= end:
+                # Found an unsupported character
+                script_name = _get_script_name(code_point)
+                logger.warning(f"⚠️ Unsupported script detected: {script_name} (char: {char}, code: {hex(code_point)})")
+                return False, f"unsupported_script:{script_name}"
+
+    return True, None
+
+def _get_script_name(code_point: int) -> str:
+    """Get human-readable script name from Unicode code point."""
+    if 0x4E00 <= code_point <= 0x9FFF:
+        return "Chinese"
+    elif 0x3040 <= code_point <= 0x309F or 0x30A0 <= code_point <= 0x30FF:
+        return "Japanese"
+    elif 0xAC00 <= code_point <= 0xD7AF:
+        return "Korean"
+    elif 0x0400 <= code_point <= 0x04FF:
+        return "Cyrillic"
+    elif 0x0370 <= code_point <= 0x03FF:
+        return "Greek"
+    elif 0x0E00 <= code_point <= 0x0E7F:
+        return "Thai"
+    elif 0x1000 <= code_point <= 0x109F:
+        return "Myanmar"
+    elif 0x0980 <= code_point <= 0x09FF:
+        return "Bengali"
+    elif 0x0A00 <= code_point <= 0x0A7F:
+        return "Punjabi"
+    elif 0x0A80 <= code_point <= 0x0AFF:
+        return "Gujarati"
+    elif 0x0D00 <= code_point <= 0x0D7F:
+        return "Malayalam"
+    elif 0x0D80 <= code_point <= 0x0DFF:
+        return "Sinhala"
+    return "Unknown"
+
+
+def is_garbage_transcription(text: str) -> bool:
+    """
+    Detect garbage/nonsensical STT transcriptions.
+    Returns True if the text appears to be garbage.
+    """
+    if not text or len(text.strip()) < 3:
+        return True
+
+    text_lower = text.lower().strip()
+
+    # 1. Check for repetitive phrases (e.g., "X, X, X" or "X X X")
+    # Split by commas or periods
+    parts = re.split(r'[,.\!]+', text_lower)
+    parts = [p.strip() for p in parts if p.strip()]
+    if len(parts) >= 2:
+        # Check if all parts are the same or very similar
+        unique_parts = set(parts)
+        if len(unique_parts) == 1 and len(parts) >= 2:
+            logger.warning(f"🗑️ Garbage detected: repetitive phrase '{parts[0]}'")
+            return True
+
+    # 2. Check for known garbage patterns from STT
+    garbage_patterns = [
+        r'i am going to make a movie',
+        r'i am going to',
+        r'i am a body artist',
+        r'actress.*point',
+        r'movie.*movie.*movie',
+        r'body artist',
+        r'thank you for watching',
+        r'subscribe to my channel',
+        r'please like and subscribe',
+        r'^(the|a|an|i|we|he|she|it)\s*$',  # Single common words
+        r'^[\d\s\.\,]+$',  # Only numbers and punctuation
+    ]
+    for pattern in garbage_patterns:
+        if re.search(pattern, text_lower):
+            logger.warning(f"🗑️ Garbage detected: matches pattern '{pattern}'")
+            return True
+
+    # 3. Check word repetition (same word repeated 3+ times)
+    words = text_lower.split()
+    if len(words) >= 3:
+        word_counts = {}
+        for w in words:
+            if len(w) > 2:  # Ignore short words
+                word_counts[w] = word_counts.get(w, 0) + 1
+        for word, count in word_counts.items():
+            if count >= 3 and count / len(words) > 0.4:  # Same word is 40%+ of text
+                logger.warning(f"🗑️ Garbage detected: word '{word}' repeated {count} times")
+                return True
+
+    return False
+
+
+def score_transcription_quality(text: str, expected_lang: str) -> int:
+    """
+    Score a transcription based on quality indicators.
+    Higher score = better quality.
+    Returns 0-100.
+    """
+    if not text or not text.strip():
+        return 0
+
+    text_lower = text.lower().strip()
+    score = 50  # Base score
+
+    # Check for garbage
+    if is_garbage_transcription(text):
+        return 0
+
+    # Bonus for booking-related keywords (any language)
+    booking_keywords = [
+        # English
+        'appointment', 'book', 'booking', 'doctor', 'hospital', 'clinic',
+        'schedule', 'time', 'date', 'tomorrow', 'today',
+        # Hindi Romanized
+        'appointment', 'book', 'karo', 'karna', 'chahiye', 'doctor', 'dawai',
+        'kal', 'aaj', 'parso', 'parsu', 'milna', 'dikhana', 'bukking',
+        # Common misspellings from STT
+        'apointment', 'appoint', 'bookin', 'docter', 'hospitl',
+    ]
+    keyword_count = sum(1 for kw in booking_keywords if kw in text_lower)
+    score += keyword_count * 10
+
+    # Bonus for native script (Devanagari, Telugu, etc.)
+    native_chars = sum(1 for c in text if ord(c) > 127)
+    if native_chars > 0:
+        score += 20
+
+    # Bonus for reasonable length
+    if 5 <= len(text.split()) <= 50:
+        score += 10
+
+    # Penalty for too short or too long
+    if len(text.split()) < 2:
+        score -= 20
+    if len(text.split()) > 100:
+        score -= 10
+
+    return min(100, max(0, score))
 
 # ═══════════════════════════════════════════
 #  CONFIG
@@ -141,14 +337,23 @@ class WhatsAppService:
     def handle_incoming_message(self, sender_id, message_type, message_content, media_id=None):
         """Process every incoming WhatsApp message."""
 
-        # ── 1. Handle Voice / Audio via Sarvam ──
+        # ── 1. Handle Voice / Audio ──
         if message_type == 'audio':
             session = self._get_session(sender_id)
             current_state = session.get('state', STATE_INIT)
             lang_code = session.get('data', {}).get('language', 'en')
+            detected_lang = session.get('data', {}).get('detected_lang', 'en')
 
-            # Use Sarvam for voice processing if available
-            if self.sarvam and self.sarvam.is_available():
+            # If user is in AI Chat mode, transcribe and feed to chat instead of Sarvam voice
+            if current_state == STATE_CHAT:
+                transcribed = self._transcribe_audio_for_chat(sender_id, media_id, detected_lang or lang_code)
+                if transcribed:
+                    message_content = transcribed
+                    # Fall through to normal text processing
+                else:
+                    return
+            elif self.sarvam and self.sarvam.is_available():
+                # Use Sarvam for voice processing in voice chat mode
                 self._handle_sarvam_voice(sender_id, media_id, session)
                 return
             else:
@@ -333,20 +538,36 @@ class WhatsAppService:
         available_services = [s['service_name'] for s in self.appt_service.get_services()]
         available_doctors = [d['full_name'] for d in self.appt_service.get_active_doctors()]
 
+        # Detect language from user input and store in session
+        detected_lang = detect_language(str(input_text))
+        if detected_lang != 'en':
+            data['detected_lang'] = detected_lang
+            logger.info(f"🌐 Language detected: {get_language_name(detected_lang)} for {sender_id}")
+        elif not data.get('detected_lang'):
+            data['detected_lang'] = 'en'
+
         # Prepare messages array
         messages = data.get('messages', [])
-        
+
         # Add patient context if available
         clean_phone = sender_id.replace('+', '').replace(' ', '')
         patient = self.patient_service.get_patient_by_phone(clean_phone)
         patient_context = ""
         if patient:
             patient_context = f"The user's registered name is {patient.get('patient_name', 'Unknown')}. \n"
-        
-        system_message_content = f"Today's date is {datetime.now().strftime('%Y-%m-%d, %A')}. {patient_context}"
-        
+
+        # Build system message with language instruction
+        lang_instruction = get_response_language_instruction(data.get('detected_lang', 'en'))
+        system_message_content = (
+            f"Today's date is {datetime.now().strftime('%Y-%m-%d, %A')}. {patient_context}"
+            f"{lang_instruction}"
+        )
+
         if not messages:
-             messages.append({"role": "system", "content": system_message_content})
+            messages.append({"role": "system", "content": system_message_content})
+        else:
+            # Update system message with latest language detection
+            messages[0] = {"role": "system", "content": system_message_content}
 
         messages.append({"role": "user", "content": str(input_text)})
 
@@ -362,31 +583,360 @@ class WhatsAppService:
             tool_callback=tool_executor
         )
 
-        messages.append({"role": "assistant", "content": ai_response_text})
+        suppress_ai_reply = bool(data.pop('_suppress_next_ai_text', False))
+        if suppress_ai_reply:
+            logger.info("📩 Missing-doctor fallback already sent directly; suppressing extra AI chat text")
+            messages.append({"role": "assistant", "content": "[Missing-doctor fallback sent via direct WhatsApp messages.]"})
+        else:
+            messages.append({"role": "assistant", "content": ai_response_text})
 
         # Save conversation memory
-        data['messages'] = messages[-15:] # Keep last 15 messages max to avoid too large context
+        data['messages'] = messages[-15:]  # Keep last 15 messages max
         self._transition_to(sender_id, STATE_CHAT, data)
 
         # Send back to WhatsApp
-        self.notifier.send_whatsapp_text(sender_id, ai_response_text)
+        if not suppress_ai_reply:
+            self.notifier.send_whatsapp_text(sender_id, ai_response_text)
+
+    def _transcribe_audio_for_chat(self, sender_id, media_id, lang_code='en'):
+        """
+        Download and transcribe a WhatsApp voice note for AI Chat mode.
+        Uses Sarvam STT (better for Indian languages) with multi-language detection.
+        Returns transcribed text, or None on failure.
+        """
+        if not media_id:
+            self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not process voice note.")
+            return None
+
+        try:
+            _status_msgs = {
+                'te': '🎤 మీ వాయిస్ మెసేజ్ ప్రాసెస్ చేస్తున్నాము...',
+                'hi': '🎤 आपका वॉइस मैसेज प्रोसेस हो रहा है...',
+                'ta': '🎤 உங்கள் குரல் செய்தியை செயலாக்குகிறோம்...',
+                'kn': '🎤 ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶವನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ...',
+                'ur': '🎤 آپ کا وائس پیغام پروسیس ہو رہا ہے...'
+            }
+            self.notifier.send_whatsapp_text(sender_id, _status_msgs.get(lang_code, "🎤 Processing your voice message..."))
+            audio_path = self._download_media(media_id)
+
+            if not audio_path:
+                self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not download audio. Please try text.")
+                return None
+
+            transcribed = None
+            final_lang_code = lang_code
+
+            # PRIORITY: Use Sarvam STT for all languages (best for Indian languages)
+            if self.sarvam and self.sarvam.is_available():
+                try:
+                    if lang_code == 'en':
+                        # Auto-detect: try common Indian languages first
+                        LANG_PRIORITY = ['hi', 'kn', 'te', 'ta', 'ur', 'en']
+                        for try_lang in LANG_PRIORITY:
+                            try:
+                                sarvam_result = self.sarvam.speech_to_text(audio_path, try_lang)
+                                if sarvam_result and sarvam_result.get('transcript'):
+                                    transcript_text = sarvam_result['transcript'].strip()
+                                    if transcript_text and len(transcript_text) > 2:
+                                        if try_lang != 'en':
+                                            has_native = any(ord(c) > 127 for c in transcript_text)
+                                            if has_native:
+                                                transcribed = transcript_text
+                                                final_lang_code = try_lang
+                                                logger.info(f"🎤 Chat STT found native {try_lang}: '{transcribed[:60]}'")
+                                                break
+                                            else:
+                                                detected = detect_language(transcript_text)
+                                                if detected == try_lang:
+                                                    transcribed = transcript_text
+                                                    final_lang_code = try_lang
+                                                    break
+                                                elif not transcribed:
+                                                    transcribed = transcript_text
+                                                    final_lang_code = try_lang
+                                        else:
+                                            if not transcribed:
+                                                transcribed = transcript_text
+                                                final_lang_code = 'en'
+                            except Exception as e:
+                                logger.warning(f"Sarvam STT {try_lang} failed: {e}")
+                                continue
+                    else:
+                        # Use specified language directly
+                        sarvam_result = self.sarvam.speech_to_text(audio_path, lang_code)
+                        if sarvam_result and sarvam_result.get('transcript'):
+                            transcribed = sarvam_result['transcript']
+                            final_lang_code = lang_code
+                            logger.info(f"🎤 Chat Sarvam STT ({lang_code}): '{transcribed}'")
+                except Exception as e:
+                    logger.warning(f"Sarvam STT failed: {e}")
+
+            # Only fallback to Groq Whisper as last resort
+            if not transcribed and self.stt:
+                logger.warning("⚠️ Sarvam STT failed, trying Groq Whisper as last resort")
+                transcribed = self.stt.transcribe_audio_file(audio_path, lang_code)
+
+            # Update lang_code for response
+            lang_code = final_lang_code
+
+            # Clean up temp file
+            try:
+                os.remove(audio_path)
+            except Exception:
+                pass
+
+            if not transcribed or self._is_garbage_transcript(transcribed):
+                # Try post-processing before giving up
+                if transcribed:
+                    processed = post_process_stt(transcribed, language_code=lang_code)
+                    if processed.get('is_likely_appointment_intent') and processed.get('corrected'):
+                        logger.info(f"🔧 STT post-processing corrected: '{transcribed}' → '{processed['corrected']}'")
+                        transcribed = processed['corrected']
+                    else:
+                        # Still garbage after post-processing
+                        self.notifier.send_whatsapp_text(
+                            sender_id, "⚠️ Could not understand audio. Please try again or use text."
+                        )
+                        return None
+                else:
+                    self.notifier.send_whatsapp_text(
+                        sender_id, "⚠️ Could not understand audio. Please try again or use text."
+                    )
+                    return None
+
+            logger.info(f"📝 Chat voice transcription ({lang_code}): '{transcribed}'")
+
+            _heard_prefix = {'te': '📝 నేను విన్నది', 'hi': '📝 मैंने सुना', 'ta': '📝 நான் கேட்டது', 'kn': '📝 ನಾನು ಕೇಳಿದ್ದು', 'ur': '📝 میں نے سنا'}
+            self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, '📝 I heard')}: \"{transcribed}\"")
+            return transcribed
+
+        except Exception as e:
+            logger.error(f"Chat audio transcription failed: {e}")
+            self.notifier.send_whatsapp_text(sender_id, "⚠️ Voice processing failed. Please use text.")
+            return None
+
+
+    def _normalize_doctor_text(self, value):
+        """Normalize doctor/specialization text for tolerant matching."""
+        text = str(value or "").lower()
+        text = text.replace('dr.', ' ').replace('dr ', ' ').replace('doctor', ' ')
+        text = re.sub(r"[^a-z0-9\s]", " ", text)
+        return " ".join(text.split())
+
+    def _extract_specialization_hint(self, doctor_query, candidate_doctors):
+        """Try to infer specialization from a combined query like 'Dr X cardiologist'."""
+        if not doctor_query or not candidate_doctors:
+            return None
+
+        query_norm = self._normalize_doctor_text(doctor_query)
+        if not query_norm:
+            return None
+        query_tokens = set(query_norm.split())
+
+        best_spec = None
+        best_score = 0
+
+        for doctor in candidate_doctors:
+            specialization = str(doctor.get('specialization', '') or '').strip()
+            spec_norm = self._normalize_doctor_text(specialization)
+            if not spec_norm:
+                continue
+
+            score = 0
+            if spec_norm in query_norm:
+                score = 100 + len(spec_norm.split())
+            else:
+                spec_tokens = [tok for tok in spec_norm.split() if len(tok) >= 4]
+                if spec_tokens:
+                    token_hits = sum(
+                        1 for tok in spec_tokens
+                        if tok in query_tokens or any(
+                            len(qtok) >= 4 and (
+                                tok.startswith(qtok)
+                                or qtok.startswith(tok)
+                                or (len(tok) >= 6 and len(qtok) >= 6 and tok[:6] == qtok[:6])
+                            )
+                            for qtok in query_tokens
+                        )
+                    )
+                    if token_hits:
+                        score = token_hits
+
+            if score > best_score:
+                best_score = score
+                best_spec = specialization
+
+        return best_spec
+
+    def _match_doctors_with_specialization(self, doctor_query, doctors, specialization_hint=None):
+        """Match doctor by name and, when present, narrow by specialization hint."""
+        query_norm = self._normalize_doctor_text(doctor_query)
+        if not query_norm or not doctors:
+            return []
+
+        query_tokens = [tok for tok in query_norm.split() if len(tok) >= 2]
+        matched_doctors = []
+
+        for doctor in doctors:
+            doctor_name_norm = self._normalize_doctor_text(doctor.get('full_name', ''))
+            if not doctor_name_norm:
+                continue
+
+            if len(doctor_name_norm) >= 2:
+                if query_norm in doctor_name_norm or doctor_name_norm in query_norm:
+                    matched_doctors.append(doctor)
+                    continue
+            elif doctor_name_norm in query_norm.split():
+                matched_doctors.append(doctor)
+                continue
+
+            doctor_name_tokens = [tok for tok in doctor_name_norm.split() if len(tok) >= 2]
+            if doctor_name_tokens and query_tokens:
+                overlap = set(doctor_name_tokens).intersection(query_tokens)
+                if overlap and len(overlap) >= min(2, len(doctor_name_tokens), len(query_tokens)):
+                    matched_doctors.append(doctor)
+
+        if not matched_doctors:
+            return []
+
+        effective_spec = specialization_hint or self._extract_specialization_hint(doctor_query, matched_doctors)
+        if not effective_spec:
+            return matched_doctors
+
+        spec_hint_norm = self._normalize_doctor_text(effective_spec)
+        if not spec_hint_norm:
+            return matched_doctors
+
+        hint_tokens = [tok for tok in spec_hint_norm.split() if len(tok) >= 4]
+        narrowed = []
+        for doctor in matched_doctors:
+            doctor_spec_norm = self._normalize_doctor_text(doctor.get('specialization', ''))
+            if doctor_spec_norm and (
+                spec_hint_norm in doctor_spec_norm
+                or doctor_spec_norm in spec_hint_norm
+                or any(
+                    tok in doctor_spec_norm
+                    or doctor_spec_norm.startswith(tok)
+                    or (len(tok) >= 6 and doctor_spec_norm[:6] == tok[:6])
+                    for tok in hint_tokens
+                )
+            ):
+                narrowed.append(doctor)
+
+        return narrowed or matched_doctors
+
+    def _build_doctor_disambiguation_message(self, doctor_query, matched_doctors):
+        """Build an explicit disambiguation prompt when multiple doctors match."""
+        if not matched_doctors:
+            return "Multiple doctors match. Please specify the doctor name and specialization."
+
+        unique_names = {
+            str(d.get('full_name', '')).strip().lower()
+            for d in matched_doctors
+            if d.get('full_name')
+        }
+        cleaned_query = str(doctor_query or '').strip()
+
+        if len(unique_names) == 1:
+            raw_name = next(iter(unique_names))
+            doctor_label = re.sub(r'^\s*dr\.?\s*', '', raw_name, flags=re.IGNORECASE).title()
+            if not doctor_label:
+                doctor_label = cleaned_query or "this doctor"
+            header = (
+                f"There are {len(matched_doctors)} doctors named Dr. {doctor_label} with different specializations:\n"
+            )
+        else:
+            label = cleaned_query or "your request"
+            header = f"Multiple doctors match '{label}':\n"
+
+        body = ""
+        for doctor in matched_doctors[:10]:
+            body += f"- Dr. {doctor.get('full_name', 'Unknown')} ({doctor.get('specialization', 'General')})\n"
+
+        footer = "Which doctor do you need? Please tell the exact doctor name or specialization."
+        return header + body + footer
+
+    def _build_missing_doctor_line(self, missing_doctor_name=None):
+        """Build the explicit missing-doctor line requested by users."""
+        requested_name = re.sub(
+            r'^\s*dr\.?\s*',
+            '',
+            str(missing_doctor_name or '').strip(),
+            flags=re.IGNORECASE
+        )
+        return (
+            f"Dr. {requested_name} is not there in our database."
+            if requested_name
+            else "That doctor is not there in our database."
+        )
+
+    def _build_present_doctors_list_message(self, doctors, limit=10, include_prompt=False):
+        """Build numbered present-doctors list with specialization."""
+        if not doctors:
+            return "No active doctors are currently available in the hospital."
+
+        lines = []
+        for doc in doctors[:limit]:
+            name = str(doc.get('full_name', '') or '').strip()
+            if not name:
+                continue
+            specialization = str(doc.get('specialization', 'General') or 'General').strip() or 'General'
+            lines.append(f"{len(lines) + 1}. Dr. {name} ({specialization})")
+
+        if not lines:
+            return "No active doctors are currently available in the hospital."
+
+        message = "Present doctors:\n" + "\n".join(lines)
+        if include_prompt:
+            message += "\nPlease choose one doctor from the present doctors list."
+        return message
+
+    def _build_available_doctors_fallback_message(self, doctors, missing_doctor_name=None, limit=10):
+        """Build explicit not-found + numbered present-doctors fallback text."""
+        missing_line = self._build_missing_doctor_line(missing_doctor_name)
+        present_doctors = self._build_present_doctors_list_message(doctors, limit=limit)
+        return f"{missing_line}\n{present_doctors}"
+
+    def _send_missing_doctor_two_step_messages(self, sender_id, doctors, missing_doctor_name=None, limit=10):
+        """Send strict 2-step fallback for unknown doctors.
+
+        1) Dr. <name> is not there in our database.
+        2) Present doctors:\n1. Dr. <name> (<specialization>) ...
+        """
+        missing_line = self._build_missing_doctor_line(missing_doctor_name)
+        present_doctors = self._build_present_doctors_list_message(doctors, limit=limit)
+        self.notifier.send_whatsapp_text(sender_id, missing_line)
+        self.notifier.send_whatsapp_text(sender_id, present_doctors)
+        return missing_line, present_doctors
 
 
     def _tool_execution_callback(self, sender_id, tool_name, tool_args, session_data):
-        """Executes actual backend functions when LLM calls a tool."""
+        """Executes actual backend functions when LLM calls a tool.
+        Uses booking_utils for date validation (reject past/today),
+        smart time resolution (auto-resolve AM/PM via doctor schedule),
+        and slot-based end_time from doctor's actual schedule.
+        """
+        today = datetime.now().date()
         try:
             if tool_name == "list_available_doctors":
-                date_str = tool_args.get("date")
+                date_input = tool_args.get("date")
                 specialization = tool_args.get("specialization")
 
-                # Resolve natural date
-                if date_str:
-                    resolved = self._parse_natural_date(date_str)
-                    if resolved:
-                        date_str = resolved
+                # Resolve and validate date
+                date_str = None
+                if date_input:
+                    resolved, date_err = resolve_date(date_input, today)
+                    if date_err:
+                        return date_err
+                    date_str = resolved
+                    if not date_str:
+                        # Try old parser as fallback
+                        date_str = self._parse_natural_date(date_input)
 
                 doctors = self.appt_service.get_active_doctors(specialization=specialization)
                 if not doctors:
+                    if specialization:
+                        return f"No doctors found for specialization '{specialization}'."
                     return "No active doctors found."
 
                 if date_str:
@@ -403,141 +953,207 @@ class WhatsAppService:
                     if not available_doctors:
                         return f"No doctors available on {date_str}."
 
-                    # Send visual WhatsApp list
-                    items = []
-                    for doc in available_doctors[:10]:
-                        items.append((
-                            f"doc_pick_{doc['name'].replace(' ', '_')}",
-                            f"👨‍⚕️ {doc['name']}",
-                            f"{doc['specialization']} | {', '.join(doc['shifts'])}"
-                        ))
-                    self.notifier.send_whatsapp_list(
-                        sender_id,
-                        f"🏥 Doctors available on {date_str}:",
-                        items,
-                        title="Available Doctors",
-                        button_text="Choose Doctor"
-                    )
-
                     result = f"On {date_str}, these doctors are available:\n"
                     for doc in available_doctors:
                         result += f"- Dr. {doc['name']} ({doc['specialization']}) — {', '.join(doc['shifts'])}\n"
                     return result
                 else:
-                    # No date — list all
-                    items = []
-                    for doc in doctors[:10]:
-                        items.append((
-                            f"doc_pick_{doc['full_name'].replace(' ', '_')}",
-                            f"👨‍⚕️ {doc['full_name']}",
-                            doc.get('specialization', 'General')
-                        ))
-                    self.notifier.send_whatsapp_list(
-                        sender_id,
-                        "🏥 Our available doctors:",
-                        items,
-                        title="Doctors",
-                        button_text="Choose Doctor"
-                    )
                     result = "Our available doctors:\n"
                     for doc in doctors[:10]:
                         result += f"- Dr. {doc['full_name']} ({doc.get('specialization', 'General')})\n"
                     return result
 
             elif tool_name == "check_availability":
-                doctor_name = tool_args.get("doctor_name")
-                date_str = tool_args.get("date")
-                time_str = tool_args.get("time")
+                doctor_name = tool_args.get("doctor_name", "").strip()
+                date_input = tool_args.get("date", "").strip()
+                time_input = tool_args.get("time")
 
-                # Resolve natural date
-                if date_str:
-                    resolved = self._parse_natural_date(date_str)
-                    if resolved:
-                        date_str = resolved
+                if not doctor_name:
+                    return "I need a doctor name to check availability."
+                if not date_input:
+                    return "I need a date to check availability."
 
-                # Match Doctor
-                doctor_clean = doctor_name.lower().replace('dr.', '').replace('doctor', '').strip()
-                doctors = self.appt_service.get_active_doctors()
-                matched_doctor = next((d for d in doctors if doctor_clean in d['full_name'].lower()), None)
-
-                if not matched_doctor:
-                    return f"Doctor '{doctor_name}' not found."
-
-                doctor_id = matched_doctor['user_id']
-                
-                # Check specifics
+                # Resolve and validate date (reject past/today)
+                date_str, date_err = resolve_date(date_input, today)
+                if date_err:
+                    return date_err
                 if not date_str:
-                    return "You must provide a date to check availability."
-                
-                try:
-                    # Validate date YYYY-MM-DD
-                    dt = datetime.strptime(date_str, "%Y-%m-%d")
-                except ValueError:
-                    # Try resolving natural language via appt_service directly if we had a natural date parser
-                    # But the LLM is instructed to generate YYYY-MM-DD.
-                    return f"Invalid date. Ask the user for a valid Date."
-                
-                # Let's get shifts and slots
+                    date_str = self._parse_natural_date(date_input)
+                if not date_str:
+                    is_valid, err = validate_booking_date(date_input, today)
+                    if not is_valid:
+                        return err or f"Invalid date '{date_input}'."
+                    date_str = date_input
+
+                # Match Doctor — handle multiple matches for disambiguation
+                specialization_hint = tool_args.get("specialization")
+                doctors = self.appt_service.get_active_doctors()
+                matched_doctors = self._match_doctors_with_specialization(
+                    doctor_name,
+                    doctors,
+                    specialization_hint
+                )
+
+                if not matched_doctors:
+                    missing_line, present_doctors = self._send_missing_doctor_two_step_messages(
+                        sender_id,
+                        doctors,
+                        doctor_name
+                    )
+                    if isinstance(session_data, dict):
+                        session_data['_suppress_next_ai_text'] = True
+                    return f"{missing_line}\n{present_doctors}"
+
+                # If multiple doctors match, ask for disambiguation
+                if len(matched_doctors) > 1:
+                    return self._build_doctor_disambiguation_message(doctor_name, matched_doctors)
+
+                matched_doctor = matched_doctors[0]
+                doctor_id = matched_doctor['user_id']
+                doctor_specialization = matched_doctor.get('specialization', 'General')
+
+                # Get shifts and slots
                 shifts = self.appt_service.get_available_shifts(doctor_id, date_str)
                 if not shifts:
-                     return f"Dr. {matched_doctor['full_name']} has no available shifts on {date_str}."
+                    weekly = get_doctor_weekly_schedule(doctor_id, self.appt_service)
+                    return (
+                        f"Dr. {matched_doctor['full_name']} ({doctor_specialization}) is NOT available on {date_str}.\n"
+                        f"Their weekly schedule:\n{weekly}"
+                    )
 
                 all_slots = []
                 for s in shifts:
                     slots = self.appt_service.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
                     if slots:
                         all_slots.extend([slot['start'] for slot in slots])
-                
-                if not all_slots:
-                     return f"All slots are booked for Dr. {matched_doctor['full_name']} on {date_str}."
 
-                if time_str:
-                    if time_str in all_slots:
-                         return f"Yes, {time_str} is available on {date_str} with Dr. {matched_doctor['full_name']}."
+                if not all_slots:
+                    return f"All slots are booked for Dr. {matched_doctor['full_name']} on {date_str}."
+
+                # Smart time resolution if time was provided
+                if time_input:
+                    resolved_time, time_err = resolve_ambiguous_time(
+                        time_input, doctor_id, date_str, self.appt_service
+                    )
+                    if time_err and not resolved_time:
+                        return time_err
+                    check_time = resolved_time or resolve_time(time_input) or time_input
+                    display_check_time = self._format_time_display(check_time)
+
+                    if check_time in all_slots:
+                        return (
+                            f"Yes, {display_check_time} is available on {date_str} with "
+                            f"Dr. {matched_doctor['full_name']} ({doctor_specialization})."
+                        )
                     else:
-                         # Return alternative times
-                         return f"No, {time_str} is NOT available. However, these slots are available: {', '.join(all_slots[:5])}..."
+                        available_display = ', '.join(self._format_time_display(slot_time) for slot_time in all_slots[:8])
+                        return (
+                            f"No, {display_check_time} is NOT available. "
+                            f"Available slots: {available_display}."
+                        )
                 else:
-                     return f"Available slots on {date_str} for Dr. {matched_doctor['full_name']} are: {', '.join(all_slots[:10])}..."
+                    all_slots_display = ', '.join(self._format_time_display(slot_time) for slot_time in all_slots[:10])
+                    return (
+                        f"Available slots on {date_str} for Dr. {matched_doctor['full_name']} "
+                        f"({doctor_specialization}) are: {all_slots_display}."
+                    )
 
             elif tool_name == "book_appointment":
-                patient_name_input = tool_args.get("patient_name")
-                doctor_name = tool_args.get("doctor_name")
-                date_str = tool_args.get("date")
-                time_str = tool_args.get("time")
+                patient_name_input = tool_args.get("patient_name", "").strip()
+                doctor_name = tool_args.get("doctor_name", "").strip()
+                date_input = tool_args.get("date", "").strip()
+                time_input = tool_args.get("time", "").strip()
 
-                # Resolve natural date/time
-                if date_str:
-                    resolved = self._parse_natural_date(date_str)
-                    if resolved:
-                        date_str = resolved
-                if time_str:
-                    time_str = self._parse_natural_time(time_str)
+                if not all([doctor_name, date_input, time_input]):
+                    return "I need doctor name, date, and time to book."
 
-                # Match Doctor
-                doctor_clean = doctor_name.lower().replace('dr.', '').replace('doctor', '').strip()
+                # Resolve and validate date (reject past/today)
+                date_str, date_err = resolve_date(date_input, today)
+                if date_err:
+                    return date_err
+                if not date_str:
+                    date_str = self._parse_natural_date(date_input)
+                if not date_str:
+                    is_valid, err = validate_booking_date(date_input, today)
+                    if not is_valid:
+                        return err or f"Invalid date '{date_input}'."
+                    date_str = date_input
+
+                # Match Doctor — handle multiple matches
+                specialization_hint = tool_args.get("specialization")
                 doctors = self.appt_service.get_active_doctors()
-                matched_doctor = next((d for d in doctors if doctor_clean in d['full_name'].lower()), None)
-                if not matched_doctor:
-                     return f"Error: Cannot book. Doctor '{doctor_name}' not found."
+                matched_doctors = self._match_doctors_with_specialization(
+                    doctor_name,
+                    doctors,
+                    specialization_hint
+                )
+
+                if not matched_doctors:
+                    missing_line, present_doctors = self._send_missing_doctor_two_step_messages(
+                        sender_id,
+                        doctors,
+                        doctor_name
+                    )
+                    if isinstance(session_data, dict):
+                        session_data['_suppress_next_ai_text'] = True
+                    return f"{missing_line}\n{present_doctors}"
+
+                if len(matched_doctors) > 1:
+                    return self._build_doctor_disambiguation_message(doctor_name, matched_doctors)
+
+                matched_doctor = matched_doctors[0]
+                doctor_id = matched_doctor['user_id']
+                doctor_specialization = matched_doctor.get('specialization', 'General')
+
+                # Smart time resolution using doctor's schedule
+                resolved_time, time_err = resolve_ambiguous_time(
+                    time_input, doctor_id, date_str, self.appt_service
+                )
+                if time_err and not resolved_time:
+                    return time_err
+                time_str = resolved_time or resolve_time(time_input) or time_input
+
+                # Look up actual slot to get real end_time from doctor's schedule
+                end_time_str = None
+                shifts = self.appt_service.get_available_shifts(doctor_id, date_str)
+                for s in shifts:
+                    slots = self.appt_service.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
+                    if slots:
+                        matching_slot = next((sl for sl in slots if sl['start'] == time_str), None)
+                        if matching_slot:
+                            end_time_str = matching_slot['end']
+                            break
+
+                if not end_time_str:
+                    # Slot not found — collect all available slots and report them
+                    all_available = []
+                    for s in shifts:
+                        slots = self.appt_service.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
+                        if slots:
+                            all_available.extend([sl['start'] for sl in slots])
+                    slots_str = (
+                        ', '.join(self._format_time_display(slot_time) for slot_time in all_available[:10])
+                        if all_available else 'No slots available'
+                    )
+                    return (
+                        f"The slot at {self._format_time_display(time_str)} is NOT available with Dr. {matched_doctor['full_name']} ({doctor_specialization}) on {date_str}. "
+                        f"Available slots: {slots_str}. "
+                        f"Please ask the user which slot they want."
+                    )
 
                 # Determine Patient Details
                 clean_phone = sender_id.replace('+', '').replace(' ', '')
                 patient_rec = self.patient_service.get_patient_by_phone(clean_phone)
-                
+
                 if not patient_rec:
                     return "Error: Patient not registered properly."
-                
+
                 patient_id = patient_rec['patient_id']
                 booked_for_name = patient_rec.get('patient_name', 'Unknown')
-                
-                if patient_name_input.lower() not in ['self', '', 'me', booked_for_name.lower()]:
-                    booked_for_name = patient_name_input # Booking for someone else under this phone
-                    
-                # Calculate end time (assume 30 min)
-                dt_time = datetime.strptime(time_str, "%H:%M")
-                end_time_str = (dt_time + timedelta(minutes=30)).strftime("%H:%M")
-                
+
+                if patient_name_input and patient_name_input.lower() not in ['self', '', 'me', booked_for_name.lower()]:
+                    booked_for_name = patient_name_input
+
                 # Book it!
                 success = self.appt_service.book_appointment({
                     'patient_id': patient_id,
@@ -551,16 +1167,20 @@ class WhatsAppService:
                     'created_by_id': sender_id,
                     'notes': f"Booked via AI Assistant for {booked_for_name}"
                 })
-                
+
                 if success:
-                     # Notify doctor via socket so dashboard updates in real-time
-                     _notify_doctor_new_appointment(matched_doctor['user_id'], success)
-                     # Clear memory so next chat is fresh
-                     session_data['messages'] = []
-                     self._transition_to(sender_id, STATE_CHAT, session_data)
-                     return "SUCCESS. The appointment has been booked. Inform the user of the final details."
+                    # Notify doctor via socket so dashboard updates in real-time
+                    _notify_doctor_new_appointment(matched_doctor['user_id'], success)
+                    # Clear memory so next chat is fresh
+                    session_data['messages'] = []
+                    self._transition_to(sender_id, STATE_CHAT, session_data)
+                    return (
+                        f"SUCCESS. Booked for patient {booked_for_name} with Dr. {matched_doctor['full_name']} "
+                        f"({doctor_specialization}) on {date_str} at {self._format_time_display(time_str)}-{self._format_time_display(end_time_str)}. "
+                        f"Inform the user with all confirmation details."
+                    )
                 else:
-                     return "FAILED to book appointment. There was a system error or slot conflict. Ask user to try another time."
+                    return "FAILED to book appointment. System error or slot conflict. Ask user to try another time."
 
             else:
                 return f"Error: Tool '{tool_name}' is not recognized."
@@ -640,8 +1260,21 @@ class WhatsAppService:
         elif action in ['voice_booking', 'voice', 'call']:
             self._start_voice_flow(sender_id)
         else:
-            self.notifier.send_whatsapp_text(sender_id, "Please select an option from the menu.")
-            self._send_main_menu(sender_id)
+            # Route freeform text / non-English to AI chat for intelligent handling
+            detected_lang = detect_language(input_text)
+            is_freeform = len(input_text.strip()) > 5 and not action.startswith(('book_', 'check_', 'list_'))
+
+            if detected_lang != 'en' or is_freeform:
+                # Switch to AI chat mode and process the message there
+                logger.info(f"🌐 Routing freeform text to AI chat (lang={detected_lang}): '{input_text[:50]}'")
+                session = self._get_session(sender_id)
+                data = session.get('data', {})
+                data['detected_lang'] = detected_lang
+                self._transition_to(sender_id, STATE_CHAT, data)
+                self._handle_ai_chat(sender_id, input_text, data)
+            else:
+                self.notifier.send_whatsapp_text(sender_id, "Please select an option from the menu.")
+                self._send_main_menu(sender_id)
 
     # ═══════════════════════════════════════════
     #  BOOKING FOR (SELF / OTHER)
@@ -807,7 +1440,9 @@ class WhatsAppService:
                 doctor_id = matched['user_id']
 
         if not doctor_id:
-            self.notifier.send_whatsapp_text(sender_id, "Invalid selection. Please pick a doctor from the list.")
+            requested_name = str(selection_id or '').strip()
+            all_doctors = self.appt_service.get_active_doctors()
+            self._send_missing_doctor_two_step_messages(sender_id, all_doctors, requested_name)
             # Re-send the doctor list so the user can try again
             service_id = (data or {}).get('service_id')
             if service_id:
@@ -819,12 +1454,14 @@ class WhatsAppService:
         doctor = self.appt_service.get_doctor_by_id(doctor_id)
 
         if not doctor:
-            self.notifier.send_whatsapp_text(sender_id, "Doctor not found.")
+            all_doctors = self.appt_service.get_active_doctors()
+            self._send_missing_doctor_two_step_messages(sender_id, all_doctors)
             return
 
         self._transition_to(sender_id, STATE_SELECT_DATE, {
             'doctor_id': doctor_id,
-            'doctor_name': doctor['full_name']
+            'doctor_name': doctor['full_name'],
+            'doctor_specialization': doctor.get('specialization', 'General')
         })
         self._send_available_dates(sender_id, doctor_id, doctor['full_name'])
 
@@ -862,100 +1499,21 @@ class WhatsAppService:
         )
 
     def _parse_natural_date(self, text):
-        """
-        Resolve natural language date text to YYYY-MM-DD without requiring a doctor.
-        Handles: today, tomorrow, day after tomorrow, weekday names, 'feb 21', YYYY-MM-DD pass-through.
-        """
-        import re as _re
-        text_lower = text.lower().strip()
-        today = datetime.now()
-
-        # Already in YYYY-MM-DD format
-        try:
-            datetime.strptime(text_lower, '%Y-%m-%d')
-            return text_lower
-        except ValueError:
-            pass
-
-        # Relative
-        if text_lower in ['today', 'aaj', 'آج']:
-            return today.strftime('%Y-%m-%d')
-        if text_lower in ['tomorrow', 'kal', 'کل', 'demain']:
-            return (today + timedelta(days=1)).strftime('%Y-%m-%d')
-        if text_lower in ['day after tomorrow', 'परसों', 'parson']:
-            return (today + timedelta(days=2)).strftime('%Y-%m-%d')
-
-        # "in N days"
-        m = _re.search(r'in\s+(\d+)\s+days?', text_lower)
-        if m:
-            return (today + timedelta(days=int(m.group(1)))).strftime('%Y-%m-%d')
-
-        # Day names → next occurrence
-        day_names = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-        for i, day_name in enumerate(day_names):
-            if day_name in text_lower:
-                days_ahead = (i - today.weekday()) % 7
-                if days_ahead == 0:
-                    days_ahead = 7  # Next week same day
-                return (today + timedelta(days=days_ahead)).strftime('%Y-%m-%d')
-
-        # Month + day: "feb 21", "21 feb", "february 21"
-        month_map = {
-            'jan': 1, 'january': 1, 'feb': 2, 'february': 2, 'mar': 3, 'march': 3,
-            'apr': 4, 'april': 4, 'may': 5, 'jun': 6, 'june': 6, 'jul': 7, 'july': 7,
-            'aug': 8, 'august': 8, 'sep': 9, 'september': 9, 'oct': 10, 'october': 10,
-            'nov': 11, 'november': 11, 'dec': 12, 'december': 12
-        }
-        for month_name, month_num in month_map.items():
-            if month_name in text_lower:
-                day_match = _re.search(r'(\d{1,2})', text_lower)
-                if day_match:
-                    day = int(day_match.group(1))
-                    year = today.year
-                    try:
-                        candidate = datetime(year, month_num, day)
-                        if candidate.date() < today.date():
-                            candidate = datetime(year + 1, month_num, day)
-                        return candidate.strftime('%Y-%m-%d')
-                    except ValueError:
-                        pass
-                break
-
-        return None  # Could not resolve
+        """Resolve natural language date to YYYY-MM-DD. Delegates to booking_utils."""
+        today = datetime.now().date()
+        date_str, _ = resolve_date(text, today)
+        return date_str
 
     def _parse_natural_time(self, text):
-        """
-        Resolve natural language time to HH:MM (24h) format.
-        Handles: '9am', '9:30am', '14:00', '2pm', '9 AM', etc.
-        """
-        import re as _re
-        text_clean = text.strip().lower().replace(' ', '')
+        """Resolve natural language time to HH:MM. Delegates to booking_utils."""
+        result = resolve_time(text)
+        return result if result else text  # Return as-is if can't parse
 
-        # Already HH:MM
-        m = _re.match(r'^(\d{1,2}):(\d{2})$', text_clean)
-        if m:
-            h, mn = int(m.group(1)), int(m.group(2))
-            return f"{h:02d}:{mn:02d}"
-
-        # 12h format: 9am, 9:30am, 2pm, 2:30pm
-        m = _re.match(r'^(\d{1,2})(?::(\d{2}))?([ap]m)$', text_clean)
-        if m:
-            h = int(m.group(1))
-            mn = int(m.group(2)) if m.group(2) else 0
-            period = m.group(3)
-            if period == 'pm' and h != 12:
-                h += 12
-            if period == 'am' and h == 12:
-                h = 0
-            return f"{h:02d}:{mn:02d}"
-
-        # Just a number
-        m = _re.match(r'^(\d{1,2})$', text_clean)
-        if m:
-            h = int(m.group(1))
-            return f"{h:02d}:00"
-
-        return text  # Return as-is if can't parse
+    def _format_time_display(self, time_str):
+        """Format time for WhatsApp user-facing text (24h -> 12h AM/PM)."""
+        if not time_str:
+            return ''
+        return self.appt_service.format_time_ampm(str(time_str))
 
     def _resolve_natural_date(self, text, doctor_id):
         """Resolve natural language date text to YYYY-MM-DD by matching available dates."""
@@ -1073,7 +1631,7 @@ class WhatsAppService:
                 items.append((
                     f"shift_{s['start']}_{s['end']}",
                     f"{s['shift_name']}",
-                    f"{s['start']}–{s['end']} ({s['free_slots']} slots)"
+                    f"{self._format_time_display(s['start'])}–{self._format_time_display(s['end'])} ({s['free_slots']} slots)"
                 ))
             self.notifier.send_whatsapp_list(
                 sender_id,
@@ -1153,7 +1711,9 @@ class WhatsAppService:
             f"Dr. {data.get('doctor_name', '?')} | {data['date']}\n",
         ]
         for i, slot in enumerate(slots, 1):
-            msg_lines.append(f"  {i}. {slot['start']} – {slot['end']}")
+            msg_lines.append(
+                f"  {i}. {self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
+            )
         msg_lines.append("\nReply with a *number* or *time* (e.g. '9 AM').")
         self.notifier.send_whatsapp_text(sender_id, '\n'.join(msg_lines))
 
@@ -1162,8 +1722,8 @@ class WhatsAppService:
         for slot in slots[:10]:
             items.append((
                 f"time_{slot['start']}",
-                f"🕐 {slot['start']}",
-                f"{slot['start']} – {slot['end']}"
+                f"🕐 {self._format_time_display(slot['start'])}",
+                f"{self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
             ))
 
         list_header = (
@@ -1295,9 +1855,10 @@ class WhatsAppService:
             f"👤 Patient: {patient_name}\n"
             f"🏥 Service: {data.get('service_name', '—')}\n"
             f"👨‍⚕️ Doctor: Dr. {data.get('doctor_name', '—')}\n"
+            f"🏥 Specialization: {data.get('doctor_specialization', 'General')}\n"
             f"📅 Date: {data['date']}\n"
             f"🕐 Shift: {data.get('shift', '—')}\n"
-            f"⏰ Time: {time_str} – {end_time}\n\n"
+            f"⏰ Time: {self._format_time_display(time_str)} – {self._format_time_display(end_time)}\n\n"
             f"_Please arrive 10 minutes early._"
         )
         self.notifier.send_whatsapp_buttons(sender_id, summary, ["✅ Confirm", "❌ Cancel"], ["confirm_yes", "confirm_no"])
@@ -1363,9 +1924,10 @@ class WhatsAppService:
                 f"👤 Patient: {patient_name}\n"
                 f"🏥 Service: {data.get('service_name', '—')}\n"
                 f"👨‍⚕️ Doctor: Dr. {data.get('doctor_name', '—')}\n"
+                f"🏥 Specialization: {data.get('doctor_specialization', 'General')}\n"
                 f"📅 Date: {data['date']}\n"
                 f"🕐 Shift: {data.get('shift', '—')}\n"
-                f"⏰ Time: {data['time']} – {data.get('end_time', '')}\n\n"
+                f"⏰ Time: {self._format_time_display(data['time'])} – {self._format_time_display(data.get('end_time', ''))}\n\n"
                 f"⏳ Status: Pending Doctor Approval\n"
                 f"_You will receive a notification once confirmed._"
             )
@@ -1403,7 +1965,7 @@ class WhatsAppService:
                 icon = {"pending_doctor_approval": "⏳", "confirmed": "✅", "rejected": "❌"}.get(a['status'], "❓")
                 doc_name = a.get('doctor_name', '?')
                 msg += (
-                    f"{icon} *{a['date']}* at {a['start_time']}\n"
+                    f"{icon} *{a['date']}* at {self._format_time_display(a['start_time'])}\n"
                     f"   Dr. {doc_name} | {a.get('service_name', '')}\n"
                     f"   Status: {a['status']}\n"
                     f"   ID: {a['appointment_id']}\n\n"
@@ -1690,6 +2252,7 @@ class WhatsAppService:
             ("lang_hi", "हिन्दी (Hindi)", "Speak in Hindi"),
             ("lang_ur", "اردو (Urdu)", "Speak in Urdu"),
             ("lang_kn", "ಕನ್ನಡ (Kannada)", "Speak in Kannada"),
+            ("lang_ta", "தமிழ் (Tamil)", "Speak in Tamil"),
             ("lang_en", "English", "Speak in English"),
         ]
 
@@ -1702,7 +2265,8 @@ class WhatsAppService:
             "2️⃣ हिन्दी (Hindi)\n"
             "3️⃣ اردو (Urdu)\n"
             "4️⃣ ಕನ್ನಡ (Kannada)\n"
-            "5️⃣ English\n\n"
+            "5️⃣ தமிழ் (Tamil)\n"
+            "6️⃣ English\n\n"
             "_You can also type the language name or number._",
             lang_items,
             title="Languages",
@@ -1710,9 +2274,9 @@ class WhatsAppService:
         )
 
         # Also send a TTS audio of the language selection prompt (in English)
-        if self.sarvam and self.sarvam.is_available() and getattr(self, 'local_voice', None):
+        if self.sarvam and self.sarvam.is_available():
             tts_text = self.sarvam.get_language_selection_tts()
-            audio_path = self.local_voice.text_to_speech(tts_text, 'en')
+            audio_path = self.sarvam.text_to_speech(tts_text, 'en')
             if audio_path:
                 self._send_whatsapp_audio(sender_id, audio_path)
 
@@ -1757,16 +2321,17 @@ class WhatsAppService:
         self.notifier.send_whatsapp_text(sender_id, confirm_msg)
 
         # Send TTS greeting in chosen language
-        if self.sarvam and self.sarvam.is_available() and getattr(self, 'local_voice', None):
+        if self.sarvam and self.sarvam.is_available():
             greetings = {
                 'te': "నమస్కారం! హాస్పిటల్ అపాయింట్మెంట్ బుకింగ్ సర్వీస్‌కి స్వాగతం. మీకు ఎలా సహాయం చేయగలను?",
                 'hi': "नमस्ते! हॉस्पिटल अपॉइंटमेंट बुकिंग सर्विस में आपका स्वागत है। मैं आपकी कैसे मदद कर सकता हूं?",
                 'ur': "السلام علیکم! ہسپتال اپائنٹمنٹ بکنگ سروس میں خوش آمدید۔ میں آپ کی کیسے مدد کر سکتا ہوں؟",
                 'kn': "ನಮಸ್ಕಾರ! ಆಸ್ಪತ್ರೆ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕಿಂಗ್ ಸೇವೆಗೆ ಸ್ವಾಗತ. ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
+                'ta': "வணக்கம்! மருத்துவமனை அப்பாயிண்ட்மென்ட் புக்கிங் சேவைக்கு வரவேற்கிறேன். நான் உங்களுக்கு எப்படி உதவி செய்யலாம்?",
                 'en': "Welcome to the hospital appointment booking service. How can I help you today?",
             }
             greeting = greetings.get(lang_code, greetings['en'])
-            audio_path = self.local_voice.text_to_speech(greeting, lang_code)
+            audio_path = self.sarvam.text_to_speech(greeting, lang_code)
             if audio_path:
                 self._send_whatsapp_audio(sender_id, audio_path)
 
@@ -1788,7 +2353,14 @@ class WhatsAppService:
         lang_code = data.get('language', 'en')
 
         try:
-            self.notifier.send_whatsapp_text(sender_id, "🎤 Processing your voice message...")
+            _status_msgs = {
+                'te': '🎤 మీ వాయిస్ మెసేజ్ ప్రాసెస్ చేస్తున్నాము...',
+                'hi': '🎤 आपका वॉइस मैसेज प्रोसेस हो रहा है...',
+                'ta': '🎤 உங்கள் குரல் செய்தியை செயலாக்குகிறோம்...',
+                'kn': '🎤 ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶವನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ...',
+                'ur': '🎤 آپ کا وائس پیغام پروسیس ہو رہا ہے...'
+            }
+            self.notifier.send_whatsapp_text(sender_id, _status_msgs.get(lang_code, "🎤 Processing your voice message..."))
 
             # 1. Download audio from WhatsApp
             audio_path = self._download_media(media_id)
@@ -1796,42 +2368,313 @@ class WhatsAppService:
                 self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not download audio. Please try again.")
                 return
 
-            # 2. If no language selected yet, ask for language first
+            # 2. If no language selected yet, auto-detect from this voice note
             if current_state not in [STATE_VOICE_CHAT, STATE_LANG_SELECT] and current_state not in [STATE_REGISTER_NAME, STATE_REGISTER_EMAIL]:
-                # User sent voice without starting voice flow — start it with language selection
-                self._start_voice_flow(sender_id)
-                # Also try to transcribe to see if they said a language name
-                stt_result = self.local_voice.speech_to_text(audio_path, 'en') if self.local_voice else None
-                if stt_result:
-                    transcript = stt_result.get('transcript', '')
-                    if transcript:
-                        resolved_lang = self.sarvam.resolve_language_from_input(transcript)
-                        if resolved_lang:
-                            self._handle_language_selection(sender_id, f"lang_{resolved_lang}")
-                try:
-                    os.remove(audio_path)
-                except Exception:
-                    pass
-                return
+                logger.info(f"🎤 AUTO-DETECT: First voice note from {sender_id}, auto-detecting language...")
 
-            # 3. Handle language selection state via voice
-            if current_state == STATE_LANG_SELECT:
-                stt_result = self.local_voice.speech_to_text(audio_path, 'en') if self.local_voice else None
+                # PRIORITY: Use Sarvam STT for Indian language detection
+                # Local Whisper "tiny" is unreliable for Indian languages and often outputs garbage
+                stt_result = None
+                temp_transcript = ""
+
+                # Strategy: Try Sarvam with common Indian languages in order of likelihood
+                # Hindi is most common, then try others
+                if self.sarvam and self.sarvam.is_available():
+                    LANG_PRIORITY = ['hi', 'kn', 'te', 'ta', 'ur', 'en']
+                    best_result = None
+                    best_lang = 'en'
+
+                    for try_lang in LANG_PRIORITY:
+                        try:
+                            temp_stt = self.sarvam.speech_to_text(audio_path, try_lang)
+                            if temp_stt and temp_stt.get('transcript'):
+                                transcript_text = temp_stt['transcript'].strip()
+                                logger.info(f"🎤 AUTO-DETECT trying {try_lang}: '{transcript_text[:60]}'")
+
+                                # Check if this looks like valid content (not garbage)
+                                if transcript_text and len(transcript_text) > 2:
+                                    # For non-English, check if it contains native script
+                                    if try_lang != 'en':
+                                        has_native_script = any(ord(c) > 127 for c in transcript_text)
+                                        if has_native_script:
+                                            # Found native script - this is likely the correct language
+                                            best_result = temp_stt
+                                            best_lang = try_lang
+                                            logger.info(f"✅ AUTO-DETECT found native script for {try_lang}")
+                                            break
+                                        else:
+                                            # Romanized text - check with language patterns
+                                            detected = detect_language(transcript_text)
+                                            if detected == try_lang:
+                                                best_result = temp_stt
+                                                best_lang = try_lang
+                                                logger.info(f"✅ AUTO-DETECT matched Romanized {try_lang}")
+                                                break
+                                            elif not best_result:
+                                                # Keep as fallback
+                                                best_result = temp_stt
+                                                best_lang = try_lang
+                                    else:
+                                        # English - use as final fallback
+                                        if not best_result:
+                                            best_result = temp_stt
+                                            best_lang = 'en'
+                        except Exception as e:
+                            logger.warning(f"Sarvam STT {try_lang} failed: {e}")
+                            continue
+
+                    if best_result:
+                        stt_result = best_result
+                        lang_code = best_lang
+                        logger.info(f"🎤 AUTO-DETECT selected {lang_code}: '{stt_result['transcript'][:60]}'")
+
+                # If Sarvam failed completely, try local Whisper as last resort
+                if not stt_result and self.local_voice and self.local_voice.stt_available:
+                    logger.warning("⚠️ Sarvam STT failed for all languages, trying local Whisper...")
+                    try:
+                        whisper_result = self.local_voice.speech_to_text(audio_path, 'hi')
+                        if whisper_result and whisper_result.get('transcript'):
+                            stt_result = whisper_result
+                            detected_lang = whisper_result.get('language_code', 'hi')
+                            lang_code = detected_lang if detected_lang in SARVAM_SUPPORTED_LANGUAGES else 'hi'
+                            logger.info(f"🎤 LOCAL Whisper fallback: {lang_code} - '{stt_result['transcript'][:60]}'")
+                    except Exception as e:
+                        logger.error(f"Local Whisper fallback failed: {e}")
+
                 try:
                     os.remove(audio_path)
                 except Exception:
                     pass
-                if stt_result:
-                    transcript = stt_result.get('transcript', '')
-                    if transcript:
-                        self.notifier.send_whatsapp_text(sender_id, f"📝 I heard: \"{transcript}\"")
-                        self._handle_language_selection(sender_id, transcript)
+
+                if stt_result and stt_result.get('transcript'):
+                    transcript = stt_result['transcript']
+
+                    # VALIDATE: Check for unsupported language scripts (Chinese, Japanese, Korean, etc.)
+                    is_valid, issue = is_transcript_valid(transcript)
+                    if not is_valid:
+                        logger.warning(f"⚠️ INVALID TRANSCRIPT: {issue} - '{transcript[:60]}'")
+                        # Send "language not detected" message in multiple supported languages
+                        self.notifier.send_whatsapp_text(
+                            sender_id,
+                            "⚠️ *Language not detected / भाषा पहचान नहीं हुई*\n\n"
+                            "I only understand these languages:\n"
+                            "• Telugu (తెలుగు)\n"
+                            "• Hindi (हिंदी)\n"
+                            "• English\n"
+                            "• Tamil (தமிழ்)\n"
+                            "• Kannada (ಕನ್ನಡ)\n"
+                            "• Urdu (اردو)\n\n"
+                            "Please speak clearly in one of these languages.\n"
+                            "कृपया इन भाषाओं में से किसी एक में स्पष्ट बोलें।"
+                        )
+                        try:
+                            os.remove(audio_path)
+                        except Exception:
+                            pass
                         return
-                self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not understand. Please try again or select from the list.")
+
+                    # Also validate that language code is in our trained set
+                    if lang_code not in TRAINED_LANGUAGES:
+                        logger.warning(f"⚠️ Language {lang_code} not in trained set, defaulting to 'hi'")
+                        lang_code = 'hi'
+
+                    logger.info(f"🌐 AUTO-DETECT language result: {lang_code} ({get_language_name(lang_code)}) for '{transcript[:60]}'")
+
+                    # Set language and transition directly to voice chat — skip language selection
+                    self._transition_to(sender_id, STATE_VOICE_CHAT, {
+                        'language': lang_code,
+                        'messages': []
+                    })
+                    _activation_msgs = {
+                        'te': f"🎤 వాయిస్ బుకింగ్ యాక్టివేట్ అయింది! భాష: *{get_language_name(lang_code)}*",
+                        'hi': f"🎤 वॉइस बुकिंग एक्टिवेट! भाषा: *{get_language_name(lang_code)}*",
+                        'ta': f"🎤 குரல் முன்பதிவு செயல்படுத்தப்பட்டது! மொழி: *{get_language_name(lang_code)}*",
+                        'kn': f"🎤 ಧ್ವನಿ ಬುಕಿಂಗ್ ಸಕ್ರಿಯಗೊಂಡಿದೆ! ಭಾಷೆ: *{get_language_name(lang_code)}*",
+                        'ur': f"🎤 وائس بکنگ ایکٹیویٹ! زبان: *{get_language_name(lang_code)}*"
+                    }
+                    self.notifier.send_whatsapp_text(
+                        sender_id,
+                        _activation_msgs.get(lang_code, f"🎤 Voice booking activated! Language: *{get_language_name(lang_code)}*")
+                    )
+                    _heard_prefix = {'te': '📝 నేను విన్నది', 'hi': '📝 मैंने सुना', 'ta': '📝 நான் கேட்டது', 'kn': '📝 ನಾನು ಕೇಳಿದ್ದು', 'ur': '📝 میں نے سنا'}
+                    self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, '📝 I heard')}: \"{transcript}\"")
+
+                    # Process this transcript immediately (don't waste the first message)
+                    session = self._get_session(sender_id)
+                    data = session.get('data', {})
+
+                    # Try booking engine first (only if NOT already in voice chat)
+                    try:
+                        if current_state != STATE_VOICE_CHAT and self._booking_engine.try_handle(sender_id, transcript, session):
+                            logger.info(f"📋 SmartBookingEngine handled auto-detected voice from {sender_id}")
+                            return
+                    except Exception as e:
+                        logger.error(f"SmartBookingEngine auto-detect error: {e}", exc_info=True)
+
+                    # Fallback to AI conversation
+                    self._process_sarvam_conversation(sender_id, transcript, data, lang_code)
+                else:
+                    # Could not transcribe with ANY method - default to Hindi and ask user to try again
+                    logger.warning(f"⚠️ AUTO-DETECT: All STT methods failed, defaulting to Hindi voice mode")
+                    self._transition_to(sender_id, STATE_VOICE_CHAT, {
+                        'language': 'hi',
+                        'messages': []
+                    })
+                    self.notifier.send_whatsapp_text(
+                        sender_id,
+                        "🎤 *वॉइस बुकिंग एक्टिवेट!*\n\n"
+                        "⚠️ आपकी आवाज़ साफ़ नहीं सुनाई दी। कृपया धीरे और साफ़ बोलें।\n\n"
+                        "_Voice booking activated! Could not understand clearly. Please speak slowly and clearly._"
+                    )
                 return
 
-            # 4. Transcribe using local STT in the selected language
-            stt_result = self.local_voice.speech_to_text(audio_path, lang_code) if self.local_voice else None
+            # 3. Handle language selection state via voice - auto-detect instead of requiring language name
+            if current_state == STATE_LANG_SELECT:
+                logger.info(f"🎤 User in LANG_SELECT sent voice - auto-detecting language instead...")
+                # Auto-detect language from voice content
+                stt_result = None
+                best_lang = 'hi'
+
+                if self.sarvam and self.sarvam.is_available():
+                    LANG_PRIORITY = ['hi', 'kn', 'te', 'ta', 'ur', 'en']
+                    for try_lang in LANG_PRIORITY:
+                        try:
+                            temp_stt = self.sarvam.speech_to_text(audio_path, try_lang)
+                            if temp_stt and temp_stt.get('transcript', '').strip():
+                                transcript_text = temp_stt['transcript'].strip()
+                                if len(transcript_text) > 2:
+                                    # Check for native script
+                                    has_native = any(ord(c) > 127 for c in transcript_text)
+                                    if has_native or try_lang == 'en':
+                                        stt_result = temp_stt
+                                        best_lang = try_lang
+                                        break
+                                    elif not stt_result:
+                                        stt_result = temp_stt
+                                        best_lang = try_lang
+                        except Exception as e:
+                            logger.warning(f"Sarvam STT {try_lang} in lang_select failed: {e}")
+                            continue
+
+                # Fallback to local Whisper
+                if not stt_result and self.local_voice:
+                    try:
+                        stt_result = self.local_voice.speech_to_text(audio_path, 'hi')
+                        if stt_result:
+                            best_lang = stt_result.get('language_code', 'hi')
+                            if best_lang not in SARVAM_SUPPORTED_LANGUAGES:
+                                best_lang = 'hi'
+                    except Exception:
+                        pass
+
+                try:
+                    os.remove(audio_path)
+                except Exception:
+                    pass
+
+                if stt_result and stt_result.get('transcript', '').strip():
+                    transcript = stt_result['transcript']
+                    # Transition to voice chat with detected language
+                    self._transition_to(sender_id, STATE_VOICE_CHAT, {
+                        'language': best_lang,
+                        'messages': []
+                    })
+                    _heard_prefix = {'te': '📝 నేను విన్నది', 'hi': '📝 मैंने सुना', 'ta': '📝 நான் கேட்டது', 'kn': '📝 ನಾನು ಕೇಳಿದ್ದು', 'ur': '📝 میں نے سنا'}
+                    self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(best_lang, '📝 I heard')}: \"{transcript}\"")
+
+                    # Process the transcript
+                    session = self._get_session(sender_id)
+                    data = session.get('data', {})
+                    try:
+                        if self._booking_engine.try_handle(sender_id, transcript, session):
+                            return
+                    except Exception as e:
+                        logger.error(f"SmartBookingEngine error in lang_select voice: {e}")
+                    self._process_sarvam_conversation(sender_id, transcript, data, best_lang)
+                else:
+                    # Default to Hindi
+                    self._transition_to(sender_id, STATE_VOICE_CHAT, {'language': 'hi', 'messages': []})
+                    self.notifier.send_whatsapp_text(
+                        sender_id,
+                        "🎤 वॉइस बुकिंग एक्टिवेट!\n⚠️ कृपया साफ़ बोलें। _Please speak clearly._"
+                    )
+                return
+
+            # 4. Transcribe purely using the established lang_code (do not overwrite with 'en' translation)
+            # PRIORITY: Use Sarvam STT - local Whisper is unreliable for Indian languages
+            stt_result = None
+            detected_lang = lang_code  # keep session language
+
+            if self.sarvam and self.sarvam.is_available():
+                try:
+                    if lang_code == 'en':
+                        # Language is "English" but user might speak Indian language
+                        # Try Sarvam with common Indian languages first
+                        LANG_PRIORITY = ['hi', 'kn', 'te', 'ta', 'ur', 'en']
+                        best_result = None
+                        best_lang = 'en'
+
+                        for try_lang in LANG_PRIORITY:
+                            try:
+                                temp_stt = self.sarvam.speech_to_text(audio_path, try_lang)
+                                if temp_stt and temp_stt.get('transcript'):
+                                    transcript_text = temp_stt['transcript'].strip()
+                                    if transcript_text and len(transcript_text) > 2:
+                                        if try_lang != 'en':
+                                            has_native_script = any(ord(c) > 127 for c in transcript_text)
+                                            if has_native_script:
+                                                best_result = temp_stt
+                                                best_lang = try_lang
+                                                logger.info(f"✅ Re-detect found native script for {try_lang}")
+                                                break
+                                            else:
+                                                detected = detect_language(transcript_text)
+                                                if detected == try_lang:
+                                                    best_result = temp_stt
+                                                    best_lang = try_lang
+                                                    break
+                                                elif not best_result:
+                                                    best_result = temp_stt
+                                                    best_lang = try_lang
+                                        else:
+                                            if not best_result:
+                                                best_result = temp_stt
+                                                best_lang = 'en'
+                            except Exception as e:
+                                logger.warning(f"Sarvam STT {try_lang} re-detect failed: {e}")
+                                continue
+
+                        if best_result:
+                            stt_result = best_result
+                            detected_lang = best_lang
+                            lang_code = best_lang
+                            logger.info(f"🎤 Re-detect selected {lang_code}: '{stt_result['transcript'][:60]}'")
+                    else:
+                        # Transcribe directly in the known native language
+                        stt_result = self.sarvam.speech_to_text(audio_path, lang_code)
+                        if stt_result and stt_result.get('transcript'):
+                            logger.info(f"🎤 Sarvam native STT [{lang_code}]: '{stt_result['transcript']}'")
+                        else:
+                            stt_result = None
+                except Exception as e:
+                    logger.warning(f"Sarvam STT failed: {e}")
+                    stt_result = None
+
+            # Only use local Whisper as last resort if Sarvam completely failed
+            if not stt_result and self.local_voice:
+                logger.warning("⚠️ Sarvam STT failed, trying local Whisper as last resort")
+                stt_result = self.local_voice.speech_to_text(audio_path, lang_code)
+                if stt_result and stt_result.get('transcript'):
+                    logger.info(f"🎤 Local STT last-resort fallback: '{stt_result['transcript'][:60]}'")
+
+            # Update session language if it changed
+            if detected_lang != lang_code:
+                lang_code = detected_lang
+                self.db.whatsapp_sessions.update_one(
+                    {'sender_id': sender_id},
+                    {'$set': {'data.language': detected_lang}}
+                )
+                logger.info(f"🌐 Updated session language to {detected_lang} ({get_language_name(detected_lang)}) for {sender_id}")
 
             # Clean up audio file
             try:
@@ -1840,17 +2683,44 @@ class WhatsAppService:
                 pass
 
             if not stt_result or not stt_result.get('transcript'):
+                _cant_understand = {
+                    'te': '⚠️ మీ వాయిస్ మెసేజ్ అర్థం కాలేదు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
+                    'hi': '⚠️ आपका वॉइस मैसेज समझ नहीं आया। कृपया फिर से कोशिश करें।',
+                    'ta': '⚠️ உங்கள் குரல் செய்தி புரியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+                    'kn': '⚠️ ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶ ಅರ್ಥವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+                    'ur': '⚠️ آپ کا وائس پیغام سمجھ نہیں آیا۔ دوبارہ کوشش کریں۔'
+                }
                 self.notifier.send_whatsapp_text(
                     sender_id,
-                    "⚠️ Could not understand your voice message. Please try again or type your request."
+                    _cant_understand.get(lang_code, "⚠️ Could not understand your voice message. Please try again or type your request.")
                 )
                 return
 
             transcript = stt_result['transcript']
             logger.info(f"🎤 Sarvam STT [{lang_code}]: '{transcript}'")
 
-            # 4b. Quality check — reject garbage transcriptions
-            if self._is_garbage_transcript(transcript):
+            # 4b. VALIDATE: Reject transcripts with unsupported language scripts
+            is_valid, issue = is_transcript_valid(transcript)
+            if not is_valid:
+                logger.warning(f"⚠️ INVALID TRANSCRIPT in VOICE_CHAT: {issue} - '{transcript[:60]}'")
+                _lang_not_detected = {
+                    'te': '⚠️ భాష గుర్తించబడలేదు. దయచేసి తెలుగు, హిందీ, ఇంగ్లీష్, తమిళం, కన్నడ లేదా ఉర్దూలో మాట్లాడండి.',
+                    'hi': '⚠️ भाषा पहचान नहीं हुई। कृपया हिंदी, अंग्रेजी, तेलुगु, तमिल, कन्नड़ या उर्दू में बोलें।',
+                    'ta': '⚠️ மொழி கண்டறியப்படவில்லை. தயவுசெய்து தமிழ், இந்தி, ஆங்கிலம், தெலுங்கு, கன்னடம் அல்லது உருது பேசுங்கள்.',
+                    'kn': '⚠️ ಭಾಷೆ ಪತ್ತೆಯಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಕನ್ನಡ, ಹಿಂದಿ, ಇಂಗ್ಲಿಷ್, ತೆಲುಗು, ತಮಿಳು ಅಥವಾ ಉರ್ದುವಿನಲ್ಲಿ ಮಾತನಾಡಿ.',
+                    'ur': '⚠️ زبان پہچان نہیں ہوئی۔ براہ کرم ہندی، انگریزی، تیلگو، تامل، کنڑ یا اردو میں بولیں۔'
+                }
+                self.notifier.send_whatsapp_text(
+                    sender_id,
+                    _lang_not_detected.get(lang_code, "⚠️ Language not detected. Please speak in Telugu, Hindi, English, Tamil, Kannada, or Urdu.")
+                )
+                return
+
+            # 4c. Quality check — reject garbage transcriptions
+            # Skip this check during active voice conversations where the AI
+            # may be expecting short answers (e.g., a patient name, yes/no)
+            has_active_conversation = len(data.get('messages', [])) > 0
+            if not has_active_conversation and self._is_garbage_transcript(transcript):
                 logger.warning(f"🗑️ Rejected garbage transcription: '{transcript}'")
                 self.notifier.send_whatsapp_text(
                     sender_id,
@@ -1858,8 +2728,9 @@ class WhatsAppService:
                 )
                 return
 
-            # Echo transcription
-            self.notifier.send_whatsapp_text(sender_id, f"📝 I heard: \"{transcript}\"")
+            # Echo transcription in user's language
+            _heard_prefix = {'te': '📝 నేను విన్నది', 'hi': '📝 मैंने सुना', 'ta': '📝 நான் கேட்டது', 'kn': '📝 ನಾನು ಕೇಳಿದ್ದು', 'ur': '📝 میں نے سنا'}
+            self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, '📝 I heard')}: \"{transcript}\"")
 
             # 5. Check for global commands
             text_lower = transcript.lower().strip()
@@ -1878,8 +2749,11 @@ class WhatsAppService:
                 return
 
             # 6. Try SmartBookingEngine first for booking/query intents
+            # BUT ONLY if we are NOT already in Voice Chat mode!
+            # If we are in Voice Chat, the AI must handle everything to prevent
+            # the deterministic engine from getting stuck in a loop.
             try:
-                if self._booking_engine.try_handle(sender_id, transcript, session):
+                if current_state != STATE_VOICE_CHAT and self._booking_engine.try_handle(sender_id, transcript, session):
                     logger.info(f"📋 SmartBookingEngine handled voice transcript from {sender_id}")
                     return
             except Exception as e:
@@ -1898,7 +2772,14 @@ class WhatsAppService:
             logger.error(f"❌ Sarvam voice processing error: {e}")
             import traceback
             logger.error(traceback.format_exc())
-            self.notifier.send_whatsapp_text(sender_id, "⚠️ Voice processing failed. Please try text instead.")
+            _fail_msgs = {
+                'te': '⚠️ వాయిస్ ప్రాసెసింగ్ విఫలమైంది. దయచేసి టెక్స్ట్ ద్వారా ప్రయత్నించండి.',
+                'hi': '⚠️ वॉइस प्रोसेसिंग विफल हुई। कृपया टेक्स्ट से प्रयास करें।',
+                'ta': '⚠️ குரல் செயலாக்கம் தோல்வி. உரை மூலம் முயற்சிக்கவும்.',
+                'kn': '⚠️ ಧ್ವನಿ ಪ್ರಕ್ರಿಯೆ ವಿಫಲ. ದಯವಿಟ್ಟು ಪಠ್ಯ ಮೂಲಕ ಪ್ರಯತ್ನಿಸಿ.',
+                'ur': '⚠️ وائس پروسیسنگ ناکام ہوئی۔ ٹیکسٹ سے کوشش کریں۔'
+            }
+            self.notifier.send_whatsapp_text(sender_id, _fail_msgs.get(lang_code, "⚠️ Voice processing failed. Please try text instead."))
 
     # ═══════════════════════════════════════════
     #  SARVAM TEXT CHAT (typed messages in voice flow)
@@ -1919,6 +2800,20 @@ class WhatsAppService:
             self._start_voice_flow(sender_id)
             return
 
+        # Convert numeric slot selection (e.g. "11") from the full slot text list.
+        numeric_match = re.match(r'^\s*(?:slot\s*)?(\d{1,2})\s*$', text_lower)
+        if numeric_match:
+            selected_idx = numeric_match.group(1)
+            slot_ctx = data.get('hybrid_slot_selection', {})
+            slot_map = slot_ctx.get('slot_map', {}) if isinstance(slot_ctx, dict) else {}
+            selected_time = slot_map.get(selected_idx)
+            if selected_time:
+                spoken = self.appt_service._time_to_spoken(selected_time)
+                input_text = f"I choose slot {selected_idx} at {spoken}"
+                logger.info(
+                    f"🔢 Hybrid numeric slot selection: idx={selected_idx} -> {selected_time} for {sender_id}"
+                )
+
         # Convert hybrid button IDs to natural language for the AI
         if input_text.startswith('vslot_'):
             time_str = input_text.replace('vslot_', '')
@@ -1928,10 +2823,17 @@ class WhatsAppService:
         if input_text.startswith('shift_'):
             parts = input_text.replace('shift_', '').split('_')
             if len(parts) == 2:
+                if isinstance(data, dict):
+                    data['_selected_shift_start'] = parts[0]
+                    data['_selected_shift_end'] = parts[1]
                 start_spoken = self.appt_service._time_to_spoken(parts[0])
                 end_spoken = self.appt_service._time_to_spoken(parts[1])
                 h = int(parts[0].split(':')[0])
-                shift_name = "morning" if h < 12 else ("afternoon" if h < 17 else "evening")
+                shift_name = (
+                    "morning" if 7 <= h < 12
+                    else ("afternoon" if 12 <= h < 17
+                    else ("evening" if 17 <= h < 22 else "night"))
+                )
                 input_text = f"I want the {shift_name} shift from {start_spoken} to {end_spoken}"
 
         # Process through Sarvam conversation
@@ -1968,43 +2870,97 @@ class WhatsAppService:
         messages.append({"role": "user", "content": str(user_text)})
 
         # Track hybrid data for side-channel WhatsApp messages
-        hybrid_data = {'slots_sent': False}
+        hybrid_data = {'shifts_sent': False, 'slots_sent': False, 'doctors_sent': False}
 
         # Tool execution callback with hybrid WhatsApp delivery
         def tool_executor(tool_name, tool_args):
             result = self._sarvam_tool_callback(sender_id, tool_name, tool_args, data, hybrid_data)
             return result
 
-        # Process with Groq Llama 3 (AI Service) instead of Sarvam due to 404 error
-        # Add a strict rule to ensure it speaks naturally for the TTS
+        # Inject temporary state context if available
+        _temp_patient = data.get('_temp_patient_name', '')
+        _temp_date = data.get('_temp_date', '')
+        _temp_ctx = ''
+        if _temp_patient:
+            _temp_ctx += f" The patient's name is '{_temp_patient}'. Do NOT ask for the name again unless booking for someone else."
+        if _temp_date:
+            _temp_ctx += f" The user's preferred date is '{_temp_date}'. Use this date unless the user explicitly changes it."
+
+        # System injection provides strict booking rules for the voice flow
         system_injection = {
             "role": "system",
-            "content": "IMPORTANT: You are speaking on a voice call. Do NOT use markdown (* or **). Speak times naturally (e.g. '9 AM' not '09:00'). Keep it conversational and brief. If the user spoke in a specific language, reply in that EXACT same language."
+            "content": (
+                "IMPORTANT: You are speaking on a voice call. Do NOT use markdown (* or **). "
+                "Speak times naturally (e.g. '9 AM' not '09:00'). Keep it conversational and brief. "
+                "If the user spoke in a specific language, reply in that EXACT same language. "
+                "If the user speaks in code-mixed style (Hinglish, Kanglish, Telglish), reply in the SAME code-mixed style. "
+                "TIME RULES: Convert spoken times to 24-hour HH:MM BEFORE calling tools. "
+                "'X and a half' = X:30. 'half past X' = X:30. "
+                "'evening'/'sham'/'night' = PM. 'morning'/'subah' = AM. "
+                "'6 in the evening' = '18:00'. '6 and a half in the evening' = '18:30'. "
+                "NEVER approximate — use the EXACT time the user said. "
+                "DATE RULE: NEVER assume, guess, or infer a date the user did not explicitly say. "
+                "If the user says 'I need an appointment' or asks about doctors without mentioning a date, "
+                "do NOT default to 'tomorrow' or any other date. ASK the user which date they prefer. "
+                "Only pass a date to tools if the user explicitly stated one. "
+                "STEP-BY-STEP: First identify the doctor, then ask for the date, then check availability to show real slots, "
+                "then confirm all details before booking. NEVER skip steps. "
+                "If the user gives all info except one field, ASK for that missing field. Never skip it. "
+                "CRITICAL: NEVER output raw text like <function=name>{}</function>. Use proper tool calls only. "
+                "NEVER SUGGEST TIMES: Do NOT say 'Can I book X PM for you?' or 'How about 10 AM?'. "
+                "Only SHOW the available slots returned by check_availability and ask 'What time works for you?'. "
+                "Let the user choose their own time from the available slots. Never recommend or push a specific slot. "
+                "DUPLICATE DOCTORS: If multiple doctors share the same name but have different specializations, "
+                "clearly tell the user: 'There are 2 doctors named Dr. X — one in [Specialty A] and one in [Specialty B]. "
+                "Which specialization do you need?' Never silently pick one. "
+                "MANDATORY CONFIRMATION: Before calling book_appointment, you MUST present ALL details in this EXACT structured format and ask the user to confirm:\n"
+                "👤 Patient Name: [name]\n"
+                "👨‍⚕️ Doctor: Dr. [name]\n"
+                "🏥 Specialization: [specialization]\n"
+                "📅 Date: [date]\n"
+                "⏰ Time Slot: [start_time] – [end_time]\n\n"
+                "'Should I go ahead and book this?' "
+                "Only call book_appointment AFTER the user says yes, confirm, haan, avunu, or haudu."
+                "LANGUAGE CONSISTENCY: ALL your responses MUST be entirely in the user's selected language. "
+                "Do NOT mix English into your conversational responses. "
+                "Only keep doctor names, dates (YYYY-MM-DD), times (HH:MM), and appointment IDs in English. "
+                "Everything else — greetings, questions, confirmations, shift descriptions, slot listings — MUST be in the user's language."
+                "SAVING DETAILS: Whenever the user mentions their name or a preferred date, IMMEDIATELY call save_temporary_details to store it. "
+                "If the user wants to change the date, call save_temporary_details again with the new date."
+                + _temp_ctx
+            )
         }
         
-        # We need to filter out old system messages to prevent Groq from getting confused
-        filtered_messages = [m for m in messages if m.get('role') != 'system' or 'Today is' in m.get('content','')]
+        # Keep system messages that have the date context (prevents AI from losing track)
+        filtered_messages = [m for m in messages if m.get('role') != 'system' or "Today's date is" in m.get('content','')]
         filtered_messages.insert(0, system_injection)
 
-        ai_response = self.ai_service.process_conversation(
+        ai_response = self.sarvam.process_conversation(
             messages=filtered_messages,
             available_services=available_services,
             available_doctors=available_doctors,
-            tool_callback=tool_executor
+            tool_callback=tool_executor,
+            language_code=lang_code
         )
 
-        messages.append({"role": "assistant", "content": ai_response})
+        suppress_ai_reply = bool(data.pop('_suppress_next_ai_text', False))
+        if suppress_ai_reply:
+            logger.info("📩 Missing-doctor fallback already sent directly; suppressing extra Sarvam text/TTS")
+            messages.append({"role": "assistant", "content": "[Missing-doctor fallback sent via direct WhatsApp messages.]"})
+        else:
+            messages.append({"role": "assistant", "content": ai_response})
 
         # Save conversation memory
         data['messages'] = messages[-15:]
         self._transition_to(sender_id, STATE_VOICE_CHAT, data)
 
         # Send text response to WhatsApp
-        self.notifier.send_whatsapp_text(sender_id, ai_response)
+        if not suppress_ai_reply:
+            self.notifier.send_whatsapp_text(sender_id, ai_response)
 
         # Generate and send TTS audio response
-        if self.sarvam and self.sarvam.is_available() and getattr(self, 'local_voice', None):
-            audio_path = self.local_voice.text_to_speech(ai_response, lang_code)
+        if not suppress_ai_reply and self.sarvam and self.sarvam.is_available():
+            audio_path = self.sarvam.text_to_speech(ai_response, lang_code)
             if audio_path:
                 self._send_whatsapp_audio(sender_id, audio_path)
 
@@ -2014,6 +2970,19 @@ class WhatsAppService:
         When slots are found, sends a visual WhatsApp list alongside the voice response.
         """
         try:
+            # Get session language for translating tool results
+            _lang_code = session_data.get('language', 'en') if isinstance(session_data, dict) else 'en'
+
+            def _translate(text):
+                """Translate tool result into user's language."""
+                if _lang_code == 'en' or not self.sarvam:
+                    return text
+                try:
+                    return self.sarvam.translate_tool_result(text, _lang_code)
+                except Exception:
+                    return text
+
+
             if tool_name == "list_available_doctors":
                 date_str = tool_args.get("date")
                 specialization = tool_args.get("specialization")
@@ -2027,7 +2996,7 @@ class WhatsAppService:
                 doctors = self.appt_service.get_active_doctors(specialization=specialization)
 
                 if not doctors:
-                    return "No active doctors found."
+                    return _translate("No active doctors found.")
 
                 if date_str:
                     # Filter to only doctors who have availability on this date
@@ -2042,7 +3011,7 @@ class WhatsAppService:
                             })
 
                     if not available_doctors:
-                        return f"No doctors are available on {date_str}. Try another date."
+                        return _translate(f"No doctors are available on {date_str}. Try another date.")
 
                     # Send visual WhatsApp list
                     if not hybrid_data.get('doctors_sent'):
@@ -2065,7 +3034,7 @@ class WhatsAppService:
                     result = f"On {date_str}, these doctors are available:\n"
                     for doc in available_doctors:
                         result += f"- Dr. {doc['name']} ({doc['specialization']}) — {', '.join(doc['shifts'])}\n"
-                    return result
+                    return _translate(result)
                 else:
                     # No date — just list all active doctors
                     items = []
@@ -2085,108 +3054,323 @@ class WhatsAppService:
                     result = "Our available doctors:\n"
                     for doc in doctors[:10]:
                         result += f"- Dr. {doc['full_name']} ({doc.get('specialization', 'General')})\n"
-                    return result
+                    return _translate(result)
 
             elif tool_name == "check_availability":
-                doctor_name = tool_args.get("doctor_name")
-                date_str = tool_args.get("date")
+                doctor_name = tool_args.get("doctor_name", "").strip()
+                date_input = tool_args.get("date", "").strip()
                 time_str = tool_args.get("time")
 
-                # Resolve natural date
-                if date_str:
-                    resolved = self._parse_natural_date(date_str)
-                    if resolved:
-                        date_str = resolved
+                if not doctor_name:
+                    return _translate("I need a doctor name to check availability.")
+                if not date_input:
+                    return _translate("Please provide a date to check availability.")
 
-                # Match Doctor
-                doctor_clean = doctor_name.lower().replace('dr.', '').replace('doctor', '').strip()
+                # Resolve and validate date (reject past/today)
+                today = datetime.now().date()
+                date_str, date_err = resolve_date(date_input, today)
+                if date_err:
+                    return _translate(date_err)
+                if not date_str:
+                    date_str = self._parse_natural_date(date_input)
+                if not date_str:
+                    is_valid, err = validate_booking_date(date_input, today)
+                    if not is_valid:
+                        return _translate(err or f"Invalid date '{date_input}'.")
+                    date_str = date_input
+
+                # Match Doctor — handle multiple matches
+                specialization_hint = tool_args.get("specialization")
                 doctors = self.appt_service.get_active_doctors()
-                matched_doctor = next((d for d in doctors if doctor_clean in d['full_name'].lower()), None)
+                matched_doctors = self._match_doctors_with_specialization(
+                    doctor_name,
+                    doctors,
+                    specialization_hint
+                )
 
-                if not matched_doctor:
-                    return f"Doctor '{doctor_name}' not found. Available doctors are: {', '.join(d['full_name'] for d in doctors[:5])}"
+                if not matched_doctors:
+                    missing_line, present_doctors = self._send_missing_doctor_two_step_messages(
+                        sender_id,
+                        doctors,
+                        doctor_name
+                    )
+                    if isinstance(session_data, dict):
+                        session_data['_suppress_next_ai_text'] = True
+                    return _translate(f"{missing_line}\n{present_doctors}")
 
+                if len(matched_doctors) > 1:
+                    return self._build_doctor_disambiguation_message(doctor_name, matched_doctors)
+
+                matched_doctor = matched_doctors[0]
                 doctor_id = matched_doctor['user_id']
                 doc_name = matched_doctor['full_name']
-
-                if not date_str:
-                    return "Please provide a date to check availability."
+                doctor_specialization = matched_doctor.get('specialization', 'General')
 
                 try:
                     datetime.strptime(date_str, "%Y-%m-%d")
                 except ValueError:
-                    return f"Invalid date format. Please use a valid date."
+                    return _translate(f"Invalid date format. Please use a valid date.")
 
                 # Get spoken shift data
                 spoken_shifts, shifts = self.appt_service.get_spoken_shifts(doctor_id, date_str)
 
                 if not shifts:
-                    return f"Dr. {doc_name} has no available shifts on {date_str}."
+                    weekly = get_doctor_weekly_schedule(doctor_id, self.appt_service)
+                    return _translate(
+                        f"Dr. {doc_name} ({doctor_specialization}) is NOT available on {date_str}. "
+                        f"Their weekly schedule: {weekly}"
+                    )
+
+                # If user explicitly tapped a shift button, prioritize that shift and avoid
+                # re-sending the same shift picker again.
+                selected_shift = None
+                selected_shift_start = None
+                selected_shift_end = None
+                if isinstance(session_data, dict):
+                    selected_shift_start = session_data.pop('_selected_shift_start', None)
+                    selected_shift_end = session_data.pop('_selected_shift_end', None)
+
+                if selected_shift_start and selected_shift_end:
+                    selected_shift = next(
+                        (
+                            s for s in shifts
+                            if s.get('start') == selected_shift_start and s.get('end') == selected_shift_end
+                        ),
+                        None
+                    )
+
+                    if selected_shift:
+                        selected_slots = self.appt_service.get_shift_slots(
+                            doctor_id,
+                            date_str,
+                            selected_shift_start,
+                            selected_shift_end
+                        )
+                        if selected_slots and not hybrid_data.get('slots_sent'):
+                            self._send_hybrid_slots(
+                                sender_id,
+                                selected_slots,
+                                selected_shift.get('shift_name', self.appt_service._classify_shift(selected_shift_start)),
+                                doc_name,
+                                date_str,
+                                session_data=session_data,
+                                lang_code=_lang_code
+                            )
+                            hybrid_data['slots_sent'] = True
+
+                        # Mark shifts as already handled for this turn so we don't repeat
+                        # the same shift picker after a user taps a shift.
+                        hybrid_data['shifts_sent'] = True
 
                 # ── HYBRID: Send WhatsApp visual list of shifts ──
-                if not hybrid_data.get('slots_sent'):
-                    self._send_hybrid_shifts(sender_id, shifts, doc_name, date_str)
+                if not hybrid_data.get('shifts_sent'):
+                    self._send_hybrid_shifts(sender_id, shifts, doc_name, date_str, _lang_code)
+                    hybrid_data['shifts_sent'] = True
 
                 # If a specific time is requested
                 if time_str:
+                    requested_time = resolve_time(time_str) or time_str
                     all_slots = []
                     for s in shifts:
                         slots = self.appt_service.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
-                        all_slots.extend([slot['start'] for slot in slots])
+                        for sl in slots:
+                            slot_copy = dict(sl)
+                            slot_copy['shift_name'] = s['shift_name']
+                            slot_copy['shift_start'] = s['start']
+                            slot_copy['shift_end'] = s['end']
+                            all_slots.append(slot_copy)
 
-                    if time_str in all_slots:
-                        return f"Yes, {time_str} is available on {date_str} with Dr. {doc_name}."
-                    else:
-                        return f"{time_str} is not available. Available slots are: {', '.join(all_slots[:8])}"
+                    matching_slot = next((sl for sl in all_slots if sl['start'] == requested_time), None)
+                    if matching_slot:
+                        return _translate(
+                            f"Yes, {self._format_time_display(requested_time)} – {self._format_time_display(matching_slot['end'])} is available on {date_str} "
+                            f"with Dr. {doc_name} ({doctor_specialization}). The appointment duration is {self._format_time_display(requested_time)} to {self._format_time_display(matching_slot['end'])}."
+                        )
 
-                # No specific time — return spoken shifts and also fire hybrid slot lists
-                for s in shifts:
-                    slots = self.appt_service.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
-                    if slots and not hybrid_data.get('slots_sent'):
-                        self._send_hybrid_slots(sender_id, slots, s['shift_name'], doc_name, date_str)
+                    # Requested time is not available: send this notice first, then slot picker + full slot list.
+                    preferred_shift = None
+                    if ':' in requested_time:
+                        try:
+                            req_hour = int(requested_time.split(':')[0])
+                            req_shift_name = self.appt_service._classify_shift(f"{req_hour:02d}:00")
+                            preferred_shift = next(
+                                (s for s in shifts if s.get('shift_name', '').lower() == req_shift_name.lower()),
+                                None
+                            )
+                        except Exception:
+                            preferred_shift = None
+
+                    if not preferred_shift and shifts:
+                        preferred_shift = shifts[0]
+
+                    preferred_slots = []
+                    if preferred_shift:
+                        preferred_slots = self.appt_service.get_shift_slots(
+                            doctor_id,
+                            date_str,
+                            preferred_shift['start'],
+                            preferred_shift['end']
+                        )
+
+                    self.notifier.send_whatsapp_text(
+                        sender_id,
+                        (
+                            f"⚠️ Dr. {doc_name} ({doctor_specialization}) is not available at {self._format_time_display(requested_time)} on {date_str}. "
+                            f"Please choose another slot from the available options below."
+                        )
+                    )
+
+                    if preferred_slots and not hybrid_data.get('slots_sent'):
+                        self._send_hybrid_slots(
+                            sender_id,
+                            preferred_slots,
+                            preferred_shift['shift_name'],
+                            doc_name,
+                            date_str,
+                            session_data=session_data,
+                            lang_code=_lang_code
+                        )
                         hybrid_data['slots_sent'] = True
 
-                return spoken_shifts
+                    available_starts = ', '.join(
+                        self._format_time_display(sl['start']) for sl in all_slots
+                    )
+                    return _translate(
+                        f"{self._format_time_display(requested_time)} is not available. "
+                        f"Available slots are: {available_starts}. "
+                        f"Please ask the user to select a slot or tell a time."
+                    )
+
+                # No specific time
+                if selected_shift:
+                    spoken_slots, _ = self.appt_service.get_spoken_slots(
+                        doctor_id,
+                        date_str,
+                        selected_shift.get('start', selected_shift_start),
+                        selected_shift.get('end', selected_shift_end),
+                        selected_shift.get('shift_name', '')
+                    )
+                    return _translate(spoken_slots)
+
+                # If only one shift exists, send full slots immediately (all in text + first 10 interactive rows).
+                if len(shifts) == 1 and not hybrid_data.get('slots_sent'):
+                    only_shift = shifts[0]
+                    shift_slots = self.appt_service.get_shift_slots(
+                        doctor_id,
+                        date_str,
+                        only_shift['start'],
+                        only_shift['end']
+                    )
+                    if shift_slots:
+                        self._send_hybrid_slots(
+                            sender_id,
+                            shift_slots,
+                            only_shift['shift_name'],
+                            doc_name,
+                            date_str,
+                            session_data=session_data,
+                            lang_code=_lang_code
+                        )
+                        hybrid_data['slots_sent'] = True
+
+                return _translate(spoken_shifts)
 
             elif tool_name == "book_appointment":
-                patient_name_input = tool_args.get("patient_name")
-                doctor_name = tool_args.get("doctor_name")
-                date_str = tool_args.get("date")
-                time_str = tool_args.get("time")
+                patient_name_input = tool_args.get("patient_name", "").strip()
+                doctor_name = tool_args.get("doctor_name", "").strip()
+                date_input = tool_args.get("date", "").strip()
+                time_input = tool_args.get("time", "").strip()
 
-                # Resolve natural date
-                if date_str:
-                    resolved = self._parse_natural_date(date_str)
-                    if resolved:
-                        date_str = resolved
+                if not all([doctor_name, date_input, time_input]):
+                    return _translate("I need doctor name, date, and time to book.")
 
-                # Resolve natural time (e.g. "9am" → "09:00")
-                if time_str:
-                    time_str = self._parse_natural_time(time_str)
+                # Resolve and validate date (reject past/today)
+                today = datetime.now().date()
+                date_str, date_err = resolve_date(date_input, today)
+                if date_err:
+                    return _translate(date_err)
+                if not date_str:
+                    date_str = self._parse_natural_date(date_input)
+                if not date_str:
+                    is_valid, err = validate_booking_date(date_input, today)
+                    if not is_valid:
+                        return _translate(err or f"Invalid date '{date_input}'.")
+                    date_str = date_input
 
-                # Match Doctor
-                doctor_clean = doctor_name.lower().replace('dr.', '').replace('doctor', '').strip()
+                # Match Doctor — handle multiple matches
+                specialization_hint = tool_args.get("specialization")
                 doctors = self.appt_service.get_active_doctors()
-                matched_doctor = next((d for d in doctors if doctor_clean in d['full_name'].lower()), None)
-                if not matched_doctor:
-                    return f"Error: Doctor '{doctor_name}' not found."
+                matched_doctors = self._match_doctors_with_specialization(
+                    doctor_name,
+                    doctors,
+                    specialization_hint
+                )
+
+                if not matched_doctors:
+                    missing_line, present_doctors = self._send_missing_doctor_two_step_messages(
+                        sender_id,
+                        doctors,
+                        doctor_name
+                    )
+                    if isinstance(session_data, dict):
+                        session_data['_suppress_next_ai_text'] = True
+                    return _translate(f"{missing_line}\n{present_doctors}")
+
+                if len(matched_doctors) > 1:
+                    return self._build_doctor_disambiguation_message(doctor_name, matched_doctors)
+
+                matched_doctor = matched_doctors[0]
+                doctor_id = matched_doctor['user_id']
+                doctor_specialization = matched_doctor.get('specialization', 'General')
+
+                # Smart time resolution using doctor's schedule
+                resolved_time, time_err = resolve_ambiguous_time(
+                    time_input, doctor_id, date_str, self.appt_service
+                )
+                if time_err and not resolved_time:
+                    return _translate(time_err)
+                time_str = resolved_time or resolve_time(time_input) or time_input
+
+                # Look up actual slot to get real end_time from doctor's schedule
+                end_time_str = None
+                shifts = self.appt_service.get_available_shifts(doctor_id, date_str)
+                for s in shifts:
+                    slots = self.appt_service.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
+                    if slots:
+                        matching_slot = next((sl for sl in slots if sl['start'] == time_str), None)
+                        if matching_slot:
+                            end_time_str = matching_slot['end']
+                            break
+
+                if not end_time_str:
+                    # Slot not found — collect all available slots and report them
+                    all_available = []
+                    for s in shifts:
+                        slots = self.appt_service.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
+                        if slots:
+                            all_available.extend([sl['start'] for sl in slots])
+                    slots_str = (
+                        ', '.join(self._format_time_display(slot_time) for slot_time in all_available[:10])
+                        if all_available else 'No slots available'
+                    )
+                    return _translate(
+                        f"The slot at {self._format_time_display(time_str)} is NOT available with Dr. {matched_doctor['full_name']} ({doctor_specialization}) on {date_str}. "
+                        f"Available slots: {slots_str}. "
+                        f"Please ask the user which slot they want."
+                    )
 
                 # Determine Patient
                 clean_phone = sender_id.replace('+', '').replace(' ', '')
                 patient_rec = self.patient_service.get_patient_by_phone(clean_phone)
 
                 if not patient_rec:
-                    return "Error: Patient not registered. Please register first."
+                    return _translate("Error: Patient not registered. Please register first.")
 
                 patient_id = patient_rec['patient_id']
                 booked_for_name = patient_rec.get('patient_name', 'Unknown')
 
                 if patient_name_input and patient_name_input.lower() not in ['self', '', 'me', booked_for_name.lower()]:
                     booked_for_name = patient_name_input
-
-                # Calculate end time
-                dt_time = datetime.strptime(time_str, "%H:%M")
-                end_time_str = (dt_time + timedelta(minutes=30)).strftime("%H:%M")
 
                 # Book appointment
                 success = self.appt_service.book_appointment({
@@ -2209,34 +3393,69 @@ class WhatsAppService:
                     self._transition_to(sender_id, STATE_VOICE_CHAT, session_data)
 
                     # ── HYBRID: Send booking confirmation as WhatsApp message ──
+                    _confirm_labels = {
+                        'te': {'title': '✅ *అపాయింట్‌మెంట్ బుక్ అయింది!*', 'patient': 'రోగి', 'doctor': 'డాక్టర్', 'spec': 'స్పెషలైజేషన్', 'date': 'తేదీ', 'time': 'సమయం', 'status': 'డాక్టర్ ఆమోదం పెండింగ్‌'},
+                        'hi': {'title': '✅ *अपॉइंटमेंट बुक हो गई!*', 'patient': 'मरीज', 'doctor': 'डॉक्टर', 'spec': 'विशेषज्ञता', 'date': 'तारीख', 'time': 'समय', 'status': 'डॉक्टर अनुमोदन पेंडिंग'},
+                        'ta': {'title': '✅ *நேரம் பதிவு செய்யப்பட்டது!*', 'patient': 'நோயாளி', 'doctor': 'மருத்துவர்', 'spec': 'சிறப்பு', 'date': 'தேதி', 'time': 'நேரம்', 'status': 'மருத்துவர் அனுமதி நிலுவையில்'},
+                        'kn': {'title': '✅ *ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಆಗಿದೆ!*', 'patient': 'ರೋಗಿ', 'doctor': 'ಡಾಕ್ಟರ್', 'spec': 'ವಿಶೇಷತೆ', 'date': 'ದಿನಾಂಕ', 'time': 'ಸಮಯ', 'status': 'ಡಾಕ್ಟರ್ ಅನುಮೋದನೆ ಬಾಕಿ'},
+                        'ur': {'title': '✅ *اپائنٹمنٹ بک ہو گئی!*', 'patient': 'مریض', 'doctor': 'ڈاکٹر', 'spec': 'ماہر', 'date': 'تاریخ', 'time': 'وقت', 'status': 'ڈاکٹر منظوری باقی'}
+                    }
+                    _cl = _confirm_labels.get(_lang_code, {
+                        'title': '✅ *Appointment Booked!*',
+                        'patient': 'Patient', 'doctor': 'Doctor', 'spec': 'Specialization',
+                        'date': 'Date', 'time': 'Time', 'status': 'Pending Doctor Approval'
+                    })
                     confirm_msg = (
-                        f"✅ *Appointment Booked!*\n\n"
-                        f"👤 Patient: {booked_for_name}\n"
-                        f"👨‍⚕️ Doctor: Dr. {matched_doctor['full_name']}\n"
-                        f"📅 Date: {date_str}\n"
-                        f"⏰ Time: {time_str} – {end_time_str}\n\n"
-                        f"⏳ Status: Pending Doctor Approval"
+                        f"{_cl['title']}\n\n"
+                        f"👤 {_cl['patient']}: {booked_for_name}\n"
+                        f"👨‍⚕️ {_cl['doctor']}: Dr. {matched_doctor['full_name']}\n"
+                        f"🏥 {_cl['spec']}: {doctor_specialization}\n"
+                        f"📅 {_cl['date']}: {date_str}\n"
+                        f"⏰ {_cl['time']}: {self._format_time_display(time_str)} – {self._format_time_display(end_time_str)}\n\n"
+                        f"⏳ {_cl['status']}"
                     )
                     self.notifier.send_whatsapp_text(sender_id, confirm_msg)
 
-                    return "SUCCESS. The appointment has been booked successfully. Inform the user of the details and ask if they need anything else."
+                    return _translate(
+                        f"SUCCESS. Appointment booked for patient {booked_for_name} with "
+                        f"Dr. {matched_doctor['full_name']} ({doctor_specialization}) on {date_str} "
+                        f"at {self._format_time_display(time_str)}-{self._format_time_display(end_time_str)}. Inform the user and ask if they need anything else."
+                    )
                 else:
-                    return "FAILED to book. There was a conflict or error. Ask user to try another time."
+                    return _translate("FAILED to book. There was a conflict or error. Ask user to try another time.")
+
+            elif tool_name == "save_temporary_details":
+                patient_name = tool_args.get('patient_name', '').strip()
+                date_val = tool_args.get('date', '').strip()
+                if isinstance(session_data, dict):
+                    if patient_name:
+                        session_data['_temp_patient_name'] = patient_name
+                        logger.info(f"💾 Saved temp patient name: '{patient_name}' for {sender_id}")
+                    if date_val:
+                        resolved = self._parse_natural_date(date_val)
+                        session_data['_temp_date'] = resolved or date_val
+                        logger.info(f"💾 Saved temp date: '{resolved or date_val}' for {sender_id}")
+                saved_parts = []
+                if patient_name:
+                    saved_parts.append(f"patient name: {patient_name}")
+                if date_val:
+                    saved_parts.append(f"preferred date: {session_data.get('_temp_date', date_val)}")
+                return _translate(f"Saved {', '.join(saved_parts)}. Continue the conversation." if saved_parts else "Nothing to save.")
 
             else:
-                return f"Error: Tool '{tool_name}' is not recognized."
+                return _translate(f"Error: Tool '{tool_name}' is not recognized.")
 
         except Exception as e:
             logger.error(f"Sarvam tool execution failed: {e}")
             import traceback
             logger.error(traceback.format_exc())
-            return f"System error: {e}"
+            return _translate(f"System error: {e}")
 
     # ═══════════════════════════════════════════
     #  HYBRID WHATSAPP DELIVERY
     # ═══════════════════════════════════════════
 
-    def _send_hybrid_shifts(self, sender_id, shifts, doctor_name, date_str):
+    def _send_hybrid_shifts(self, sender_id, shifts, doctor_name, date_str, lang_code='en'):
         """
         Send available shifts as a WhatsApp interactive list while the AI speaks them.
         This is the 'hybrid' feature — voice + visual simultaneously.
@@ -2244,6 +3463,18 @@ class WhatsAppService:
         try:
             if not shifts:
                 return
+
+            _shift_labels = {
+                'te': {'header': f"📋 Dr. {doctor_name} — {date_str}\nఅందుబాటులో ఉన్న షిఫ్ట్‌లు (ఎంచుకోండి):", 'title': 'షిఫ్ట్‌లు', 'btn': 'చూడండి'},
+                'hi': {'header': f"📋 Dr. {doctor_name} — {date_str}\nउपलब्ध शिफ्ट (चुनें):", 'title': 'शिफ्ट', 'btn': 'देखें'},
+                'ta': {'header': f"📋 Dr. {doctor_name} — {date_str}\nகிடைக்கும் ஷிஃப்ட்ஸ் (தேர்வு செய்யவும்):", 'title': 'ஷிஃப்ட்ஸ்', 'btn': 'பார்க்க'},
+                'kn': {'header': f"📋 Dr. {doctor_name} — {date_str}\nಲಭ್ಯವಿರುವ ಶಿಫ್ಟ್‌ಗಳು (ಆಯ್ಕೆ ಮಾಡಿ):", 'title': 'ಶಿಫ್ಟ್‌ಗಳು', 'btn': 'ನೋಡಿ'},
+                'ur': {'header': f"📋 Dr. {doctor_name} — {date_str}\nدستیاب شفٹیں (منتخب کریں):", 'title': 'شفٹیں', 'btn': 'دیکھیں'}
+            }
+            _sl = _shift_labels.get(lang_code, {
+                'header': f"📋 Dr. {doctor_name} — {date_str}\nAvailable shifts (tap to select):",
+                'title': 'Shifts', 'btn': 'View Shifts'
+            })
 
             if len(shifts) <= 3:
                 # Use buttons
@@ -2257,7 +3488,7 @@ class WhatsAppService:
 
                 self.notifier.send_whatsapp_buttons(
                     sender_id,
-                    f"📋 Dr. {doctor_name} — {date_str}\nAvailable shifts (tap to select):",
+                    _sl['header'],
                     btn_titles[:3],
                     btn_ids[:3]
                 )
@@ -2274,10 +3505,10 @@ class WhatsAppService:
 
                 self.notifier.send_whatsapp_list(
                     sender_id,
-                    f"📋 Dr. {doctor_name} — {date_str}\nAvailable shifts:",
+                    f"📋 Dr. {doctor_name} — {date_str}\n{_sl['title']}:",
                     items,
-                    title="Shifts",
-                    button_text="View Shifts"
+                    title=_sl['title'],
+                    button_text=_sl['btn']
                 )
 
             logger.info(f"📤 Hybrid: Sent shift list to {sender_id} for {doctor_name} on {date_str}")
@@ -2285,16 +3516,66 @@ class WhatsAppService:
         except Exception as e:
             logger.error(f"Hybrid shift delivery error: {e}")
 
-    def _send_hybrid_slots(self, sender_id, slots, shift_name, doctor_name, date_str):
+    def _send_hybrid_slots(self, sender_id, slots, shift_name, doctor_name, date_str, session_data=None, lang_code='en'):
         """
-        Send available time slots as a WhatsApp interactive list while the AI speaks them.
+        Send available time slots in hybrid mode:
+        1) full numbered text list (all slots),
+        2) WhatsApp interactive list (first 10 due API limit).
         """
         try:
             if not slots:
                 return
 
+            _slot_labels = {
+                'te': {'header': f"\u23f0 *\u0c05\u0c02\u0c26\u0c41\u0c2c\u0c3e\u0c1f\u0c41\u0c32\u0c4b \u0c09\u0c28\u0c4d\u0c28 \u0c38\u0c4d\u0c32\u0c3e\u0c1f\u0c4d\u0c32\u0c41 ({count})*", 'footer': '_\u0c28\u0c02\u0c2c\u0c30\u0c4d \u0c1a\u0c46\u0c2a\u0c4d\u0c2a\u0c02\u0c21\u0c3f \u0c32\u0c47\u0c26\u0c3e \u0c35\u0c3e\u0c2f\u0c3f\u0c38\u0c4d \u0c26\u0c4d\u0c35\u0c3e\u0c30\u0c3e \u0c38\u0c2e\u0c2f\u0c02 \u0c1a\u0c46\u0c2a\u0c4d\u0c2a\u0c02\u0c21\u0c3f._', 'tap': '_\u0c38\u0c4d\u0c32\u0c3e\u0c1f\u0c4d \u0c0e\u0c02\u0c1a\u0c41\u0c15\u0c4b\u0c02\u0c21\u0c3f._', 'title': '\u0c38\u0c4d\u0c32\u0c3e\u0c1f\u0c4d\u0c32\u0c41', 'btn': '\u0c38\u0c4d\u0c32\u0c3e\u0c1f\u0c4d\u0c32\u0c41 \u0c1a\u0c42\u0c21\u0c02\u0c21\u0c3f'},
+                'hi': {'header': f"\u23f0 *\u0909\u092a\u0932\u092c\u094d\u0927 \u0938\u094d\u0932\u0949\u091f ({count})*", 'footer': '_\u0928\u0902\u092c\u0930 \u092c\u0924\u093e\u090f\u0902 \u092f\u093e \u0935\u0949\u0907\u0938 \u0938\u0947 \u0938\u092e\u092f \u092c\u0924\u093e\u090f\u0902\u0964_', 'tap': '_\u0938\u094d\u0932\u0949\u091f \u091a\u0941\u0928\u0947\u0902\u0964_', 'title': '\u0938\u094d\u0932\u0949\u091f', 'btn': '\u0938\u094d\u0932\u0949\u091f \u0926\u0947\u0916\u0947\u0902'},
+                'ta': {'header': f"\u23f0 *\u0b95\u0bbf\u0b9f\u0bc8\u0b95\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0bb8\u0bcd\u0bb2\u0bbe\u0b9f\u0bcd\u0b95\u0bb3\u0bcd ({count})*", 'footer': '_\u0b8e\u0ba3\u0bcd \u0b85\u0bb2\u0bcd\u0bb2\u0ba4\u0bc1 \u0b95\u0bc1\u0bb0\u0bb2\u0bbf\u0bb2\u0bcd \u0ba8\u0bc7\u0bb0\u0bae\u0bcd \u0b9a\u0bca\u0bb2\u0bcd\u0bb2\u0bb5\u0bc1\u0bae\u0bcd._', 'tap': '_\u0bb8\u0bcd\u0bb2\u0bbe\u0b9f\u0bcd \u0ba4\u0bc7\u0bb0\u0bcd\u0bb5\u0bc1 \u0b9a\u0bc6\u0baf\u0bcd\u0baf\u0bb5\u0bc1\u0bae\u0bcd._', 'title': '\u0bb8\u0bcd\u0bb2\u0bbe\u0b9f\u0bcd\u0b95\u0bb3\u0bcd', 'btn': '\u0bb8\u0bcd\u0bb2\u0bbe\u0b9f\u0bcd\u0b95\u0bb3\u0bcd \u0baa\u0bbe\u0bb0\u0bcd\u0b95\u0bcd\u0b95'},
+                'kn': {'header': f"\u23f0 *\u0cb2\u0cad\u0ccd\u0caf\u0cb5\u0cbf\u0cb0\u0cc1\u0cb5 \u0cb8\u0ccd\u0cb2\u0cbe\u0c9f\u0ccd\u200c\u0c97\u0cb3\u0cc1 ({count})*", 'footer': '_\u0cb8\u0c82\u0c96\u0ccd\u0caf\u0cc6 \u0cb9\u0cc7\u0cb3\u0cbf \u0c85\u0ca5\u0cb5\u0cbe \u0ca7\u0ccd\u0cb5\u0ca8\u0cbf\u0caf\u0cb2\u0ccd\u0cb2\u0cbf \u0cb8\u0cae\u0caf \u0cb9\u0cc7\u0cb3\u0cbf._', 'tap': '_\u0cb8\u0ccd\u0cb2\u0cbe\u0c9f\u0ccd \u0c86\u0caf\u0ccd\u0c95\u0cc6 \u0cae\u0cbe\u0ca1\u0cbf._', 'title': '\u0cb8\u0ccd\u0cb2\u0cbe\u0c9f\u0ccd\u200c\u0c97\u0cb3\u0cc1', 'btn': '\u0cb8\u0ccd\u0cb2\u0cbe\u0c9f\u0ccd\u200c\u0c97\u0cb3\u0cc1 \u0ca8\u0ccb\u0ca1\u0cbf'},
+                'ur': {'header': f"\u23f0 *\u062f\u0633\u062a\u06cc\u0627\u0628 \u0633\u0644\u0627\u0679 ({count})*", 'footer': '_\u0646\u0645\u0628\u0631 \u0628\u062a\u0627\u0626\u06cc\u06ba \u06cc\u0627 \u0648\u0627\u0626\u0633 \u0633\u06d2 \u0648\u0642\u062a \u0628\u062a\u0627\u0626\u06cc\u06ba\u06d4_', 'tap': '_\u0633\u0644\u0627\u0679 \u0645\u0646\u062a\u062e\u0628 \u06a9\u0631\u06cc\u06ba\u06d4_', 'title': '\u0633\u0644\u0627\u0679', 'btn': '\u0633\u0644\u0627\u0679 \u062f\u06cc\u06a9\u06be\u06cc\u06ba'}
+            }
+            _default_slot_labels = {
+                'header': f"\u23f0 *Available Slots ({'{count}'})*",
+                'footer': '_Reply with a number (e.g. 11), tap View Slots, or tell me the time by voice._',
+                'tap': '_Tap a slot to select, or tell me the time by voice._',
+                'title': 'Available Slots', 'btn': 'View Slots'
+            }
+            _sll = _slot_labels.get(lang_code, _default_slot_labels)
+
+            # Preserve schedule-generated order from get_shift_slots().
+            # Do NOT lexicographically sort by HH:MM here, or overnight shifts
+            # (e.g. 22:00→07:00) will incorrectly appear AM-first.
+            slots_ordered = list(slots)
+
+            # Save slot index mapping so user can reply with a number like "11".
+            if isinstance(session_data, dict):
+                slot_map = {
+                    str(idx): slot.get('start')
+                    for idx, slot in enumerate(slots_ordered, 1)
+                    if slot.get('start')
+                }
+                session_data['hybrid_slot_selection'] = {
+                    'date': date_str,
+                    'doctor_name': doctor_name,
+                    'shift_name': shift_name,
+                    'slot_map': slot_map
+                }
+
+            # 1) Send complete slot list in text (all slots, not limited to 10)
+            lines = [
+                _sll['header'].replace('{count}', str(len(slots_ordered))),
+                f"Dr. {doctor_name} | {date_str} | {shift_name}",
+                ""
+            ]
+            for idx, slot in enumerate(slots_ordered, 1):
+                lines.append(
+                    f"{idx}. {self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
+                )
+            lines.append("")
+            lines.append(_sll['footer'])
+            self.notifier.send_whatsapp_text(sender_id, '\n'.join(lines))
+
             items = []
-            for slot in slots[:10]:
+            for slot in slots_ordered[:10]:
                 start_spoken = self.appt_service._time_to_spoken(slot['start'])
                 end_spoken = self.appt_service._time_to_spoken(slot['end'])
                 items.append((
@@ -2303,14 +3584,27 @@ class WhatsAppService:
                     f"{start_spoken} – {end_spoken}"
                 ))
 
+            header = (
+                f"⏰ {shift_name} — Dr. {doctor_name}\n"
+                f"📅 {date_str}\n\n"
+                f"{_sll['tap']}"
+            )
+            if len(slots_ordered) > 10:
+                _more_label = {
+                    'te': '\n(\u0c2e\u0c46\u0c28\u0c41\u0c32\u0c4b \u0c2e\u0c4a\u0c26\u0c1f\u0c3f 10 \u0c2e\u0c3e\u0c24\u0c4d\u0c30\u0c2e\u0c47. \u0c2a\u0c42\u0c30\u0c4d\u0c24\u0c3f \u0c1c\u0c3e\u0c2c\u0c3f\u0c24\u0c3e \u0c2a\u0c48\u0c28 \u0c09\u0c02\u0c26\u0c3f.)',
+                    'hi': '\n(\u092e\u0947\u0928\u0942 \u092e\u0947\u0902 \u092a\u0939\u0932\u0947 10 \u0926\u093f\u0916\u093e\u090f \u0917\u090f \u0939\u0948\u0902\u0964 \u092a\u0942\u0930\u0940 \u0932\u093f\u0938\u094d\u091f \u090a\u092a\u0930 \u0939\u0948\u0964)',
+                    'ta': '\n(\u0bae\u0bc6\u0ba9\u0bc1\u0bb5\u0bbf\u0bb2\u0bcd \u0bae\u0bc1\u0ba4\u0bb2\u0bcd 10 \u0b95\u0bbe\u0b9f\u0bcd\u0b9f\u0baa\u0bcd\u0baa\u0b9f\u0bcd\u0b9f\u0ba4\u0bc1. \u0bae\u0bc1\u0bb4\u0bc1 \u0baa\u0b9f\u0bcd\u0b9f\u0bbf\u0baf\u0bb2\u0bcd \u0bae\u0bc7\u0bb2\u0bc7 \u0b89\u0bb3\u0bcd\u0bb3\u0ba4\u0bc1.)',
+                    'kn': '\n(\u0cae\u0cc6\u0ca8\u0cc1\u0cb5\u0cbf\u0ca8\u0cb2\u0ccd\u0cb2\u0cbf \u0cae\u0cca\u0ca6\u0cb2 10 \u0ca4\u0ccb\u0cb0\u0cbf\u0cb8\u0cb2\u0cbe\u0c97\u0cbf\u0ca6\u0cc6. \u0caa\u0cc2\u0cb0\u0ccd\u0ca3 \u0caa\u0c9f\u0ccd\u0c9f\u0cbf \u0cae\u0cc7\u0cb2\u0cbf\u0ca6\u0cc6.)',
+                    'ur': '\n(\u0645\u06cc\u0646\u0648 \u0645\u06cc\u06ba \u067e\u06c1\u0644\u06d2 10 \u062f\u06a9\u06be\u0627\u0626\u06d2 \u06af\u0626\u06d2 \u06c1\u06cc\u06ba\u06d4 \u0645\u06a9\u0645\u0644 \u0641\u06c1\u0631\u0633\u062a \u0627\u0648\u067e\u0631 \u06c1\u06d2\u06d4)'
+                }
+                header += _more_label.get(lang_code, '\n(Showing first 10 in the menu. Full slot list is above.)')
+
             self.notifier.send_whatsapp_list(
                 sender_id,
-                f"⏰ {shift_name} Shift — Dr. {doctor_name}\n"
-                f"📅 {date_str}\n\n"
-                f"_Tap a slot to select, or tell me the time by voice._",
+                header,
                 items,
-                title="Available Slots",
-                button_text="View Slots"
+                title=_sll['title'],
+                button_text=_sll['btn']
             )
 
             logger.info(f"📤 Hybrid: Sent slot list to {sender_id} for {shift_name} shift")
@@ -2338,11 +3632,11 @@ class WhatsAppService:
 
             with open(audio_file_path, 'rb') as audio_file:
                 files = {
-                    'file': (os.path.basename(audio_file_path), audio_file, 'audio/ogg')
+                    'file': (os.path.basename(audio_file_path), audio_file, 'audio/ogg; codecs=opus')
                 }
                 data = {
                     'messaging_product': 'whatsapp',
-                    'type': 'audio/ogg'
+                    'type': 'audio/ogg; codecs=opus'
                 }
 
                 upload_response = requests.post(upload_url, headers=headers, files=files, data=data)
@@ -2403,6 +3697,7 @@ class WhatsAppService:
             return True
 
         clean = text.strip()
+        t_lower = clean.lower()
 
         # 1. Mostly non-alphanumeric (fractions, symbols, control chars)
         alpha_chars = sum(1 for c in clean if c.isalpha())
@@ -2410,33 +3705,64 @@ class WhatsAppService:
             return True
 
         # 2. Excessive repetition (same word repeated 3+ times)
-        # e.g. "⅔ 2.0  ⅔ 3.0  ⅔ 3.0  ⅔ 4.0" or "requirement of the requirement of the requirement"
         words = clean.split()
         if len(words) >= 4:
             from collections import Counter
             word_counts = Counter(w.lower().strip('.,!?') for w in words)
-            # Skip common filler words like 'the', 'of', 'a'
             filler = {'the', 'of', 'a', 'an', 'is', 'to', 'and', 'in', 'on', 'it', 'i'}
             for most_common_word, most_common_count in word_counts.most_common(5):
                 if most_common_word in filler:
                     continue
                 if most_common_count >= 3 and most_common_count / len(words) > 0.25:
                     return True
-                break  # Only check the top non-filler word
+                break
 
         # 3. Very short with no real words (less than 2 alphabetic words)
-        # But allow known short valid inputs: greetings, commands
-        short_valid = {'hi', 'hello', 'menu', 'yes', 'no', 'ok', 'book', 'help',
-                       'call', 'voice', 'reset', 'start', 'back', 'exit',
-                       'haan', 'nahi', 'haa', 'cancel', 'confirm'}
-        if clean.lower().strip() in short_valid:
+        # Allow known short valid inputs: greetings, commands, booking terms, multilingual
+        short_valid = {
+            # English commands and responses
+            'hi', 'hello', 'menu', 'yes', 'no', 'ok', 'book', 'help',
+            'call', 'voice', 'reset', 'start', 'back', 'exit',
+            'cancel', 'confirm', 'done', 'thanks', 'thank you',
+            'morning', 'evening', 'afternoon', 'night', 'today', 'tomorrow',
+            'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+            # Hindi
+            'haan', 'nahi', 'haa', 'ji', 'theek', 'sahi', 'kal', 'parson', 'aaj',
+            'subah', 'sham', 'dopahar', 'raat',
+            # Telugu
+            'avunu', 'kaadu', 'repu', 'eeroju', 'udayam', 'sayantram',
+            # Kannada
+            'haudu', 'illa', 'naale', 'beligge', 'sanje',
+            # Urdu
+            'jee', 'naheen',
+        }
+        if t_lower.strip() in short_valid:
             return False
+
+        # Allow transcripts containing time patterns (e.g. "10 am", "at 3 pm", "9:30")
+        if _re.search(r'\d{1,2}\s*(?:am|pm|a\.m|p\.m|baje|gantalaku|gantege)', t_lower):
+            return False
+        if _re.search(r'\d{1,2}:\d{2}', t_lower):
+            return False
+
+        # Allow transcripts containing date-like content
+        if _re.search(r'\d{1,2}(?:st|nd|rd|th)', t_lower):
+            return False
+
+        # Allow if it contains known appointment/doctor keywords
+        booking_keywords = {'doctor', 'dr', 'appointment', 'book', 'slot', 'available',
+                            'specialist', 'cardio', 'ortho', 'dental', 'eye',
+                            'डॉक्टर', 'अपॉइंटमेंट', 'డాక్టర్', 'అపాయింట్మెంట్',
+                            'ಡಾಕ್ಟರ್', 'ಅಪಾಯಿಂಟ್ಮೆಂಟ್'}
+        if any(kw in t_lower for kw in booking_keywords):
+            return False
+
         real_words = [w for w in words if _re.match(r'^[a-zA-Z\u0900-\u097F\u0C00-\u0C7F\u0600-\u06FF]{2,}$', w)]
         if len(real_words) < 2 and len(clean) < 20:
             return True
 
         # 4. Contains fraction characters or other STT artifacts
-        fraction_chars = sum(1 for c in clean if ord(c) in range(0x2150, 0x2190))  # ⅓ ⅔ ¼ etc
+        fraction_chars = sum(1 for c in clean if ord(c) in range(0x2150, 0x2190))
         if fraction_chars >= 2:
             return True
 

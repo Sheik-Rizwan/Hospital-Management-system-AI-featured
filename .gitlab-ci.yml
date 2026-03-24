@@ -1,4 +1,4 @@
-stages:
+qstages:
   - notify
 
 whatsapp-notification:

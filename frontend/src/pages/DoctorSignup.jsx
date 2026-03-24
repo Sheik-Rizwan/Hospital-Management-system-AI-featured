@@ -1,6 +1,24 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { API_BASE } from '../utils/api';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Link from '@mui/material/Link';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Avatar from '@mui/material/Avatar';
+
+// Icons
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 const DoctorSignup = () => {
     const [formData, setFormData] = useState({
@@ -68,98 +86,95 @@ const DoctorSignup = () => {
     };
 
     return (
-        <div className="signup-page">
-            <div className="signup-container">
-                <div className="signup-card">
-                    <div className="signup-header">
-                        <span className="signup-icon">👨‍⚕️</span>
-                        <h1>Doctor Registration</h1>
-                        <p>Create your doctor account</p>
-                    </div>
+        <Box 
+            sx={{ 
+                minHeight: '100vh', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                p: 3
+            }}
+        >
+            <Container maxWidth="sm">
+                <Paper 
+                    elevation={12} 
+                    sx={{ 
+                        p: 5, 
+                        borderRadius: 4,
+                        bgcolor: 'background.paper',
+                        textAlign: 'center',
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}
+                >
+                    {/* Background Accent */}
+                    <Box sx={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 6, bgcolor: 'primary.main' }} />
+                    
+                    <Avatar sx={{ m: '0 auto 20px', bgcolor: 'primary.main', width: 64, height: 64 }}>
+                        <MedicalServicesIcon fontSize="large" />
+                    </Avatar>
 
-                    {error && <div className="alert error">{error}</div>}
-                    {success && <div className="alert success">{success}</div>}
+                    <Typography variant="h4" fontWeight={900} gutterBottom sx={{ letterSpacing: -1 }}>
+                        Doctor Registration
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                        Join our clinical network and manage your practice seamlessly.
+                    </Typography>
 
-                    <form onSubmit={handleSubmit} className="signup-form">
-                        <div className="form-row">
-                            <input
-                                type="text"
-                                name="full_name"
-                                placeholder="Full Name *"
-                                value={formData.full_name}
-                                onChange={handleChange}
-                                required
-                            />
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Email Address *"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
+                    {error && <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>{error}</Alert>}
+                    {success && <Alert severity="success" sx={{ mb: 3, textAlign: 'left' }}>{success}</Alert>}
 
-                        <div className="form-row">
-                            <input
-                                type="text"
-                                name="specialty"
-                                placeholder="Specialty (e.g., Cardiology) *"
-                                value={formData.specialty}
-                                onChange={handleChange}
-                                required
-                            />
-                            <input
-                                type="text"
-                                name="license_number"
-                                placeholder="Medical License Number *"
-                                value={formData.license_number}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
+                    <Box component="form" onSubmit={handleSubmit} noValidate>
+                        <Grid container spacing={2.5}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Full Name" name="full_name" value={formData.full_name} onChange={handleChange} required />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Email Address" name="email" type="email" value={formData.email} onChange={handleChange} required />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Specialty" name="specialty" placeholder="e.g. Cardiology" value={formData.specialty} onChange={handleChange} required />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Medical License #" name="license_number" value={formData.license_number} onChange={handleChange} required />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Password" name="password" type="password" value={formData.password} onChange={handleChange} required autoComplete="new-password" />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Confirm Password" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} required autoComplete="new-password" />
+                            </Grid>
+                        </Grid>
 
-                        <input
-                            type="tel"
-                            name="phone"
-                            placeholder="Phone Number"
-                            value={formData.phone}
-                            onChange={handleChange}
-                        />
+                        <Button 
+                            type="submit" 
+                            fullWidth 
+                            variant="contained" 
+                            size="large"
+                            disabled={loading}
+                            sx={{ mt: 5, py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: '1rem', textTransform: 'none' }}
+                        >
+                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Create Professional Account'}
+                        </Button>
 
-                        <div className="form-row">
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder="Password *"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                autoComplete="new-password"
-                            />
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                placeholder="Confirm Password *"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required
-                                autoComplete="new-password"
-                            />
-                        </div>
-
-                        <button type="submit" disabled={loading} className="submit-btn purple">
-                            {loading ? 'Creating Account...' : 'Create Doctor Account'}
-                        </button>
-                    </form>
-
-                    <div className="signup-footer">
-                        <p>Already have an account? <Link to="/">Login here</Link></p>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <Box sx={{ mt: 4 }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Already have an account?{' '}
+                                <Link component={RouterLink} to="/" fontWeight={700} underline="hover" color="primary">
+                                    Login here
+                                </Link>
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Paper>
+            </Container>
+        </Box>
     );
 };
 
 export default DoctorSignup;
+

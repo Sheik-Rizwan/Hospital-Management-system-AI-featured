@@ -1,21 +1,24 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const Notification = ({ message, type, onClose }) => {
-    useEffect(() => {
-        const timer = setTimeout(onClose, 4000);
-        return () => clearTimeout(timer);
-    }, [onClose]);
-
-    if (!message) return null;
-
-    const bgClass = 
-        type === 'success' ? 'bg-green-600' : 
-        type === 'error' ? 'bg-red-600' : 'bg-blue-600';
-
     return (
-        <div className={`fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 text-white ${bgClass}`}>
-            {message}
-        </div>
+        <Snackbar 
+            open={!!message} 
+            autoHideDuration={4000} 
+            onClose={onClose}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+            <Alert 
+                onClose={onClose} 
+                severity={type === 'error' ? 'error' : type === 'success' ? 'success' : 'info'} 
+                variant="filled" 
+                sx={{ width: '100%', borderRadius: 2, fontWeight: 600 }}
+            >
+                {message}
+            </Alert>
+        </Snackbar>
     );
 };
 

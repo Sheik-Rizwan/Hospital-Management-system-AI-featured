@@ -8,20 +8,29 @@ def setup_logger(name='whatsapp_webhook', log_file='logs/webhook.log', level=log
     if logging.getLogger(name).hasHandlers():
         return logging.getLogger(name)
 
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    # Detailed format showing module, function, and line number
+    file_formatter = logging.Formatter(
+        '%(asctime)s | %(levelname)-7s | %(funcName)-30s | L%(lineno)-4d | %(message)s',
+        datefmt='%H:%M:%S'
+    )
+    # Concise but informative console format
+    console_formatter = logging.Formatter(
+        '%(asctime)s | %(levelname)-7s | %(message)s',
+        datefmt='%H:%M:%S'
+    )
     
     # Ensure logs directory exists
     log_dir = os.path.dirname(log_file)
     if log_dir and not os.path.exists(log_dir):
         os.makedirs(log_dir)
     
-    # File Handler
+    # File Handler — detailed
     file_handler = logging.FileHandler(log_file)
-    file_handler.setFormatter(formatter)
+    file_handler.setFormatter(file_formatter)
 
-    # Stream Handler (Console)
+    # Stream Handler (Console) — concise but clear
     stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
+    stream_handler.setFormatter(console_formatter)
 
     logger = logging.getLogger(name)
     logger.setLevel(level)

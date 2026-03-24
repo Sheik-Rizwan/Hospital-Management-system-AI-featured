@@ -78,8 +78,10 @@ class SpeechToTextRecorder:
         except Exception as e:
             raise Exception(f"Recording error: {e}")
 
-    def transcribe_audio_file(self, audio_file_path: str) -> str:
-        """Transcribe an audio file from a path used Groq Whisper API for reliability."""
+    def transcribe_audio_file(self, audio_file_path: str, language_code: str = 'en') -> str:
+        """Transcribe an audio file using Groq Whisper API with multilingual support.
+        language_code: 'en', 'hi', 'te', 'kn' — passed to Whisper for higher accuracy.
+        """
         try:
             import os
             from groq import Groq
@@ -102,9 +104,14 @@ class SpeechToTextRecorder:
                 if size == 0:
                      raise Exception("Audio file is empty")
 
+                # Map common 2-letter codes that Whisper natively understands
+                whisper_lang_map = {'kn': 'kn', 'te': 'te', 'hi': 'hi', 'en': 'en', 'ur': 'ur'}
+                whisper_lang = whisper_lang_map.get(language_code, 'en')
+
                 transcription = client.audio.transcriptions.create(
                     file=(os.path.basename(audio_file_path), file.read()),
                     model="whisper-large-v3",
+                    language=whisper_lang,
                     response_format="json",
                     temperature=0.0
                 )

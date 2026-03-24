@@ -1,26 +1,63 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { API_BASE, setRoleAuth } from '../utils/api';
 import ThemeToggle from '../components/ThemeToggle';
 
+// MUI Components
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActionArea from '@mui/material/CardActionArea';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Stack from '@mui/material/Stack';
+import Avatar from '@mui/material/Avatar';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
+import Tooltip from '@mui/material/Tooltip';
+
+// Icons
+import CloseIcon from '@mui/icons-material/Close';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import PeopleIcon from '@mui/icons-material/People';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+
+const ROLES = [
+    { key: 'nurse', title: 'Nurse', desc: 'Clinical Care & Vitals', icon: <MedicalServicesIcon />, color: '#3B82F6' },
+    { key: 'doctor', title: 'Doctor', desc: 'Expert Clinical Overview', icon: <LocalHospitalIcon />, color: '#8B5CF6' },
+    { key: 'patient', title: 'Patient', desc: 'Access Your Health Records', icon: <PeopleIcon />, color: '#10B981' },
+    { key: 'super_admin', title: 'Admin', desc: 'Environment Management', icon: <AdminPanelSettingsIcon />, color: '#EF4444' },
+    { key: 'vendor', title: 'Vendor', desc: 'Supply Chain Operations', icon: <LocalShippingIcon />, color: '#F59E0B' }
+];
+
 const Login = () => {
-    const [showNurseModal, setShowNurseModal] = useState(false);
-    const [showPatientModal, setShowPatientModal] = useState(false);
-    const [showDoctorModal, setShowDoctorModal] = useState(false);
-    const [showAdminModal, setShowAdminModal] = useState(false);
-    const [showVendorModal, setShowVendorModal] = useState(false);
-    const [showWhatsAppLogin, setShowWhatsAppLogin] = useState(false);
+    const [selectedRole, setSelectedRole] = useState(null);
+    const [showWhatsApp, setShowWhatsApp] = useState(false);
     const [whatsappPhone, setWhatsappPhone] = useState('');
     const [formData, setFormData] = useState({ email: '', password: '', patient_id: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = async (e, type) => {
-        e.preventDefault();
+    const handleLogin = async (e, forceType) => {
+        if (e) e.preventDefault();
         setLoading(true);
         setError('');
 
+        const type = forceType || selectedRole?.key;
         let endpoint = '';
         let payload = {};
 
@@ -31,7 +68,7 @@ const Login = () => {
                 break;
             case 'patient':
                 endpoint = '/auth/patient/login';
-                payload = { patient_id: formData.patient_id, password: formData.password };
+                payload = { patient_id: formData.patient_id || formData.email, password: formData.password };
                 break;
             case 'doctor':
                 endpoint = '/auth/doctor/login';
@@ -46,6 +83,7 @@ const Login = () => {
                 payload = { email: formData.email, password: formData.password };
                 break;
             default:
+                setLoading(false);
                 return;
         }
 
@@ -59,46 +97,22 @@ const Login = () => {
 
             if (data.success) {
                 setRoleAuth(data.user.role, data.access_token, data.user);
-
-                // Navigate based on role
-                switch (data.user.role) {
-                    case 'nurse':
-                        navigate('/nurse-dashboard');
-                        break;
-                    case 'patient':
-                        navigate('/patient-dashboard');
-                        break;
-                    case 'doctor':
-                        navigate('/doctor-dashboard');
-                        break;
-                    case 'super_admin':
-                        navigate('/admin-dashboard');
-                        break;
-                    case 'vendor':
-                        navigate('/vendor-dashboard');
-                        break;
-                    default:
-                        navigate('/');
-                }
+                
+                const dashboardMap = {
+                    'nurse': '/nurse-dashboard',
+                    'patient': '/patient-dashboard',
+                    'doctor': '/doctor-dashboard',
+                    'super_admin': '/admin-dashboard',
+                    'vendor': '/vendor-dashboard'
+                };
+                navigate(dashboardMap[data.user.role] || '/');
             } else {
-                setError(data.error || 'Login failed');
+                setError(data.error || 'Identity verification failed');
             }
         } catch (err) {
-            setError('Network error. Please try again.');
+            setError('System connectivity error. Please retry.');
         }
         setLoading(false);
-    };
-
-    const closeAllModals = () => {
-        setShowNurseModal(false);
-        setShowPatientModal(false);
-        setShowDoctorModal(false);
-        setShowAdminModal(false);
-        setShowVendorModal(false);
-        setShowWhatsAppLogin(false);
-        setWhatsappPhone('');
-        setError('');
-        setFormData({ email: '', password: '', patient_id: '' });
     };
 
     const handleWhatsAppLogin = async (e) => {
@@ -118,308 +132,231 @@ const Login = () => {
                 setRoleAuth(data.user.role, data.access_token, data.user);
                 navigate('/patient-dashboard');
             } else {
-                setError(data.error || 'Login failed');
+                setError(data.error || 'Verified number not found');
             }
         } catch (err) {
-            setError('Network error. Please try again.');
+            setError('Connectivity error. Please retry.');
         }
         setLoading(false);
     };
 
+    const handleClose = () => {
+        if (loading) return;
+        setSelectedRole(null);
+        setShowWhatsApp(false);
+        setError('');
+        setFormData({ email: '', password: '', patient_id: '' });
+    };
+
     return (
-        <div className="login-page">
-            {/* Theme Toggle */}
-            <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 10 }}>
-                <ThemeToggle />
-            </div>
+        <Box 
+            sx={{ 
+                minHeight: '100vh', 
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative'
+            }}
+        >
+            {/* Navigation Header */}
+            <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>
+                        <MedicalServicesIcon sx={{ fontSize: 18 }} />
+                    </Avatar>
+                    <Typography variant="h6" fontWeight={900} sx={{ letterSpacing: -0.5 }}>MedCore AI</Typography>
+                </Box>
+                <Stack direction="row" spacing={2} alignItems="center">
+                    <ThemeToggle />
+                    <Box component="img" src="/logo.png" sx={{ height: 32, opacity: 0.8 }} />
+                </Stack>
+            </Box>
 
-            <div className="login-container">
-                {/* Logo and Title */}
-                <div className="login-header">
-                    <div className="login-logo">
-                        <svg className="logo-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m-8-8h16" />
-                        </svg>
-                    </div>
-                    <h1 className="login-title">MedCore AI</h1>
-                    <p className="login-subtitle">AI-Powered Clinical Intelligence Platform</p>
-                </div>
+            {/* Main Content */}
+            <Container maxWidth="lg" sx={{ flex: 1, display: 'flex', alignItems: 'center', py: 6 }}>
+                <Grid container spacing={8} alignItems="center">
+                    <Grid item xs={12} lg={6}>
+                        <Typography variant="overline" color="primary.light" sx={{ fontWeight: 800, letterSpacing: 3, mb: 1, display: 'block' }}>
+                            NEXT-GEN HEALTHCARE OS
+                        </Typography>
+                        <Typography variant="h1" sx={{ fontWeight: 900, mb: 3, lineHeight: 1.1, fontSize: { xs: '3rem', md: '4.5rem' }, color: 'white' }}>
+                            Clinical Intelligence <Box component="span" sx={{ color: 'primary.main' }}>Unleashed.</Box>
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: 'rgba(255,255,255,0.7)', mb: 5, fontWeight: 400, maxWidth: 500 }}>
+                            Empowering healthcare professionals with AI-driven workflows, patient insights, and seamless resource coordination.
+                        </Typography>
+                        
+                        <Stack direction="row" spacing={3} sx={{ opacity: 0.6 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <VpnKeyIcon sx={{ fontSize: 16, color: 'white' }} />
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'white' }}>SECURE ACCESS</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <AdminPanelSettingsIcon sx={{ fontSize: 16, color: 'white' }} />
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'white' }}>HIPAA COMPLIANT</Typography>
+                            </Box>
+                        </Stack>
+                    </Grid>
 
-                {/* Role Selection Cards */}
-                <div className="login-card">
-                    <p className="login-prompt">Select your role to continue</p>
+                    <Grid item xs={12} lg={6}>
+                        <Box sx={{ p: { xs: 0, sm: 4 }, borderRadius: 6, bgcolor: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <Typography variant="h5" align="center" sx={{ fontWeight: 800, mb: 1, color: 'white' }}>Welcome Back</Typography>
+                            <Typography variant="body2" align="center" sx={{ color: 'rgba(255, 255, 255, 0.6)', mb: 4 }}>Choose your access point to enter the workspace</Typography>
+                            
+                            <Grid container spacing={2}>
+                                {ROLES.map(role => (
+                                    <Grid item xs={12} sm={6} key={role.key}>
+                                        <Card 
+                                            sx={{ 
+                                                bgcolor: 'rgba(255,255,255,0.05)', 
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                '&:hover': { borderColor: role.color, transform: 'translateY(-4px)', bgcolor: 'rgba(255,255,255,0.08)' },
+                                                transition: '0.3s'
+                                            }}
+                                        >
+                                            <CardActionArea onClick={() => setSelectedRole(role)} sx={{ p: 2 }}>
+                                                <Avatar sx={{ bgcolor: role.color, mb: 1.5, width: 44, height: 44 }}>{role.icon}</Avatar>
+                                                <Typography variant="subtitle1" fontWeight={800} sx={{ color: 'white' }}>{role.title}</Typography>
+                                                <Typography variant="caption" sx={{ display: 'block', color: 'rgba(255, 255, 255, 0.5)' }}>{role.desc}</Typography>
+                                            </CardActionArea>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    </Grid>
+                </Grid>
+            </Container>
 
-                    <div className="role-grid">
-                        {/* Nurse */}
-                        <button onClick={() => setShowNurseModal(true)} className="role-btn nurse">
-                            <span className="role-icon">👩‍⚕️</span>
-                            <p className="role-title">Nurse</p>
-                            <p className="role-desc">Full System Access</p>
-                        </button>
+            {/* Footer */}
+            <Box sx={{ p: 4, textAlign: 'center', opacity: 0.4 }}>
+                <Typography variant="caption" sx={{ color: 'white' }}>© 2026 CortexCraft.AI • All Clinical Data Encrypted • Version 4.2.0-LTS</Typography>
+            </Box>
 
-                        {/* Doctor */}
-                        <button onClick={() => setShowDoctorModal(true)} className="role-btn doctor">
-                            <span className="role-icon">👨‍⚕️</span>
-                            <p className="role-title">Doctor</p>
-                            <p className="role-desc">Clinical Overview</p>
-                        </button>
-
-                        {/* Patient */}
-                        <button onClick={() => setShowPatientModal(true)} className="role-btn patient">
-                            <span className="role-icon">💚</span>
-                            <p className="role-title">Patient</p>
-                            <p className="role-desc">View Your Info</p>
-                        </button>
-
-                        {/* Super Admin */}
-                        <button onClick={() => setShowAdminModal(true)} className="role-btn admin">
-                            <span className="role-icon">🛡️</span>
-                            <p className="role-title">Admin</p>
-                            <p className="role-desc">System Management</p>
-                        </button>
-
-                        {/* Vendor */}
-                        <button onClick={() => setShowVendorModal(true)} className="role-btn vendor">
-                            <span className="role-icon">🚚</span>
-                            <p className="role-title">Vendor</p>
-                            <p className="role-desc">Supply Chain</p>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <p className="login-footer">
-                    🔒 Secure • HIPAA Compliant • AI-Powered
-                </p>
-            </div>
-
-            {/* Nurse Login Modal */}
-            {showNurseModal && (
-                <LoginModal
-                    title="Nurse Login"
-                    type="nurse"
-                    color="blue"
-                    icon="👩‍⚕️"
-                    formData={formData}
-                    setFormData={setFormData}
-                    onSubmit={handleLogin}
-                    onClose={closeAllModals}
-                    loading={loading}
-                    error={error}
-                    emailPlaceholder="Nurse Email"
-                    showSignup
-                    signupLink="/nurse-signup"
-                />
-            )}
-
-            {/* Doctor Login Modal */}
-            {showDoctorModal && (
-                <LoginModal
-                    title="Doctor Login"
-                    type="doctor"
-                    color="purple"
-                    icon="👨‍⚕️"
-                    formData={formData}
-                    setFormData={setFormData}
-                    onSubmit={handleLogin}
-                    onClose={closeAllModals}
-                    loading={loading}
-                    error={error}
-                    emailPlaceholder="Doctor Email"
-                    showSignup
-                    signupLink="/doctor-signup"
-                />
-            )}
-
-            {/* Super Admin Login Modal */}
-            {showAdminModal && (
-                <LoginModal
-                    title="Admin Login"
-                    type="super_admin"
-                    color="red"
-                    icon="🛡️"
-                    formData={formData}
-                    setFormData={setFormData}
-                    onSubmit={handleLogin}
-                    onClose={closeAllModals}
-                    loading={loading}
-                    error={error}
-                    emailPlaceholder="Admin Email"
-                    showSignup
-                    signupLink="/admin-signup"
-                />
-            )}
-
-            {/* Vendor Login Modal */}
-            {showVendorModal && (
-                <LoginModal
-                    title="Vendor Login"
-                    type="vendor"
-                    color="green"
-                    icon="🚚"
-                    formData={formData}
-                    setFormData={setFormData}
-                    onSubmit={handleLogin}
-                    onClose={closeAllModals}
-                    loading={loading}
-                    error={error}
-                    emailPlaceholder="Vendor Email"
-                    showSignup
-                    signupLink="/vendor-signup"
-                />
-            )}
-
-            {/* Patient Login Modal */}
-            {showPatientModal && (
-                <div className="modal-overlay">
-                    <div className="modal-box">
-                        <div className="modal-accent green"></div>
-                        <button onClick={closeAllModals} className="modal-close">✕</button>
-
-                        <div className="modal-header">
-                            <span className="modal-icon">💚</span>
-                            <h2>Patient Login</h2>
-                        </div>
-
-                        {error && <div className="modal-error">{error}</div>}
-
-                        <form onSubmit={(e) => handleLogin(e, 'patient')} className="modal-form" autoComplete="off">
-                            <input
-                                type="text"
-                                placeholder="Patient ID or Email"
-                                className="modal-input"
-                                value={formData.patient_id}
-                                onChange={e => setFormData({ ...formData, patient_id: e.target.value })}
+            {/* Role Login Dialog */}
+            <Dialog 
+                open={!!selectedRole} 
+                onClose={handleClose} 
+                maxWidth="xs" 
+                fullWidth
+                PaperProps={{ 
+                    sx: { borderRadius: 4, p: 1, borderBottom: 6, borderColor: selectedRole?.color } 
+                }}
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar sx={{ bgcolor: selectedRole?.color }}>{selectedRole?.icon}</Avatar>
+                        <Box>
+                            <Typography variant="h6" fontWeight={900}>{selectedRole?.title} Login</Typography>
+                            <Typography variant="caption" color="text.secondary">Secure Authentication Portal</Typography>
+                        </Box>
+                    </Stack>
+                    <IconButton onClick={handleClose} size="small" disabled={loading}><CloseIcon /></IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+                    <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
+                        <Stack spacing={2.5}>
+                            <TextField 
+                                fullWidth 
+                                label={selectedRole?.key === 'patient' ? "Patient ID" : "Corporate Email"} 
+                                variant="outlined" 
+                                value={selectedRole?.key === 'patient' ? formData.patient_id : formData.email}
+                                onChange={e => selectedRole?.key === 'patient' ? setFormData({...formData, patient_id: e.target.value}) : setFormData({...formData, email: e.target.value})}
                                 required
-                                autoComplete="off"
-                                name={`patient_id_${Math.random().toString(36).slice(2)}`}
                             />
-                            <input
-                                type="password"
-                                placeholder="Password"
-                                className="modal-input"
+                            <TextField 
+                                fullWidth 
+                                label="Security Password" 
+                                type="password" 
+                                variant="outlined" 
                                 value={formData.password}
-                                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                onChange={e => setFormData({...formData, password: e.target.value})}
                                 required
-                                autoComplete="current-password"
-                                name={`password_${Math.random().toString(36).slice(2)}`}
                             />
-                            <button type="submit" disabled={loading} className="modal-submit green">
-                                {loading ? 'Logging in...' : 'Login'}
-                            </button>
-                        </form>
-                        <div className="modal-link">
-                            <Link to="/patient-signup">Sign up as Patient</Link>
-                        </div>
-                        <div className="modal-link" style={{ marginTop: '8px' }}>
-                            <button 
-                                type="button"
-                                onClick={() => { setShowPatientModal(false); setShowWhatsAppLogin(true); setError(''); }}
-                                style={{ background: 'none', border: 'none', color: '#25D366', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center', width: '100%' }}
+                            <Button 
+                                fullWidth 
+                                variant="contained" 
+                                size="large" 
+                                type="submit" 
+                                disabled={loading}
+                                sx={{ py: 1.5, borderRadius: 2, bgcolor: selectedRole?.color, '&:hover': { bgcolor: selectedRole?.color, opacity: 0.9 } }}
                             >
-                                <span style={{ fontSize: '18px' }}>📱</span> Login with WhatsApp Number
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* WhatsApp Patient Login Modal */}
-            {showWhatsAppLogin && (
-                <div className="modal-overlay">
-                    <div className="modal-box">
-                        <div className="modal-accent green"></div>
-                        <button onClick={closeAllModals} className="modal-close">✕</button>
-
-                        <div className="modal-header">
-                            <span className="modal-icon">📱</span>
-                            <h2>WhatsApp Login</h2>
-                        </div>
-
-                        <p style={{ textAlign: 'center', fontSize: '13px', color: 'var(--color-muted-foreground)', marginBottom: '16px' }}>
-                            Enter the phone number you used to book an appointment via WhatsApp
-                        </p>
-
-                        {error && <div className="modal-error">{error}</div>}
-
-                        <form onSubmit={handleWhatsAppLogin} className="modal-form" autoComplete="off">
-                            <input
-                                type="tel"
-                                placeholder="Phone number (e.g. 918885851826)"
-                                className="modal-input"
-                                value={whatsappPhone}
-                                onChange={e => setWhatsappPhone(e.target.value)}
-                                required
-                                autoComplete="off"
-                            />
-                            <button type="submit" disabled={loading} className="modal-submit green">
-                                {loading ? 'Logging in...' : 'Login with WhatsApp'}
-                            </button>
-                        </form>
-                        <div className="modal-link" style={{ marginTop: '8px' }}>
-                            <button 
-                                type="button"
-                                onClick={() => { setShowWhatsAppLogin(false); setShowPatientModal(true); setError(''); }}
-                                style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
+                                {loading ? <CircularProgress size={24} color="inherit" /> : `Enter Workspace →`}
+                            </Button>
+                        </Stack>
+                    </Box>
+                    <Box sx={{ mt: 3, textAlign: 'center' }}>
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                            Don't have an account?{' '}
+                            <Link component={RouterLink} to={`/${selectedRole?.key}-signup`} sx={{ fontWeight: 700, color: selectedRole?.color }}>Sign up now</Link>
+                        </Typography>
+                        {selectedRole?.key === 'patient' && (
+                            <Button 
+                                startIcon={<WhatsAppIcon sx={{ color: '#25D366' }} />} 
+                                onClick={() => { setSelectedRole(null); setShowWhatsApp(true); }}
+                                sx={{ textTransform: 'none', color: 'text.secondary', fontWeight: 500 }}
                             >
-                                Back to Patient Login
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
+                                Login with WhatsApp Number
+                            </Button>
+                        )}
+                    </Box>
+                </DialogContent>
+            </Dialog>
+
+            {/* WhatsApp Login Dialog */}
+            <Dialog 
+                open={showWhatsApp} 
+                onClose={handleClose} 
+                maxWidth="xs" 
+                fullWidth
+                PaperProps={{ sx: { borderRadius: 4, p: 1, borderBottom: 6, borderColor: '#25D366' } }}
+            >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar sx={{ bgcolor: '#25D366' }}><WhatsAppIcon /></Avatar>
+                        <Box>
+                            <Typography variant="h6" fontWeight={800}>WhatsApp Login</Typography>
+                            <Typography variant="caption" color="text.secondary">Vitals & Record Access</Typography>
+                        </Box>
+                    </Stack>
+                    <IconButton onClick={handleClose} size="small"><CloseIcon /></IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ mb: 3, opacity: 0.7 }}>Enter the phone number associated with your WhatsApp clinical consultations.</Typography>
+                    {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+                    <Box component="form" onSubmit={handleWhatsAppLogin}>
+                        <TextField 
+                            fullWidth 
+                            label="WhatsApp Phone Number" 
+                            placeholder="e.g. 918885851826" 
+                            variant="outlined" 
+                            value={whatsappPhone}
+                            onChange={e => setWhatsappPhone(e.target.value)}
+                            required
+                            sx={{ mb: 3 }}
+                        />
+                        <Button 
+                            fullWidth 
+                            variant="contained" 
+                            size="large" 
+                            type="submit" 
+                            disabled={loading}
+                            sx={{ py: 1.5, borderRadius: 2, bgcolor: '#25D366', '&:hover': { bgcolor: '#1ea952' } }}
+                        >
+                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Verify & Continue'}
+                        </Button>
+                    </Box>
+                    <Box sx={{ mt: 3, textAlign: 'center' }}>
+                        <Button onClick={() => { setShowWhatsApp(false); setSelectedRole(ROLES.find(r => r.key === 'patient')); }} sx={{ color: 'text.secondary' }}>
+                            Back to Patient ID Login
+                        </Button>
+                    </Box>
+                </DialogContent>
+            </Dialog>
+        </Box>
     );
 };
 
-// Reusable login modal component
-const LoginModal = ({ title, type, color, icon, formData, setFormData, onSubmit, onClose, loading, error, emailPlaceholder, showSignup, signupLink }) => {
-    return (
-        <div className="modal-overlay">
-            <div className="modal-box">
-                <div className={`modal-accent ${color}`}></div>
-                <button onClick={onClose} className="modal-close">✕</button>
-
-                <div className="modal-header">
-                    <span className="modal-icon">{icon}</span>
-                    <h2>{title}</h2>
-                </div>
-
-                {error && <div className="modal-error">{error}</div>}
-
-                <form onSubmit={(e) => onSubmit(e, type)} className="modal-form" autoComplete="off">
-                    <input
-                        type="email"
-                        placeholder={emailPlaceholder || "Email"}
-                        className="modal-input"
-                        value={formData.email}
-                        onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        required
-                        autoComplete="off"
-                        name={`email_${Math.random().toString(36).slice(2)}`}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        className="modal-input"
-                        value={formData.password}
-                        onChange={e => setFormData({ ...formData, password: e.target.value })}
-                        required
-                        autoComplete="current-password"
-                        name={`password_${Math.random().toString(36).slice(2)}`}
-                    />
-                    <button type="submit" disabled={loading} className={`modal-submit ${color}`}>
-                        {loading ? 'Logging in...' : 'Login'}
-                    </button>
-                </form>
-                {showSignup && (
-                    <div className="modal-link">
-                        <Link to={signupLink}>Sign up as {title.replace(' Login', '')}</Link>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
-
-export default Login;
+export default Login;

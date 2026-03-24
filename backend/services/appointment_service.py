@@ -9,7 +9,8 @@ from logger_config import logger
 
 class AppointmentService:
     def __init__(self):
-        self.db = MongoDatabase().db
+        self.mongo = MongoDatabase()          # singleton – has .doctors, .patients, etc. (healthcare_db)
+        self.db    = self.mongo.db             # nurse_handoff_db – appointments, schedules, services, logs
 
     # ═══════════════════════════════════════════
     #  SERVICES
@@ -36,7 +37,7 @@ class AppointmentService:
             safe = _re.escape(specialization.strip())
             query['specialization'] = {'$regex': f'^\\s*{safe}\\s*$', '$options': 'i'}
             
-        doctors = list(self.db.doctors.find(query, {'_id': 0, 'password': 0}))
+        doctors = list(self.mongo.doctors.find(query, {'_id': 0, 'password': 0}))
         
         # Enrich with schedule availability flag
         for doc in doctors:
@@ -63,20 +64,22 @@ class AppointmentService:
         
         # 2. Find doctors where specialization matches the service name (case-insensitive)
         # We also support mapped service_id as a fallback
+        import re as _re
+        safe_name = _re.escape(service_name.strip())
         query = {
             'is_active': True,
             '$or': [
-                {'specialization': {'$regex': f'^{service_name}$', '$options': 'i'}},
+                {'specialization': {'$regex': f'^\\s*{safe_name}\\s*$', '$options': 'i'}},
                 {'service_id': service_id}
             ]
         }
         
-        doctors = list(self.db.doctors.find(query, {'_id': 0, 'password': 0}))
+        doctors = list(self.mongo.doctors.find(query, {'_id': 0, 'password': 0}))
         return doctors
 
     def get_doctor_by_id(self, doctor_id):
         """Get specific doctor details."""
-        return self.db.doctors.find_one(
+        return self.mongo.doctors.find_one(
             {'user_id': doctor_id}, 
             {'_id': 0, 'password': 0}
         )
@@ -196,12 +199,29 @@ class AppointmentService:
     def _classify_shift(self, start_time):
         """Classify a shift based on start time."""
         hour = int(start_time.split(':')[0])
-        if hour < 12:
+        if 7 <= hour < 12:
             return "Morning"
-        elif hour < 17:
+        elif 12 <= hour < 17:
             return "Afternoon"
-        else:
+        elif 17 <= hour < 22:
             return "Evening"
+        else:
+            return "Night"
+
+    @staticmethod
+    def format_time_ampm(time_str):
+        """Convert 24h time string like '09:00' to '9:00 AM', '22:00' to '10:00 PM'."""
+        try:
+            h, m = map(int, time_str.split(':'))
+            period = 'AM' if h < 12 else 'PM'
+            h12 = h if h == 0 else (h if h <= 12 else h - 12)
+            if h == 0:
+                h12 = 12
+            if m > 0:
+                return f"{h12}:{m:02d} {period}"
+            return f"{h12}:00 {period}"
+        except Exception:
+            return time_str
 
     # ═══════════════════════════════════════════
     #  SLOT AVAILABILITY
@@ -303,7 +323,17 @@ class AppointmentService:
             key = f"{s['start']}-{s['end']}"
             if key not in unique_map:
                 unique_map[key] = s
-        all_slots = sorted(list(unique_map.values()), key=lambda x: x['start'])
+
+        # Chronology-aware sorting: for overnight shifts, post-midnight hours
+        # (< 12) sort after pre-midnight hours (>= 18) instead of before them
+        has_evening_or_night = any(int(s['start'].split(':')[0]) >= 18 for s in unique_map.values())
+        def _chrono_sort_key(slot):
+            h = int(slot['start'].split(':')[0])
+            m = int(slot['start'].split(':')[1])
+            if has_evening_or_night and h < 12:
+                return (h + 24) * 60 + m
+            return h * 60 + m
+        all_slots = sorted(list(unique_map.values()), key=_chrono_sort_key)
 
         # Filter booked slots — any active status blocks the slot
         booked = list(self.db.appointments.find({
@@ -350,8 +380,45 @@ class AppointmentService:
         """
         Book an appointment.
         Expected keys: patient_id, doctor_id, date, start_time, end_time, created_by
+        Validates: (1) time falls within doctor's schedule, (2) slot not already booked.
         """
-        # Double check availability (concurrency) — block ALL active statuses
+        doctor_id = appointment_data['doctor_id']
+        date_str = appointment_data['date']
+        start_time = appointment_data['start_time']
+
+        # ── Validate: time must be within a valid schedule slot ──
+        shifts = self.get_available_shifts(doctor_id, date_str)
+        if not shifts:
+            raise ValueError(f"Doctor has no available shifts on {date_str}")
+
+        # Check if start_time falls within ANY shift's actual slots
+        valid_slot = False
+        slot_end_time = None
+        for s in shifts:
+            slots = self.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
+            for slot in slots:
+                if slot['start'] == start_time:
+                    valid_slot = True
+                    slot_end_time = slot['end']
+                    break
+            if valid_slot:
+                break
+
+        if not valid_slot:
+            all_free = []
+            for s in shifts:
+                slots = self.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
+                all_free.extend(slot['start'] for slot in slots)
+            raise ValueError(
+                f"Time {start_time} is not within the doctor's schedule on {date_str}. "
+                f"Available times: {', '.join(all_free[:8])}"
+            )
+
+        # Auto-fix end_time if missing or incorrect
+        if not appointment_data.get('end_time') and slot_end_time:
+            appointment_data['end_time'] = slot_end_time
+
+        # ── Double check availability (concurrency) — block ALL active statuses ──
         existing = self.db.appointments.find_one({
             'doctor_id': appointment_data['doctor_id'],
             'date': appointment_data['date'],
@@ -369,6 +436,7 @@ class AppointmentService:
         # Create model
         new_appt = Appointment.create(appointment_data)
         result = self.db.appointments.insert_one(new_appt)
+        new_appt.pop('_id', None)  # Remove MongoDB ObjectId (not JSON serializable)
         
         # Create Log
         self.log_action(
@@ -441,9 +509,9 @@ class AppointmentService:
             'date': {'$gte': today}
         }).sort('date', 1))
         
-        # Enrich with doctor info from doctors collection
+        # Enrich with doctor info from doctors collection (healthcare_db)
         for apt in appts:
-            doc = self.db.doctors.find_one({'user_id': apt['doctor_id']})
+            doc = self.mongo.doctors.find_one({'user_id': apt['doctor_id']})
             if doc:
                 apt['doctor_name'] = doc.get('full_name', '')
                 apt['doctor_specialization'] = doc.get('specialization', '')

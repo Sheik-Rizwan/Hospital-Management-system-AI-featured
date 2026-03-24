@@ -2,6 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { API_BASE, getAuthHeaders, formatDate } from '../../utils/api';
 import { jsPDF } from 'jspdf';
 
+// MUI Components
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import IconButton from '@mui/material/IconButton';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import CircularProgress from '@mui/material/CircularProgress';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Divider from '@mui/material/Divider';
+import Tooltip from '@mui/material/Tooltip';
+import LinearProgress from '@mui/material/LinearProgress';
+
+// Icons
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
+import StoreIcon from '@mui/icons-material/Store';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import AddIcon from '@mui/icons-material/Add';
+import DescriptionIcon from '@mui/icons-material/Description';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+
 const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
     const [activeTab, setActiveTab] = useState('inventory');
     const [loading, setLoading] = useState(false);
@@ -29,12 +74,13 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
     const [quotations, setQuotations] = useState([]);
     const [loadingQuotations, setLoadingQuotations] = useState(false);
     const [selectedBudgetId, setSelectedBudgetId] = useState('');
+    const [creatingPO, setCreatingPO] = useState(false);
 
     useEffect(() => {
         loadData();
     }, [activeTab]);
 
-    // Re-load data when refreshTrigger changes (real-time update from socket)
+    // Re-load data when refreshTrigger changes
     useEffect(() => {
         if (refreshTrigger > 0) loadData();
     }, [refreshTrigger]);
@@ -65,7 +111,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
                 if (activeTab === 'orders') setOrders(data.orders || []);
             }
 
-            // Also load approved vendors and budgets when viewing requests
             if (activeTab === 'requests') {
                 const vendorRes = await fetch(`${API_BASE}/procurement/vendors?approved=true`, { headers });
                 const vendorData = await vendorRes.json();
@@ -79,12 +124,11 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
                 }
             }
         } catch (error) {
+            console.error('Procurement error:', error);
             if (showNotify) showNotify(`Failed to load ${activeTab}`, 'error');
         }
         setLoading(false);
     };
-
-    // --- Action Handlers ---
 
     const handleApproveRequest = async (id) => {
         try {
@@ -95,19 +139,19 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             });
             const data = await res.json();
             if (data.success) {
-                showNotify('Request approved', 'success');
+                showNotify?.('Request approved', 'success');
                 setAssigningRequestId(null);
                 setSelectedVendorId('');
                 loadData();
             } else {
-                showNotify(data.error || 'Approval failed', 'error');
+                showNotify?.(data.error || 'Approval failed', 'error');
             }
-        } catch (e) { showNotify('Error approving request', 'error'); }
+        } catch (e) { showNotify?.('Error approving request', 'error'); }
     };
 
     const handleRejectRequest = async (id) => {
-        const reason = prompt('Enter rejection reason:');
-        if (reason === null) return; // User cancelled
+        const reason = window.prompt('Enter rejection reason:');
+        if (reason === null) return;
         try {
             const res = await fetch(`${API_BASE}/procurement/requests/${id}/reject`, {
                 method: 'PUT',
@@ -116,12 +160,12 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             });
             const data = await res.json();
             if (data.success) {
-                showNotify('Request rejected', 'success');
+                showNotify?.('Request rejected', 'success');
                 loadData();
             } else {
-                showNotify(data.error || 'Rejection failed', 'error');
+                showNotify?.(data.error || 'Rejection failed', 'error');
             }
-        } catch (e) { showNotify('Error rejecting request', 'error'); }
+        } catch (e) { showNotify?.('Error rejecting request', 'error'); }
     };
 
     const handleCompleteOrder = async (id) => {
@@ -132,12 +176,12 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             });
             const data = await res.json();
             if (data.success) {
-                showNotify('Order completed', 'success');
+                showNotify?.('Order completed', 'success');
                 loadData();
             } else {
-                showNotify(data.error || 'Completion failed', 'error');
+                showNotify?.(data.error || 'Completion failed', 'error');
             }
-        } catch (e) { showNotify('Error completing order', 'error'); }
+        } catch (e) { showNotify?.('Error completing order', 'error'); }
     };
 
     const handleCreateBudget = async (e) => {
@@ -153,17 +197,16 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             });
             const data = await res.json();
             if (data.success) {
-                showNotify('Budget created successfully', 'success');
+                showNotify?.('Budget created successfully', 'success');
                 setBudgetForm({ department: '', total_budget: '' });
                 setShowBudgetForm(false);
                 loadData();
             } else {
-                showNotify(data.error || 'Failed to create budget', 'error');
+                showNotify?.(data.error || 'Failed to create budget', 'error');
             }
-        } catch (e) { showNotify('Error creating budget', 'error'); }
+        } catch (e) { showNotify?.('Error creating budget', 'error'); }
     };
 
-    // Fetch quotations for a request
     const handleViewQuotations = async (requestId) => {
         setViewingRequestId(requestId);
         setLoadingQuotations(true);
@@ -175,52 +218,60 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             if (data.success) {
                 setQuotations(data.quotations || []);
             } else {
-                showNotify(data.error || 'Failed to load quotations', 'error');
+                showNotify?.(data.error || 'Failed to load quotations', 'error');
             }
-        } catch (e) { showNotify('Error loading quotations', 'error'); }
+        } catch (e) { showNotify?.('Error loading quotations', 'error'); }
         setLoadingQuotations(false);
     };
 
-    // Select a quotation to create a Purchase Order
-    const handleSelectQuotation = async (requestId, quotationId) => {
+    const handleSelectQuotation = async (requestId, quotationId, deliveryDays) => {
         if (!selectedBudgetId) {
-            showNotify('Please select a budget to deduct from', 'error');
+            showNotify?.('Please select a budget to deduct from', 'error');
             return;
         }
+        if (creatingPO) return;
+        setCreatingPO(true);
         try {
+            const expectedDeliveryDate = new Date();
+            expectedDeliveryDate.setDate(expectedDeliveryDate.getDate() + (deliveryDays || 0));
+            const expectedDateString = expectedDeliveryDate.toISOString().split('T')[0];
+
             const res = await fetch(`${API_BASE}/procurement/requests/${requestId}/select-quotation`, {
                 method: 'POST',
                 headers: { ...getAuthHeaders('super_admin'), 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quotation_id: quotationId, budget_id: selectedBudgetId })
+                body: JSON.stringify({ 
+                    quotation_id: quotationId, 
+                    budget_id: selectedBudgetId,
+                    expected_delivery: expectedDateString
+                })
             });
             const data = await res.json();
             if (data.success) {
-                showNotify('Purchase Order created successfully!', 'success');
+                showNotify?.('Purchase Order created successfully!', 'success');
                 setViewingRequestId(null);
                 setQuotations([]);
                 setSelectedBudgetId('');
                 loadData();
             } else {
-                showNotify(data.error || 'Failed to create PO', 'error');
+                showNotify?.(data.error || 'Failed to create PO', 'error');
             }
-        } catch (e) { showNotify('Error creating purchase order', 'error'); }
+        } catch (e) { showNotify?.('Error creating purchase order', 'error'); }
+        setCreatingPO(false);
     };
 
-    // Generate Admin PO PDF (with budget details)
     const generateAdminPO = async (poId) => {
         try {
             const res = await fetch(`${API_BASE}/procurement/orders/${poId}/pdf-data`, {
                 headers: getAuthHeaders('super_admin')
             });
             const data = await res.json();
-            if (!data.success) { showNotify(data.error || 'Failed to load PO data', 'error'); return; }
+            if (!data.success) { showNotify?.(data.error || 'Failed to load PO data', 'error'); return; }
 
             const { order, vendor, budget } = data;
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
             let y = 20;
 
-            // Title
             doc.setFontSize(18);
             doc.setFont('helvetica', 'bold');
             doc.text('PURCHASE ORDER (Admin Copy)', pageWidth / 2, y, { align: 'center' });
@@ -234,7 +285,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             doc.text(`Status: ${order.status.toUpperCase()}`, pageWidth / 2, y, { align: 'center' });
             y += 12;
 
-            // Vendor Info
             doc.setDrawColor(100);
             doc.line(14, y, pageWidth - 14, y);
             y += 8;
@@ -252,7 +302,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             if (vendor.gst_number) { doc.text(`GST: ${vendor.gst_number}`, 14, y); y += 6; }
             y += 6;
 
-            // Items Table
             doc.line(14, y, pageWidth - 14, y);
             y += 8;
             doc.setFontSize(13);
@@ -260,7 +309,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             doc.text('Order Items', 14, y);
             y += 8;
 
-            // Table header
             doc.setFontSize(10);
             doc.setFont('helvetica', 'bold');
             doc.text('Item', 14, y);
@@ -271,7 +319,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             doc.line(14, y, pageWidth - 14, y);
             y += 6;
 
-            // Table rows
             doc.setFont('helvetica', 'normal');
             (order.items || []).forEach(item => {
                 doc.text(item.item_name || '', 14, y);
@@ -284,7 +331,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             doc.line(14, y, pageWidth - 14, y);
             y += 6;
 
-            // Total
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(12);
             doc.text(`Total Amount: Rs.${(order.total_amount || 0).toLocaleString()}`, 14, y);
@@ -292,7 +338,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             if (order.department) { doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Department: ${order.department}`, 14, y); y += 6; }
             y += 8;
 
-            // Budget Summary (Admin only)
             if (budget) {
                 doc.line(14, y, pageWidth - 14, y);
                 y += 8;
@@ -310,25 +355,23 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             }
 
             doc.save(`PO_Admin_${order.po_id}.pdf`);
-            showNotify('Admin PO PDF downloaded', 'success');
-        } catch (e) { showNotify('Error generating PDF', 'error'); }
+            showNotify?.('Admin PO PDF downloaded', 'success');
+        } catch (e) { showNotify?.('Error generating PDF', 'error'); }
     };
 
-    // Generate Vendor PO PDF (no budget details)
     const generateVendorPO = async (poId) => {
         try {
             const res = await fetch(`${API_BASE}/procurement/orders/${poId}/pdf-data`, {
                 headers: getAuthHeaders('super_admin')
             });
             const data = await res.json();
-            if (!data.success) { showNotify(data.error || 'Failed to load PO data', 'error'); return; }
+            if (!data.success) { showNotify?.(data.error || 'Failed to load PO data', 'error'); return; }
 
             const { order, vendor } = data;
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
             let y = 20;
 
-            // Title
             doc.setFontSize(18);
             doc.setFont('helvetica', 'bold');
             doc.text('PURCHASE ORDER', pageWidth / 2, y, { align: 'center' });
@@ -342,7 +385,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             doc.text(`Status: ${order.status.toUpperCase()}`, pageWidth / 2, y, { align: 'center' });
             y += 12;
 
-            // Vendor Info
             doc.setDrawColor(100);
             doc.line(14, y, pageWidth - 14, y);
             y += 8;
@@ -360,7 +402,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             if (vendor.gst_number) { doc.text(`GST: ${vendor.gst_number}`, 14, y); y += 6; }
             y += 6;
 
-            // Items Table
             doc.line(14, y, pageWidth - 14, y);
             y += 8;
             doc.setFontSize(13);
@@ -368,7 +409,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             doc.text('Order Items', 14, y);
             y += 8;
 
-            // Table header
             doc.setFontSize(10);
             doc.setFont('helvetica', 'bold');
             doc.text('Item', 14, y);
@@ -379,7 +419,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             doc.line(14, y, pageWidth - 14, y);
             y += 6;
 
-            // Table rows
             doc.setFont('helvetica', 'normal');
             (order.items || []).forEach(item => {
                 doc.text(item.item_name || '', 14, y);
@@ -392,7 +431,6 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             doc.line(14, y, pageWidth - 14, y);
             y += 6;
 
-            // Total
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(12);
             doc.text(`Total Amount: Rs.${(order.total_amount || 0).toLocaleString()}`, 14, y);
@@ -401,472 +439,411 @@ const ProcurementPanel = ({ showNotify, refreshTrigger }) => {
             if (order.expected_delivery) { doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Expected Delivery: ${formatDate(order.expected_delivery)}`, 14, y); y += 6; }
 
             doc.save(`PO_Vendor_${order.po_id}.pdf`);
-            showNotify('Vendor PO PDF downloaded', 'success');
-        } catch (e) { showNotify('Error generating PDF', 'error'); }
+            showNotify?.('Vendor PO PDF downloaded', 'success');
+        } catch (e) { showNotify?.('Error generating PDF', 'error'); }
     };
 
-    // --- Render Helpers ---
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+    };
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-bold text-foreground">Procurement Management</h2>
-                <div className="flex gap-2 bg-card p-1 rounded-lg">
-                    {['inventory', 'requests', 'vendors', 'budgets', 'orders'].map(tab => (
-                        <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`px-4 py-2 rounded-md capitalize transition ${activeTab === tab ? 'bg-card text-white shadow' : 'text-muted-foreground hover:text-white'}`}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
-            </div>
+        <Stack spacing={3}>
+            {/* Header / Tab Navigation */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                <Typography variant="h4" fontWeight={800}>Procurement & Supply Chain</Typography>
+                <Tabs value={activeTab} onChange={handleTabChange} sx={{ bgcolor: 'action.hover', borderRadius: 2, p: 0.5 }}>
+                    <Tab value="inventory" icon={<Inventory2Icon />} label="Inventory" iconPosition="start" />
+                    <Tab value="requests" icon={<RequestQuoteIcon />} label="Requests" iconPosition="start" />
+                    <Tab value="vendors" icon={<StoreIcon />} label="Vendors" iconPosition="start" />
+                    <Tab value="budgets" icon={<AccountBalanceWalletIcon />} label="Budgets" iconPosition="start" />
+                    <Tab value="orders" icon={<ShoppingBagIcon />} label="Orders" iconPosition="start" />
+                </Tabs>
+            </Box>
 
-            {loading && <div className="text-center text-muted-foreground py-8">Loading data...</div>}
+            {loading && <LinearProgress sx={{ borderRadius: 2 }} />}
 
+            {/* Main Content Area */}
             {!loading && (
-                <div className="bg-card rounded-lg border border-border overflow-hidden min-h-[400px]">
+                <Paper variant="outlined" sx={{ borderRadius: 3, overflow: 'hidden' }}>
                     {/* Inventory Tab */}
                     {activeTab === 'inventory' && (
-                        <table className="w-full text-left">
-                            <thead className="bg-sidebar text-muted-foreground text-sm uppercase">
-                                <tr>
-                                    <th className="p-4">Item Name</th>
-                                    <th className="p-4">SKU</th>
-                                    <th className="p-4">Category</th>
-                                    <th className="p-4">Stock</th>
-                                    <th className="p-4">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[#565869]">
-                                {inventory.map(item => (
-                                    <tr key={item.item_id} className="hover:bg-muted">
-                                        <td className="p-4 font-medium">{item.name}</td>
-                                        <td className="p-4 text-sm font-mono text-muted-foreground">{item.sku}</td>
-                                        <td className="p-4 text-text-secondary">{item.category}</td>
-                                        <td className="p-4 font-bold">{item.quantity} {item.unit}</td>
-                                        <td className="p-4">
-                                            {item.quantity <= item.reorder_level ? (
-                                                <span className="text-error text-xs font-bold uppercase bg-red-900/30 px-2 py-1 rounded">Low Stock</span>
-                                            ) : (
-                                                <span className="text-success text-xs font-bold uppercase bg-green-900/30 px-2 py-1 rounded">In Stock</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                                {inventory.length === 0 && <tr><td colSpan="5" className="p-8 text-center text-muted-foreground">No inventory items found.</td></tr>}
-                            </tbody>
-                        </table>
+                        <TableContainer>
+                            <Table>
+                                <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                    <TableRow>
+                                        <TableCell sx={{ fontWeight: 700 }}>Item Name</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>SKU</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Stock</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {inventory.map(item => (
+                                        <TableRow key={item.item_id} hover>
+                                            <TableCell sx={{ fontWeight: 600 }}>{item.name}</TableCell>
+                                            <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.85rem', color: 'text.secondary' }}>{item.sku}</TableCell>
+                                            <TableCell sx={{ textTransform: 'capitalize' }}>{item.category?.replace('_', ' ')}</TableCell>
+                                            <TableCell sx={{ fontWeight: 700 }}>{item.quantity} {item.unit}</TableCell>
+                                            <TableCell>
+                                                {item.quantity <= (item.reorder_level || 10) ? (
+                                                    <Chip label="Low Stock" color="error" size="small" variant="soft" />
+                                                ) : (
+                                                    <Chip label="In Stock" color="success" size="small" variant="soft" />
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {inventory.length === 0 && (
+                                        <TableRow><TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>No inventory items found.</TableCell></TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     )}
 
                     {/* Requests Tab */}
                     {activeTab === 'requests' && (
-                        <table className="w-full text-left">
-                            <thead className="bg-sidebar text-muted-foreground text-sm uppercase">
-                                <tr>
-                                    <th className="p-4">Date</th>
-                                    <th className="p-4">Item</th>
-                                    <th className="p-4">Requester</th>
-                                    <th className="p-4">Status</th>
-                                    <th className="p-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[#565869]">
-                                {requests.map(req => (
-                                    <tr key={req.request_id} className="hover:bg-muted">
-                                        <td className="p-4 text-sm text-muted-foreground">{formatDate(req.created_at)}</td>
-                                        <td className="p-4 font-medium">
-                                            {req.item_name}
-                                            <span className="block text-xs text-muted-foreground">{req.quantity} needed</span>
-                                        </td>
-                                        <td className="p-4 text-text-secondary">{req.requested_by_name || req.requested_by}</td>
-                                        <td className="p-4">
-                                            <span className={`px-2 py-1 rounded text-xs uppercase font-bold ${
-                                                req.status === 'approved' ? 'bg-green-900/30 text-success' :
-                                                req.status === 'rejected' ? 'bg-red-900/30 text-error' :
-                                                req.status === 'ordered' ? 'bg-blue-900/30 text-blue-400' :
-                                                'bg-yellow-900/30 text-yellow-400'
-                                            }`}>
-                                                {req.status}
-                                            </span>
-                                        </td>
-                                        <td className="p-4">
-                                            {req.status === 'requested' && (
-                                                <div className="flex flex-col gap-2">
-                                                    {assigningRequestId === req.request_id ? (
-                                                        <div className="flex flex-col gap-2">
-                                                            <select
-                                                                value={selectedVendorId}
-                                                                onChange={(e) => setSelectedVendorId(e.target.value)}
-                                                                className="bg-card text-white text-xs px-2 py-1 rounded border border-border"
-                                                            >
-                                                                <option value="">-- No vendor (RFQ to all) --</option>
-                                                                {approvedVendors.map(v => (
-                                                                    <option key={v.user_id} value={v.user_id}>
-                                                                        {v.company_name}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                            <div className="flex gap-1">
-                                                                <button
-                                                                    onClick={() => handleApproveRequest(req.request_id)}
-                                                                    className="bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded text-xs transition"
-                                                                >
-                                                                    Confirm
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => { setAssigningRequestId(null); setSelectedVendorId(''); }}
-                                                                    className="bg-[#565869] hover:bg-[#6E6E80] text-white px-3 py-1 rounded text-xs transition"
-                                                                >
-                                                                    Cancel
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex gap-1">
-                                                            <button
-                                                                onClick={() => setAssigningRequestId(req.request_id)}
-                                                                className="bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded text-xs transition"
-                                                            >
-                                                                Approve
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleRejectRequest(req.request_id)}
-                                                                className="bg-error hover:bg-[#DC2626] text-white px-3 py-1 rounded text-xs transition"
-                                                            >
-                                                                Reject
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                            {req.status === 'approved' && (
-                                                <button
-                                                    onClick={() => handleViewQuotations(req.request_id)}
-                                                    className="bg-[#6366F1] hover:bg-[#4F46E5] text-white px-3 py-1 rounded text-xs transition"
-                                                >
-                                                    📋 View Quotations
-                                                </button>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                                {requests.length === 0 && <tr><td colSpan="5" className="p-8 text-center text-muted-foreground">No purchase requests found.</td></tr>}
-                            </tbody>
-                        </table>
+                        <TableContainer>
+                            <Table>
+                                <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                    <TableRow>
+                                        <TableCell sx={{ fontWeight: 700 }}>Date</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Item</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Requester</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Actions</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {requests.map(req => (
+                                        <TableRow key={req.request_id} hover>
+                                            <TableCell sx={{ fontSize: '0.85rem', color: 'text.secondary' }}>{formatDate(req.created_at)}</TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2" fontWeight={600}>{req.item_name}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{req.quantity} needed</Typography>
+                                            </TableCell>
+                                            <TableCell>{req.requested_by_name || req.requested_by}</TableCell>
+                                            <TableCell>
+                                                <Chip 
+                                                    label={req.status} 
+                                                    size="small" 
+                                                    variant="soft"
+                                                    color={
+                                                        req.status === 'approved' ? 'success' : 
+                                                        req.status === 'rejected' ? 'error' : 
+                                                        req.status === 'ordered' ? 'info' : 'warning'
+                                                    }
+                                                    sx={{ textTransform: 'capitalize', fontWeight: 600 }}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                {req.status === 'requested' && (
+                                                    <Stack spacing={1}>
+                                                        {assigningRequestId === req.request_id ? (
+                                                            <Stack spacing={1}>
+                                                                <FormControl size="small" fullWidth>
+                                                                    <InputLabel>Select Vendor</InputLabel>
+                                                                    <Select
+                                                                        value={selectedVendorId}
+                                                                        onChange={(e) => setSelectedVendorId(e.target.value)}
+                                                                        label="Select Vendor"
+                                                                    >
+                                                                        <MenuItem value="">-- No vendor (RFQ) --</MenuItem>
+                                                                        {approvedVendors.map(v => (
+                                                                            <MenuItem key={v.user_id} value={v.user_id}>{v.company_name}</MenuItem>
+                                                                        ))}
+                                                                    </Select>
+                                                                </FormControl>
+                                                                <Stack direction="row" spacing={1}>
+                                                                    <Button size="small" variant="contained" onClick={() => handleApproveRequest(req.request_id)}>Confirm</Button>
+                                                                    <Button size="small" variant="outlined" onClick={() => { setAssigningRequestId(null); setSelectedVendorId(''); }}>Cancel</Button>
+                                                                </Stack>
+                                                            </Stack>
+                                                        ) : (
+                                                            <Stack direction="row" spacing={1}>
+                                                                <Button size="small" variant="contained" onClick={() => setAssigningRequestId(req.request_id)}>Approve</Button>
+                                                                <Button size="small" variant="outlined" color="error" onClick={() => handleRejectRequest(req.request_id)}>Reject</Button>
+                                                            </Stack>
+                                                        )}
+                                                    </Stack>
+                                                )}
+                                                {req.status === 'approved' && (
+                                                    <Button 
+                                                        size="small" 
+                                                        variant="contained" 
+                                                        color="secondary"
+                                                        startIcon={<DescriptionIcon />}
+                                                        onClick={() => handleViewQuotations(req.request_id)}
+                                                    >
+                                                        View Quotations
+                                                    </Button>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {requests.length === 0 && (
+                                        <TableRow><TableCell colSpan={5} align="center" sx={{ py: 6, color: 'text.secondary' }}>No purchase requests found.</TableCell></TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     )}
 
                     {/* Vendors Tab */}
                     {activeTab === 'vendors' && (
-                        <table className="w-full text-left">
-                            <thead className="bg-sidebar text-muted-foreground text-sm uppercase">
-                                <tr>
-                                    <th className="p-4">Company</th>
-                                    <th className="p-4">Contact Person</th>
-                                    <th className="p-4">Email</th>
-                                    <th className="p-4">Category</th>
-                                    <th className="p-4">Status</th>
-                                    <th className="p-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[#565869]">
-                                {vendors.map(v => (
-                                    <tr key={v.user_id} className="hover:bg-muted">
-                                        <td className="p-4 font-medium">{v.company_name}</td>
-                                        <td className="p-4 text-text-secondary">{v.contact_person}</td>
-                                        <td className="p-4 text-muted-foreground">{v.email}</td>
-                                        <td className="p-4 capitalize">{v.category}</td>
-                                        <td className="p-4">
-                                            {v.is_approved ? (
-                                                <span className="text-success text-xs font-bold uppercase bg-green-900/30 px-2 py-1 rounded">Approved</span>
-                                            ) : (
-                                                <span className="text-yellow-400 text-xs font-bold uppercase bg-yellow-900/30 px-2 py-1 rounded">Pending</span>
-                                            )}
-                                        </td>
-                                        <td className="p-4 flex gap-2">
-                                            {!v.is_approved && (
-                                                <button
-                                                    onClick={async () => {
-                                                        try {
-                                                            const res = await fetch(`${API_BASE}/procurement/vendors/${v.user_id}/approve`, {
-                                                                method: 'PUT',
-                                                                headers: getAuthHeaders('super_admin')
-                                                            });
-                                                            const data = await res.json();
-                                                            if (data.success) {
-                                                                showNotify('Vendor approved successfully', 'success');
-                                                                loadData();
-                                                            } else {
-                                                                showNotify(data.error || 'Approval failed', 'error');
-                                                            }
-                                                        } catch (e) { showNotify('Error approving vendor', 'error'); }
-                                                    }}
-                                                    className="bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded text-xs transition"
-                                                >
-                                                    Approve
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={async () => {
-                                                    try {
-                                                        const res = await fetch(`${API_BASE}/procurement/vendors/${v.user_id}/reject`, {
-                                                            method: 'PUT',
-                                                            headers: getAuthHeaders('super_admin')
-                                                        });
-                                                        const data = await res.json();
-                                                        if (data.success) {
-                                                            showNotify('Vendor rejected', 'success');
-                                                            loadData();
-                                                        } else {
-                                                            showNotify(data.error || 'Rejection failed', 'error');
-                                                        }
-                                                    } catch (e) { showNotify('Error rejecting vendor', 'error'); }
-                                                }}
-                                                className={`px-3 py-1 rounded text-xs transition text-white ${v.is_approved ? 'bg-error hover:bg-[#DC2626]' : 'bg-error hover:bg-[#DC2626]'}`}
-                                            >
-                                                {v.is_approved ? 'Revoke' : 'Reject'}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {vendors.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-muted-foreground">No vendors registered.</td></tr>}
-                            </tbody>
-                        </table>
+                        <TableContainer>
+                            <Table>
+                                <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                    <TableRow>
+                                        <TableCell sx={{ fontWeight: 700 }}>Company</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Contact Person</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Email</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Category</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Actions</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {vendors.map(v => (
+                                        <TableRow key={v.user_id} hover>
+                                            <TableCell sx={{ fontWeight: 600 }}>{v.company_name}</TableCell>
+                                            <TableCell>{v.contact_person}</TableCell>
+                                            <TableCell sx={{ color: 'text.secondary' }}>{v.email}</TableCell>
+                                            <TableCell sx={{ textTransform: 'capitalize' }}>{v.category}</TableCell>
+                                            <TableCell>
+                                                <Chip 
+                                                    label={v.is_approved ? 'Approved' : 'Pending'} 
+                                                    color={v.is_approved ? 'success' : 'warning'}
+                                                    size="small"
+                                                    variant="soft"
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Stack direction="row" spacing={1}>
+                                                    {!v.is_approved ? (
+                                                        <Button 
+                                                            size="small" 
+                                                            variant="contained" 
+                                                            color="success"
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const res = await fetch(`${API_BASE}/procurement/vendors/${v.user_id}/approve`, { method: 'PUT', headers: getAuthHeaders('super_admin') });
+                                                                    const data = await res.json();
+                                                                    if (data.success) { showNotify?.('Vendor approved', 'success'); loadData(); }
+                                                                    else showNotify?.(data.error || 'Failed', 'error');
+                                                                } catch (e) { showNotify?.('Error', 'error'); }
+                                                            }}
+                                                        >
+                                                            Approve
+                                                        </Button>
+                                                    ) : (
+                                                        <Button 
+                                                            size="small" 
+                                                            variant="outlined" 
+                                                            color="error"
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const res = await fetch(`${API_BASE}/procurement/vendors/${v.user_id}/reject`, { method: 'PUT', headers: getAuthHeaders('super_admin') });
+                                                                    const data = await res.json();
+                                                                    if (data.success) { showNotify?.('Vendor revoked', 'success'); loadData(); }
+                                                                    else showNotify?.(data.error || 'Failed', 'error');
+                                                                } catch (e) { showNotify?.('Error', 'error'); }
+                                                            }}
+                                                        >
+                                                            Revoke
+                                                        </Button>
+                                                    )}
+                                                </Stack>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {vendors.length === 0 && (
+                                        <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>No vendors found.</TableCell></TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     )}
 
                     {/* Budgets Tab */}
                     {activeTab === 'budgets' && (
-                        <div className="p-6">
-                            {/* Create Budget Button / Form */}
-                            <div className="mb-6">
+                        <Box sx={{ p: 3 }}>
+                            <Box sx={{ mb: 4 }}>
                                 {!showBudgetForm ? (
-                                    <button
-                                        onClick={() => setShowBudgetForm(true)}
-                                        className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg transition font-medium"
-                                    >
-                                        + Create New Budget
-                                    </button>
+                                    <Button variant="contained" startIcon={<AddIcon />} onClick={() => setShowBudgetForm(true)}>New Budget</Button>
                                 ) : (
-                                    <form onSubmit={handleCreateBudget} className="bg-card p-5 rounded-lg border border-border max-w-md">
-                                        <h3 className="text-lg font-bold mb-4">Create Department Budget</h3>
-                                        <div className="space-y-3">
-                                            <div>
-                                                <label className="block text-sm text-muted-foreground mb-1">Department Name</label>
-                                                <input
-                                                    type="text"
-                                                    required
-                                                    placeholder="e.g. Surgery, ICU, Pharmacy"
-                                                    className="w-full bg-sidebar border border-border rounded p-2 text-white"
-                                                    value={budgetForm.department}
-                                                    onChange={e => setBudgetForm({...budgetForm, department: e.target.value})}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm text-muted-foreground mb-1">Total Budget (₹)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    required
-                                                    placeholder="e.g. 500000"
-                                                    className="w-full bg-sidebar border border-border rounded p-2 text-white"
-                                                    value={budgetForm.total_budget}
-                                                    onChange={e => setBudgetForm({...budgetForm, total_budget: e.target.value})}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-2 mt-4">
-                                            <button type="submit" className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded transition">
-                                                Create Budget
-                                            </button>
-                                            <button type="button" onClick={() => { setShowBudgetForm(false); setBudgetForm({ department: '', total_budget: '' }); }} className="bg-[#565869] hover:bg-[#6E6E80] text-white px-4 py-2 rounded transition">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
+                                    <Paper sx={{ p: 3, maxWidth: 400, border: 1, borderColor: 'divider' }}>
+                                        <Typography variant="h6" sx={{ mb: 2 }}>Create Department Budget</Typography>
+                                        <Stack spacing={2} component="form" onSubmit={handleCreateBudget}>
+                                            <TextField label="Department" required value={budgetForm.department} onChange={e => setBudgetForm({...budgetForm, department: e.target.value})} />
+                                            <TextField label="Total Budget (₹)" type="number" required value={budgetForm.total_budget} onChange={e => setBudgetForm({...budgetForm, total_budget: e.target.value})} />
+                                            <Stack direction="row" spacing={1}>
+                                                <Button type="submit" variant="contained">Create</Button>
+                                                <Button variant="outlined" onClick={() => setShowBudgetForm(false)}>Cancel</Button>
+                                            </Stack>
+                                        </Stack>
+                                    </Paper>
                                 )}
-                            </div>
-
-                            {/* Budget Cards */}
-                            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                            </Box>
+                            <Grid container spacing={3}>
                                 {budgets.map(b => (
-                                    <div key={b.budget_id} className="bg-card p-5 rounded border border-border">
-                                        <h3 className="text-lg font-bold mb-1">{b.department}</h3>
-                                        <p className="text-xs text-muted-foreground mb-4">Fiscal Year: {b.fiscal_year}</p>
-                                        
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between text-sm">
-                                                <span>Total Budget:</span>
-                                                <span className="font-mono font-bold">₹{b.total_budget.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm text-[#EF4444]">
-                                                <span>Used:</span>
-                                                <span className="font-mono">₹{b.used_budget.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm text-yellow-400">
-                                                <span>Reserved:</span>
-                                                <span className="font-mono">₹{b.reserved_budget.toLocaleString()}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm text-primary">
-                                                <span>Available:</span>
-                                                <span className="font-mono font-bold">₹{b.available_budget.toLocaleString()}</span>
-                                            </div>
-
-                                            <div className="w-full bg-[#565869] h-2 rounded-full overflow-hidden mt-2">
-                                                <div 
-                                                    className="bg-primary h-full" 
-                                                    style={{ width: `${Math.min(b.utilization_percent, 100)}%` }}
-                                                />
-                                            </div>
-                                            <p className="text-xs text-right text-muted-foreground">{b.utilization_percent.toFixed(1)}% Used</p>
-                                        </div>
-                                    </div>
+                                    <Grid item xs={12} sm={6} lg={4} key={b.budget_id}>
+                                        <Card variant="outlined" sx={{ borderRadius: 2 }}>
+                                            <CardContent>
+                                                <Typography variant="h6" fontWeight={700}>{b.department}</Typography>
+                                                <Typography variant="caption" color="text.secondary">Fiscal Year: {b.fiscal_year}</Typography>
+                                                <Divider sx={{ my: 1.5 }} />
+                                                <Stack spacing={1}>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <Typography variant="body2">Total:</Typography>
+                                                        <Typography variant="body2" fontWeight={700}>₹{b.total_budget.toLocaleString()}</Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <Typography variant="body2" color="error">Used:</Typography>
+                                                        <Typography variant="body2" color="error">₹{b.used_budget.toLocaleString()}</Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <Typography variant="body2">Available:</Typography>
+                                                        <Typography variant="body2" fontWeight={700} color="primary">₹{b.available_budget.toLocaleString()}</Typography>
+                                                    </Box>
+                                                    <Box sx={{ mt: 1 }}>
+                                                        <LinearProgress 
+                                                            variant="determinate" 
+                                                            value={Math.min(b.utilization_percent, 100)} 
+                                                            sx={{ height: 8, borderRadius: 4, bgcolor: 'action.hover' }} 
+                                                        />
+                                                        <Typography variant="caption" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>{b.utilization_percent.toFixed(1)}% Used</Typography>
+                                                    </Box>
+                                                </Stack>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
                                 ))}
-                                {budgets.length === 0 && <p className="col-span-3 text-center text-muted-foreground">No department budgets set. Create one above.</p>}
-                            </div>
-                        </div>
+                                {budgets.length === 0 && (
+                                    <Grid item xs={12}>
+                                        <Typography color="text.secondary" align="center">No department budgets set.</Typography>
+                                    </Grid>
+                                )}
+                            </Grid>
+                        </Box>
                     )}
 
                     {/* Orders Tab */}
                     {activeTab === 'orders' && (
-                        <table className="w-full text-left">
-                            <thead className="bg-sidebar text-muted-foreground text-sm uppercase">
-                                <tr>
-                                    <th className="p-4">PO #</th>
-                                    <th className="p-4">Item</th>
-                                    <th className="p-4">Vendor</th>
-                                    <th className="p-4">Amount</th>
-                                    <th className="p-4">Status</th>
-                                    <th className="p-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[#565869]">
-                                {orders.map(o => (
-                                    <tr key={o.po_id} className="hover:bg-muted">
-                                        <td className="p-4 font-mono text-sm">{o.po_id}</td>
-                                        <td className="p-4 font-medium">{o.items[0]?.item_name}</td>
-                                        <td className="p-4 text-text-secondary">{o.vendor_name || 'Unknown Vendor'}</td>
-                                        <td className="p-4 font-mono font-bold text-primary">₹{o.total_amount?.toLocaleString() || '0'}</td>
-                                        <td className="p-4">
-                                            <span className={`px-2 py-1 rounded text-xs uppercase font-bold ${
-                                                o.status === 'completed' ? 'bg-green-900/30 text-success' :
-                                                o.status === 'delivered' ? 'bg-blue-900/30 text-blue-400' :
-                                                'bg-yellow-900/30 text-yellow-400'
-                                            }`}>
-                                                {o.status}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 flex gap-2">
-                                            {o.status === 'delivered' && (
-                                                <button 
-                                                    onClick={() => handleCompleteOrder(o.po_id)}
-                                                    className="bg-primary hover:bg-primary-hover text-white px-3 py-1 rounded text-xs transition"
-                                                >
-                                                    Mark Complete
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => generateAdminPO(o.po_id)}
-                                                className="bg-[#6366F1] hover:bg-[#4F46E5] text-white px-3 py-1 rounded text-xs transition"
-                                                title="Download Admin PO with budget details"
-                                            >
-                                                📄 Admin PO
-                                            </button>
-                                            <button
-                                                onClick={() => generateVendorPO(o.po_id)}
-                                                className="bg-[#F59E0B] hover:bg-[#D97706] text-white px-3 py-1 rounded text-xs transition"
-                                                title="Download Vendor PO (no budget info)"
-                                            >
-                                                📄 Vendor PO
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {orders.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-muted-foreground">No purchase orders found.</td></tr>}
-                            </tbody>
-                        </table>
+                        <TableContainer>
+                            <Table>
+                                <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                    <TableRow>
+                                        <TableCell sx={{ fontWeight: 700 }}>PO #</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Item</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Vendor</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Amount</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Status</TableCell>
+                                        <TableCell sx={{ fontWeight: 700 }}>Actions</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {orders.map(o => (
+                                        <TableRow key={o.po_id} hover>
+                                            <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{o.po_id}</TableCell>
+                                            <TableCell sx={{ fontWeight: 600 }}>{o.items[0]?.item_name}</TableCell>
+                                            <TableCell>{o.vendor_name || '—'}</TableCell>
+                                            <TableCell sx={{ fontWeight: 700, color: 'primary.main' }}>₹{o.total_amount?.toLocaleString()}</TableCell>
+                                            <TableCell>
+                                                <Chip 
+                                                    label={o.status} 
+                                                    color={o.status === 'completed' ? 'success' : o.status === 'delivered' ? 'info' : 'warning'}
+                                                    variant="soft" size="small" sx={{ textTransform: 'capitalize' }}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Stack direction="row" spacing={1}>
+                                                    {o.status === 'delivered' && (
+                                                        <Button size="small" variant="contained" onClick={() => handleCompleteOrder(o.po_id)}>Complete</Button>
+                                                    )}
+                                                    <Tooltip title="Admin PO (with budget)">
+                                                        <IconButton size="small" onClick={() => generateAdminPO(o.po_id)}><FileDownloadIcon color="primary" /></IconButton>
+                                                    </Tooltip>
+                                                    <Tooltip title="Vendor PO">
+                                                        <IconButton size="small" onClick={() => generateVendorPO(o.po_id)}><DescriptionIcon color="warning" /></IconButton>
+                                                    </Tooltip>
+                                                </Stack>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {orders.length === 0 && (
+                                        <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.secondary' }}>No purchase orders found.</TableCell></TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     )}
-                </div>
+                </Paper>
             )}
 
-            {/* Quotation Selection Modal */}
-            {viewingRequestId && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div className="bg-sidebar p-6 rounded-xl w-full max-w-2xl border border-border shadow-2xl max-h-[80vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-bold">Vendor Quotations</h2>
-                            <button
-                                onClick={() => { setViewingRequestId(null); setQuotations([]); setSelectedBudgetId(''); }}
-                                className="text-muted-foreground hover:text-white text-2xl"
-                            >
-                                ×
-                            </button>
-                        </div>
-
-                        {/* Budget Selection */}
-                        <div className="mb-4 p-3 bg-card rounded-lg border border-border">
-                            <label className="block text-sm text-muted-foreground mb-2 font-medium">💰 Select Budget to Deduct From</label>
-                            <select
-                                value={selectedBudgetId}
-                                onChange={(e) => setSelectedBudgetId(e.target.value)}
-                                className="w-full bg-sidebar text-white px-3 py-2 rounded border border-border text-sm"
-                            >
-                                <option value="">-- Choose a budget --</option>
-                                {budgets.map(b => (
-                                    <option key={b.budget_id} value={b.budget_id}>
-                                        {b.department} — Available: ₹{(b.total_budget - (b.used_budget || 0) - (b.reserved_budget || 0)).toLocaleString()}
-                                    </option>
+            {/* Quotations Dialog */}
+            <Dialog open={Boolean(viewingRequestId)} onClose={() => setViewingRequestId(null)} maxWidth="md" fullWidth>
+                <DialogTitle sx={{ fontWeight: 800 }}>Vendor Quotations</DialogTitle>
+                <DialogContent dividers>
+                    {loadingQuotations ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress /></Box>
+                    ) : quotations.length === 0 ? (
+                        <Typography color="text.secondary" align="center" sx={{ py: 4 }}>No quotations submitted by vendors yet.</Typography>
+                    ) : (
+                        <Stack spacing={3}>
+                            <FormControl fullWidth>
+                                <InputLabel>Assign Budget Cabinet</InputLabel>
+                                <Select value={selectedBudgetId} onChange={(e) => setSelectedBudgetId(e.target.value)} label="Assign Budget Cabinet">
+                                    <MenuItem value="">-- Select Budget --</MenuItem>
+                                    {budgets.map(b => (
+                                        <MenuItem key={b.budget_id} value={b.budget_id}>
+                                            {b.department} (Avail: ₹{b.available_budget.toLocaleString()})
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            <Grid container spacing={2}>
+                                {quotations.map(q => (
+                                    <Grid item xs={12} key={q.quotation_id}>
+                                        <Card variant="outlined" sx={{ '&:hover': { borderColor: 'primary.main' } }}>
+                                            <CardContent>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                    <Box>
+                                                        <Typography variant="subtitle1" fontWeight={700}>{q.vendor_name}</Typography>
+                                                        <Typography variant="caption" color="text.secondary">Quote ID: {q.quotation_id}</Typography>
+                                                    </Box>
+                                                    <Typography variant="h5" fontWeight={800} color="primary">₹{q.total_price.toLocaleString()}</Typography>
+                                                </Box>
+                                                <Divider sx={{ my: 1.5 }} />
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={6}><Typography variant="body2">Unit Price: ₹{q.unit_price}</Typography></Grid>
+                                                    <Grid item xs={6}><Typography variant="body2">Delivery: {q.delivery_days} days</Typography></Grid>
+                                                </Grid>
+                                                {q.notes && <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>Notes: {q.notes}</Typography>}
+                                                <Button 
+                                                    fullWidth 
+                                                    variant="contained" 
+                                                    sx={{ mt: 2 }} 
+                                                    disabled={creatingPO}
+                                                    onClick={() => handleSelectQuotation(viewingRequestId, q.quotation_id, q.delivery_days)}
+                                                >
+                                                    Accept & Create PO
+                                                </Button>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
                                 ))}
-                            </select>
-                            {!selectedBudgetId && <p className="text-yellow-400 text-xs mt-1">⚠ You must select a budget before creating a PO</p>}
-                        </div>
-
-                        {loadingQuotations && <p className="text-center text-muted-foreground py-8">Loading quotations...</p>}
-
-                        {!loadingQuotations && quotations.length === 0 && (
-                            <p className="text-center text-muted-foreground py-8">No quotations submitted yet for this request.</p>
-                        )}
-
-                        {!loadingQuotations && quotations.length > 0 && (
-                            <div className="space-y-4">
-                                {quotations.map((q, index) => (
-                                    <div key={q.quotation_id} className={`bg-card p-4 rounded-lg border ${index === 0 ? 'border-primary' : 'border-border'}`}>
-                                        {index === 0 && <span className="text-primary text-xs font-bold uppercase mb-2 block">💰 Best Price</span>}
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex-1">
-                                                {/* Vendor Identity */}
-                                                <h3 className="font-bold text-lg">{q.vendor_contact || q.vendor_name || 'Unknown Vendor'}</h3>
-                                                <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground mt-1">
-                                                    {q.vendor_company && <span>🏢 {q.vendor_company}</span>}
-                                                    {q.vendor_email && <span>✉️ {q.vendor_email}</span>}
-                                                    {q.vendor_phone && <span>📞 {q.vendor_phone}</span>}
-                                                </div>
-                                                {/* Pricing */}
-                                                <div className="grid grid-cols-2 gap-x-6 gap-y-1 mt-3 text-sm">
-                                                    <p><span className="text-muted-foreground">Unit Price:</span> <span className="font-mono font-bold">₹{q.unit_price?.toLocaleString()}</span></p>
-                                                    <p><span className="text-muted-foreground">Total Price:</span> <span className="font-mono font-bold text-primary">₹{q.total_price?.toLocaleString()}</span></p>
-                                                    <p><span className="text-muted-foreground">Delivery:</span> {q.delivery_days} days</p>
-                                                    <p><span className="text-muted-foreground">Valid for:</span> {q.validity_days} days</p>
-                                                </div>
-                                                {q.notes && <p className="text-xs text-muted-foreground mt-2 italic">📝 {q.notes}</p>}
-                                            </div>
-                                            <button
-                                                onClick={() => handleSelectQuotation(viewingRequestId, q.quotation_id)}
-                                                className={`px-4 py-2 rounded-lg text-sm font-medium transition ml-4 text-white ${selectedBudgetId ? 'bg-primary hover:bg-primary-hover' : 'bg-gray-600 cursor-not-allowed'}`}
-                                                disabled={!selectedBudgetId}
-                                            >
-                                                Select & Create PO
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-        </div>
+                            </Grid>
+                        </Stack>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={() => setViewingRequestId(null)}>Close</Button>
+                </DialogActions>
+            </Dialog>
+        </Stack>
     );
 };
 

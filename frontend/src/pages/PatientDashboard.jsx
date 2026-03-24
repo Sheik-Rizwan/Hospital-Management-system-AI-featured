@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE, getAuthHeaders, logout, formatDate, handleAuthError } from '../utils/api';
-import Notification from '../components/Notification';
 import ProfileModal from '../components/ProfileModal';
 import BookAppointment from '../components/BookAppointment';
-import ThemeToggle from '../components/ThemeToggle';
+import DashboardLayout from '../layout/DashboardLayout';
+import AppNotification from '../components/ui/AppNotification';
+import PageHeader from '../components/ui/PageHeader';
+import StatusChip from '../components/ui/StatusChip';
+
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
 
 const PatientDashboard = () => {
     const [info, setInfo] = useState(null);
@@ -39,17 +52,23 @@ const PatientDashboard = () => {
             const handoffData = await handoffRes.json();
             const apptData = await apptRes.json();
 
-            if (infoData.success) setInfo(infoData.data);
+            if (infoData.success) {
+                setInfo(infoData.data);
+                if (infoData.data.patient_name) {
+                    setUser(prev => {
+                        const updated = { ...prev, patient_name: infoData.data.patient_name };
+                        sessionStorage.setItem('user', JSON.stringify(updated));
+                        return updated;
+                    });
+                }
+            }
             if (handoffData.success) setHandoffs(handoffData.handoffs);
             if (apptData.success) {
                 const newAppointments = apptData.appointments || [];
-                
-                // Check for status changes if we already have appointments
                 if (background && appointments.length > 0) {
                     newAppointments.forEach(newApt => {
                         const oldApt = appointments.find(a => a.appointment_id === newApt.appointment_id);
                         if (oldApt && oldApt.status !== newApt.status) {
-                            // Status changed! Show notification
                             if (newApt.status === 'approved' || newApt.status === 'confirmed') {
                                 showNotify(`Great news! Your appointment with Dr. ${newApt.doctor_name} has been approved.`, 'success');
                             } else if (newApt.status === 'rejected') {
@@ -66,24 +85,18 @@ const PatientDashboard = () => {
         if (!background) setLoading(false);
     };
 
-    // Poll for updates every 30 seconds
     useEffect(() => {
-        const interval = setInterval(() => {
-            loadData(true);
-        }, 30000);
+        const interval = setInterval(() => { loadData(true); }, 30000);
         return () => clearInterval(interval);
-    }, [appointments]); // Depend on appointments so we can compare state
+    }, [appointments]);
 
     const handleChat = async (e) => {
         e.preventDefault();
         if (!chatQuestion.trim()) return;
-
         setChatResponse('Thinking...');
         try {
             const res = await fetch(`${API_BASE}/patient/chatbot`, {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify({ question: chatQuestion })
+                method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ question: chatQuestion })
             });
             const data = await res.json();
             setChatResponse(data.success ? data.answer : data.error);
@@ -92,348 +105,259 @@ const PatientDashboard = () => {
 
     const handleCancelAppointment = async (appointmentId) => {
         if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
-        
         try {
             const res = await fetch(`${API_BASE}/patient/appointments/${appointmentId}/cancel`, {
-                method: 'PATCH',
-                headers: getAuthHeaders()
+                method: 'PATCH', headers: getAuthHeaders()
             });
             const data = await res.json();
-            if (data.success) {
-                showNotify('Appointment cancelled successfully', 'success');
-                loadData();
-            } else {
-                showNotify(data.error || 'Failed to cancel', 'error');
-            }
-        } catch (e) {
-            showNotify('Failed to cancel appointment', 'error');
-        }
+            if (data.success) { showNotify('Appointment cancelled successfully', 'success'); loadData(); }
+            else showNotify(data.error || 'Failed to cancel', 'error');
+        } catch (e) { showNotify('Failed to cancel appointment', 'error'); }
     };
 
-    const getStatusBadge = (status) => {
-        const badges = {
-            pending: 'bg-warning-soft text-yellow-700 border-yellow-300',
-            pending_doctor_approval: 'bg-warning-soft text-yellow-700 border-yellow-300',
-            approved: 'bg-success-soft text-green-700 border-green-300',
-            confirmed: 'bg-success-soft text-green-700 border-green-300',
-            rejected: 'bg-error-soft text-red-700 border-red-300',
-            completed: 'bg-primary-soft text-blue-700 border-blue-300',
-            cancelled: 'bg-muted text-muted-foreground border-border'
-        };
-        return badges[status] || badges.pending;
-    };
+    const sidebarItems = [
+        { id: 'overview', icon: '📋', label: 'Overview' },
+        { id: 'appointments', icon: '📅', label: 'Appointments' },
+        { id: 'history', icon: '📜', label: 'Care History' },
+    ];
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="spinner"></div>
-            </div>
+            <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default' }}>
+                <CircularProgress />
+            </Box>
         );
     }
 
+    const vitalColorMap = {
+        blue: { bg: 'rgba(24,144,255,0.08)', text: 'primary.main' },
+        red: { bg: 'rgba(255,77,79,0.08)', text: 'error.main' },
+        yellow: { bg: 'rgba(255,193,7,0.08)', text: 'warning.main' },
+        green: { bg: 'rgba(82,196,26,0.08)', text: 'success.main' },
+        purple: { bg: 'rgba(114,46,209,0.08)', text: 'secondary.main' },
+    };
+
+    const renderVitalTile = (label, value, unit, colorClass) => {
+        const colors = vitalColorMap[colorClass] || vitalColorMap.blue;
+        let displayValue = value;
+        if (value && typeof value === 'object') displayValue = value.value || value.reading || JSON.stringify(value);
+        return (
+            <Card sx={{ bgcolor: colors.bg, textAlign: 'center' }}>
+                <CardContent sx={{ py: 2 }}>
+                    <Typography variant="body2" color="text.secondary">{label}</Typography>
+                    <Typography variant="h4" fontWeight={700} sx={{ color: colors.text, my: 0.5 }}>{displayValue || '--'}</Typography>
+                    <Typography variant="caption" color="text.secondary">{unit}</Typography>
+                </CardContent>
+            </Card>
+        );
+    };
+
     return (
-        <div className="min-h-screen bg-background ">
-            {/* Navigation */}
-            <nav className="bg-green-600 text-white shadow-lg">
-                <div className="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
-                    <h1 className="text-xl font-bold">🏥 Patient Portal</h1>
-                    <div className="flex items-center space-x-4">
-                        <span className="text-sm">Welcome, {user.patient_name || 'Patient'}</span>
-                        <ThemeToggle />
-                        <button onClick={() => setShowProfile(true)} className="p-2 hover:bg-green-700 rounded transition" title="Profile">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        </button>
-                        <button onClick={logout} className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition">
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </nav>
+        <DashboardLayout
+            title="Patient Portal"
+            sidebarItems={sidebarItems}
+            activeView={activeTab}
+            onViewChange={setActiveTab}
+            user={{ ...user, role: 'patient', full_name: user.patient_name }}
+            onLogout={logout}
+            onProfileClick={() => setShowProfile(true)}
+        >
+            {/* ── Overview ── */}
+            {activeTab === 'overview' && (
+                <Stack spacing={3}>
+                    <PageHeader title="My Information" />
+                    {info ? (
+                        <Grid container spacing={2}>
+                            {[
+                                { label: 'Patient ID', value: info.patient_id },
+                                { label: 'Room', value: info.room_number || 'Not Assigned' },
+                                { label: 'Status', value: info.status || 'Active' },
+                                { label: 'Diagnosis', value: info.diagnosis || 'N/A' },
+                                { label: 'Admission Date', value: formatDate(info.admission_date) },
+                                { label: 'Total Records', value: String(handoffs.length) },
+                            ].map(item => (
+                                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.label}>
+                                    <Card>
+                                        <CardContent>
+                                            <Typography variant="body2" color="text.secondary">{item.label}</Typography>
+                                            <Typography variant="h6" fontWeight={600}>{item.value}</Typography>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    ) : (
+                        <Typography color="text.secondary">No patient data available.</Typography>
+                    )}
 
-            {/* Tab Navigation */}
-            <div className="bg-card shadow-sm border-b border-border ">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="flex space-x-4">
-                        {['overview', 'appointments', 'history'].map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`py-4 px-6 font-medium capitalize border-b-2 transition ${
-                                    activeTab === tab
-                                        ? 'border-green-600 text-success'
-                                        : 'border-transparent text-muted-foreground hover:text-text-secondary hover:text-foreground'
-                                }`}
-                            >
-                                {tab === 'overview' && '📋 '}
-                                {tab === 'appointments' && '📅 '}
-                                {tab === 'history' && '📜 '}
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
+                    {/* Upcoming Appointment Widget */}
+                    {(() => {
+                        const nextApt = appointments
+                            .filter(a => (a.status === 'approved' || a.status === 'confirmed') && new Date(a.date) >= new Date().setHours(0,0,0,0))
+                            .sort((a,b) => new Date(a.date) - new Date(b.date))[0];
+                        if (!nextApt) return null;
+                        return (
+                            <Card sx={{ background: 'linear-gradient(135deg, #4f46e5, #2563eb)', color: '#fff' }}>
+                                <CardContent>
+                                    <Typography variant="h6" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        📅 Upcoming Appointment
+                                    </Typography>
+                                    <Typography variant="h5" fontWeight={700}>
+                                        {new Date(nextApt.date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ opacity: 0.9, mb: 2 }}>{nextApt.start_time} - {nextApt.end_time}</Typography>
+                                    <Stack direction="row" spacing={1.5}>
+                                        <Box sx={{ bgcolor: 'rgba(255,255,255,0.15)', px: 2, py: 1, borderRadius: 1 }}>👨‍⚕️ Dr. {nextApt.doctor_name}</Box>
+                                        <Box sx={{ bgcolor: 'rgba(255,255,255,0.15)', px: 2, py: 1, borderRadius: 1 }}>🩺 {nextApt.doctor_specialization || 'General'}</Box>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
+                        );
+                    })()}
 
-            <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-                {/* Overview Tab */}
-                {activeTab === 'overview' && (
-                    <>
-                        {/* Info Card */}
-                        <div className="bg-card rounded-lg shadow-lg p-6 animate-fade-in">
-                            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-foreground">
-                                <span>📋</span> My Information
-                            </h2>
-                            {info ? (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <InfoTile label="Patient ID" value={info.patient_id} />
-                                    <InfoTile label="Room" value={info.room_number || 'Not Assigned'} />
-                                    <InfoTile label="Status" value={info.status || 'Active'} />
-                                    <InfoTile label="Diagnosis" value={info.diagnosis || 'N/A'} />
-                                    <InfoTile label="Admission Date" value={formatDate(info.admission_date)} />
-                                    <InfoTile label="Total Records" value={handoffs.length.toString()} />
-                                </div>
+                    {/* Vitals */}
+                    <Card>
+                        <CardContent>
+                            <Typography variant="h5" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>💓 Latest Vitals</Typography>
+                            {info?.latest_vitals ? (
+                                <Grid container spacing={2}>
+                                    <Grid size={{ xs: 6, md: 2.4 }}>{renderVitalTile('Heart Rate', info.latest_vitals.heart_rate, 'bpm', 'blue')}</Grid>
+                                    <Grid size={{ xs: 6, md: 2.4 }}>{renderVitalTile('Blood Pressure', info.latest_vitals.blood_pressure, 'mmHg', 'red')}</Grid>
+                                    <Grid size={{ xs: 6, md: 2.4 }}>{renderVitalTile('Temperature', info.latest_vitals.temperature, '°F', 'yellow')}</Grid>
+                                    <Grid size={{ xs: 6, md: 2.4 }}>{renderVitalTile('SpO2', info.latest_vitals.oxygen_saturation, '%', 'green')}</Grid>
+                                    <Grid size={{ xs: 6, md: 2.4 }}>{renderVitalTile('Resp. Rate', info.latest_vitals.respiratory_rate, '/min', 'purple')}</Grid>
+                                </Grid>
                             ) : (
-                                <p className="text-muted-foreground">No patient data available.</p>
+                                <Typography color="text.secondary" align="center" sx={{ py: 3 }}>No vitals recorded yet.</Typography>
                             )}
-                        </div>
+                        </CardContent>
+                    </Card>
 
-                        {/* Upcoming Appointment Widget */}
-                        {appointments.filter(a => (a.status === 'approved' || a.status === 'confirmed') && new Date(a.date) >= new Date().setHours(0,0,0,0)).sort((a,b) => new Date(a.date) - new Date(b.date))[0] && (
-                            <div className="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-lg shadow-lg p-6 text-white animate-fade-in relative overflow-hidden">
-                                <div className="absolute right-0 top-0 p-16 bg-surface/10 rounded-full -mr-8 -mt-8"></div>
-                                <h3 className="text-xl font-bold mb-2 flex items-center gap-2 relative z-10">
-                                    <span>📅</span> Upcoming Appointment
-                                </h3>
-                                {/* Get nearest approved future appointment */}
-                                {(() => {
-                                    const nextApt = appointments
-                                        .filter(a => (a.status === 'approved' || a.status === 'confirmed') && new Date(a.date) >= new Date().setHours(0,0,0,0))
-                                        .sort((a,b) => new Date(a.date) - new Date(b.date))[0];
-                                    
-                                    return (
-                                        <div className="relative z-10">
-                                            <p className="text-2xl font-bold mb-1">{new Date(nextApt.date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-                                            <p className="text-lg opacity-90 mb-4">{nextApt.start_time} - {nextApt.end_time}</p>
-                                            <div className="flex items-center gap-3">
-                                                <div className="bg-surface/20 p-2 rounded-lg">
-                                                    👨‍⚕️ Dr. {nextApt.doctor_name}
-                                                </div>
-                                                <div className="bg-surface/20 p-2 rounded-lg">
-                                                    🩺 {nextApt.doctor_specialization || 'General'}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })()}
-                            </div>
-                        )}
-
-                        {/* Vitals Card */}
-                        <div className="bg-surface rounded-lg shadow-lg p-6 animate-fade-in">
-                            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-foreground">
-                                <span>💓</span> Latest Vitals
-                            </h2>
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                                <VitalTile label="Heart Rate" value={info?.latest_vitals?.heart_rate} unit="bpm" colorClass="blue" />
-                                <VitalTile label="Blood Pressure" value={info?.latest_vitals?.blood_pressure} unit="mmHg" colorClass="red" />
-                                <VitalTile label="Temperature" value={info?.latest_vitals?.temperature} unit="°F" colorClass="yellow" />
-                                <VitalTile label="SpO2" value={info?.latest_vitals?.oxygen_saturation} unit="%" colorClass="green" />
-                                <VitalTile label="Resp. Rate" value={info?.latest_vitals?.respiratory_rate} unit="/min" colorClass="purple" />
-                            </div>
-                            {!info?.latest_vitals && (
-                                <p className="text-muted-foreground text-center mt-4">No vitals recorded yet.</p>
-                            )}
-                        </div>
-
-                        {/* Chatbot */}
-                        <div className="bg-surface rounded-lg shadow-lg p-6 animate-fade-in">
-                            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-foreground">
-                                <span>🤖</span> Ask About My Health
-                            </h2>
-                            <form onSubmit={handleChat} className="space-y-4">
-                                <input
-                                    type="text"
-                                    className="w-full px-4 py-3 border border-border bg-input rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-foreground placeholder:text-muted-foreground"
+                    {/* Chatbot */}
+                    <Card>
+                        <CardContent>
+                            <Typography variant="h5" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>🤖 Ask About My Health</Typography>
+                            <Box component="form" onSubmit={handleChat} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                <TextField
+                                    fullWidth
                                     placeholder="e.g., What are my latest vitals? What medications am I on?"
                                     value={chatQuestion}
                                     onChange={(e) => setChatQuestion(e.target.value)}
                                 />
-                                <button type="submit" className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold">
-                                    Ask Question
-                                </button>
-                            </form>
+                                <Button type="submit" variant="contained" fullWidth>Ask Question</Button>
+                            </Box>
                             {chatResponse && (
-                                <div className="mt-4 p-4 bg-background rounded-lg">
-                                    <p className="text-sm font-medium text-text-secondary mb-2">Response:</p>
-                                    <p className="whitespace-pre-wrap text-foreground">{chatResponse}</p>
-                                </div>
+                                <Box sx={{ mt: 2, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>Response:</Typography>
+                                    <Typography sx={{ whiteSpace: 'pre-wrap' }}>{chatResponse}</Typography>
+                                </Box>
                             )}
-                        </div>
-                    </>
-                )}
-
-                {/* Appointments Tab */}
-                {activeTab === 'appointments' && (
-                    <>
-                        {/* Book Appointment CTA */}
-                        <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-lg shadow-lg p-8 text-white">
-                            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                                <div>
-                                    <h2 className="text-2xl font-bold mb-2">📅 Book an Appointment</h2>
-                                    <p className="opacity-90">Schedule a visit with one of our doctors</p>
-                                </div>
-                                <button
-                                    onClick={() => setShowBookAppointment(true)}
-                                    className="px-8 py-3 bg-surface text-success rounded-lg font-semibold hover:bg-muted transition shadow-lg"
-                                >
-                                    Find a Doctor →
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* My Appointments List */}
-                        <div className="bg-surface rounded-lg shadow-lg p-6">
-                            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-foreground">
-                                <span>📋</span> My Appointments
-                            </h2>
-                            
-                            {appointments.length === 0 ? (
-                                <div className="text-center py-12 text-muted-foreground">
-                                    <p className="text-4xl mb-4">📅</p>
-                                    <p>No appointments yet. Book your first appointment above!</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {appointments.map(apt => (
-                                        <div key={apt.appointment_id} className="border rounded-lg p-4 hover:shadow-md transition">
-                                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                                <div className="flex-1">
-                                                    <div className="flex items-center gap-3 mb-2">
-                                                        <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getStatusBadge(apt.status)}`}>
-                                                            {apt.status?.toUpperCase()}
-                                                        </span>
-                                                        <span className="text-sm text-muted-foreground">{apt.appointment_id}</span>
-                                                    </div>
-                                                    <p className="font-semibold text-foreground">Dr. {apt.doctor_name || 'Doctor'}</p>
-                                                    <p className="text-sm text-text-secondary">
-                                                        📅 {apt.date} | ⏰ {apt.start_time} - {apt.end_time}
-                                                    </p>
-                                                    {apt.notes && (
-                                                        <p className="text-sm text-muted-foreground mt-1">📝 {apt.notes}</p>
-                                                    )}
-                                                    {apt.rejection_reason && (
-                                                        <p className="text-sm text-error mt-1">❌ {apt.rejection_reason}</p>
-                                                    )}
-                                                </div>
-                                                {['pending', 'pending_doctor_approval', 'approved', 'confirmed'].includes(apt.status) && (
-                                                    <button
-                                                        onClick={() => handleCancelAppointment(apt.appointment_id)}
-                                                        className="px-4 py-2 text-error border border-red-300 rounded-lg hover:bg-red-50 transition text-sm"
-                                                    >
-                                                        Cancel
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </>
-                )}
-
-                {/* History Tab */}
-                {activeTab === 'history' && (
-                    <div className="bg-surface rounded-lg shadow-lg p-6 animate-fade-in">
-                        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-foreground">
-                            <span>📜</span> My Care History
-                        </h2>
-                        <div className="space-y-4">
-                            {handoffs.length === 0 ? (
-                                <p className="text-muted-foreground text-center py-4">No care records found.</p>
-                            ) : (
-                                handoffs.map((h, idx) => (
-                                    <div key={idx} className="border-l-4 border-green-500 p-4 rounded-lg bg-background hover:bg-muted transition">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <span className="font-bold text-green-700">{h.shift} Shift</span>
-                                                <p className="text-sm text-text-secondary mt-1">Nurse: {h.nurse_name}</p>
-                                            </div>
-                                            <span className="text-sm text-muted-foreground">{formatDate(h.timestamp)}</span>
-                                        </div>
-                                        {h.structured_report?.vitals && (
-                                            <div className="mt-2 text-xs text-text-secondary bg-success-soft p-2 rounded">
-                                                <span className="font-medium">Vitals: </span>
-                                                HR: {typeof h.structured_report.vitals.heart_rate === 'object' ? h.structured_report.vitals.heart_rate?.value : h.structured_report.vitals.heart_rate || '--'},
-                                                BP: {typeof h.structured_report.vitals.blood_pressure === 'object' ? h.structured_report.vitals.blood_pressure?.value : h.structured_report.vitals.blood_pressure || '--'}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                )}
-            </main>
-
-            {/* Book Appointment Modal */}
-            {showBookAppointment && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <BookAppointment
-                        onClose={() => setShowBookAppointment(false)}
-                        onSuccess={() => {
-                            loadData();
-                            setActiveTab('appointments');
-                        }}
-                    />
-                </div>
+                        </CardContent>
+                    </Card>
+                </Stack>
             )}
 
+            {/* ── Appointments ── */}
+            {activeTab === 'appointments' && (
+                <Stack spacing={3}>
+                    <Card sx={{ background: 'linear-gradient(135deg, #22c55e, #14b8a6)', color: '#fff' }}>
+                        <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                            <Box>
+                                <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>📅 Book an Appointment</Typography>
+                                <Typography sx={{ opacity: 0.9 }}>Schedule a visit with one of our doctors</Typography>
+                            </Box>
+                            <Button variant="contained" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }}
+                                onClick={() => setShowBookAppointment(true)}>
+                                Find a Doctor →
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    <PageHeader title="My Appointments" />
+                    {appointments.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', py: 8 }}>
+                            <Typography sx={{ fontSize: '3rem', mb: 1 }}>📅</Typography>
+                            <Typography color="text.secondary">No appointments yet. Book your first appointment above!</Typography>
+                        </Box>
+                    ) : (
+                        <Stack spacing={2}>
+                            {appointments.map(apt => (
+                                <Card key={apt.appointment_id} variant="outlined" sx={{ '&:hover': { boxShadow: 3 }, transition: 'box-shadow 0.2s' }}>
+                                    <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+                                        <Box sx={{ flex: 1 }}>
+                                            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                                                <StatusChip status={apt.status} />
+                                                <Typography variant="caption" color="text.secondary">{apt.appointment_id}</Typography>
+                                            </Stack>
+                                            <Typography fontWeight={600}>Dr. {apt.doctor_name || 'Doctor'}</Typography>
+                                            <Typography variant="body2" color="text.secondary">📅 {apt.date} | ⏰ {apt.start_time} - {apt.end_time}</Typography>
+                                            {apt.notes && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>📝 {apt.notes}</Typography>}
+                                            {apt.rejection_reason && <Typography variant="body2" color="error.main" sx={{ mt: 0.5 }}>❌ {apt.rejection_reason}</Typography>}
+                                        </Box>
+                                        {['pending', 'pending_doctor_approval', 'approved', 'confirmed'].includes(apt.status) && (
+                                            <Button color="error" variant="outlined" size="small" onClick={() => handleCancelAppointment(apt.appointment_id)}>Cancel</Button>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </Stack>
+                    )}
+                </Stack>
+            )}
+
+            {/* ── History ── */}
+            {activeTab === 'history' && (
+                <Stack spacing={3}>
+                    <PageHeader title="My Care History" />
+                    {handoffs.length === 0 ? (
+                        <Typography color="text.secondary" align="center" sx={{ py: 4 }}>No care records found.</Typography>
+                    ) : (
+                        <Stack spacing={2}>
+                            {handoffs.map((h, idx) => (
+                                <Card key={idx} variant="outlined" sx={{ borderLeft: 4, borderLeftColor: 'success.main', '&:hover': { bgcolor: 'action.hover' }, transition: 'background 0.2s' }}>
+                                    <CardContent>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                            <Box>
+                                                <Typography fontWeight={700} color="success.main">{h.shift} Shift</Typography>
+                                                <Typography variant="body2" color="text.secondary">Nurse: {h.nurse_name}</Typography>
+                                            </Box>
+                                            <Typography variant="body2" color="text.secondary">{formatDate(h.timestamp)}</Typography>
+                                        </Box>
+                                        {h.structured_report?.vitals && (
+                                            <Box sx={{ mt: 1, p: 1.5, bgcolor: 'success.main', borderRadius: 1, opacity: 0.08 }}>
+                                                <Typography variant="caption"><strong>Vitals:</strong>{' '}
+                                                    HR: {typeof h.structured_report.vitals.heart_rate === 'object' ? h.structured_report.vitals.heart_rate?.value : h.structured_report.vitals.heart_rate || '--'},
+                                                    BP: {typeof h.structured_report.vitals.blood_pressure === 'object' ? h.structured_report.vitals.blood_pressure?.value : h.structured_report.vitals.blood_pressure || '--'}
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </Stack>
+                    )}
+                </Stack>
+            )}
+
+            {/* Book Appointment Dialog */}
+            <Dialog open={showBookAppointment} onClose={() => setShowBookAppointment(false)} maxWidth="md" fullWidth>
+                <BookAppointment
+                    onClose={() => setShowBookAppointment(false)}
+                    onSuccess={() => { loadData(); setActiveTab('appointments'); }}
+                />
+            </Dialog>
+
             {/* Notification */}
-            <Notification message={notification?.message} type={notification?.type} onClose={() => setNotification(null)} />
+            <AppNotification open={!!notification} message={notification?.message || ''} type={notification?.type} onClose={() => setNotification(null)} />
 
             {/* Profile Modal */}
-            <ProfileModal 
-                isOpen={showProfile} 
-                onClose={() => setShowProfile(false)} 
-                user={{...user, role: 'patient', full_name: user.patient_name}} 
+            <ProfileModal
+                isOpen={showProfile}
+                onClose={() => setShowProfile(false)}
+                user={{...user, role: 'patient', full_name: user.patient_name}}
                 onUpdate={(updatedUser) => setUser(updatedUser)}
             />
-        </div>
-    );
-};
-
-// Info tile with neutral styling
-const InfoTile = ({ label, value }) => (
-    <div className="p-4 bg-background rounded-lg border border-border">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="text-lg font-semibold text-foreground">{value}</p>
-    </div>
-);
-
-// Vital tile with explicit color classes (not dynamic)
-const VitalTile = ({ label, value, unit, colorClass }) => {
-    const colorMap = {
-        blue: { bg: 'bg-blue-500/10', text: 'text-primary' },
-        red: { bg: 'bg-red-500/10', text: 'text-error' },
-        yellow: { bg: 'bg-yellow-500/10', text: 'text-warning' },
-        green: { bg: 'bg-green-500/10', text: 'text-success' },
-        purple: { bg: 'bg-purple-500/10', text: 'text-purple-500' },
-    };
-    const colors = colorMap[colorClass] || colorMap.blue;
-
-    // Handle object values like {value: "72", unit: "bpm", status: "normal"}
-    let displayValue = value;
-    if (value && typeof value === 'object') {
-        displayValue = value.value || value.reading || JSON.stringify(value);
-    }
-
-    return (
-        <div className={`p-4 ${colors.bg} rounded-lg text-center border border-border`}>
-            <p className="text-sm text-text-secondary">{label}</p>
-            <p className={`text-2xl font-bold ${colors.text}`}>{displayValue || '--'}</p>
-            <p className="text-xs text-muted-foreground">{unit}</p>
-        </div>
+        </DashboardLayout>
     );
 };
 

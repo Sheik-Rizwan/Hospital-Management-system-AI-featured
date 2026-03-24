@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE, getAuthHeaders } from '../utils/api';
 
+// MUI Components
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+
+// Icons
+import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
+
 const PatientEditModal = ({ isOpen, onClose, patient, onUpdate }) => {
     const [formData, setFormData] = useState({
         patient_name: '',
@@ -26,8 +45,6 @@ const PatientEditModal = ({ isOpen, onClose, patient, onUpdate }) => {
         }
     }, [patient]);
 
-    if (!isOpen) return null;
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -39,19 +56,8 @@ const PatientEditModal = ({ isOpen, onClose, patient, onUpdate }) => {
         setError('');
 
         try {
-            // Determine endpoint based on user role (Doctor or Nurse) - handled by parent or context?
-            // Actually, we can try doctor endpoint first, if 403 then nurse? 
-            // Or better, pass the role or endpoint as prop?
-            // For now, let's assume the Dashboard passes the correct role-specific update function or we try both/standard one.
-            // Since we added endpoints for both roles at similar paths:
-            // Doctor: /doctor/patients/:id
-            // Nurse: /nurse/patients/:id
-            
-            // Let's use a prop `role` or deduce from local storage, OR simply try the path given via prop.
-            // But to keep it simple, let's assume the parent fetches and updates, or we just use the right prefix.
-            // Let's check sessionStorage user role to build the URL.
-            
-            const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+            const userStr = sessionStorage.getItem('user');
+            const user = userStr ? JSON.parse(userStr) : {};
             const role = user.role || 'doctor'; 
             const endpoint = `${API_BASE}/${role}/patients/${patient.patient_id}`;
 
@@ -64,7 +70,7 @@ const PatientEditModal = ({ isOpen, onClose, patient, onUpdate }) => {
             const data = await res.json();
 
             if (data.success) {
-                onUpdate(); // Trigger refresh in parent
+                onUpdate(); 
                 onClose();
             } else {
                 setError(data.error || 'Failed to update patient');
@@ -77,107 +83,104 @@ const PatientEditModal = ({ isOpen, onClose, patient, onUpdate }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
-            <div className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-lg animate-fade-in-up">
-                <div className="p-6 border-b border-border flex justify-between items-center">
-                    <h2 className="text-xl font-bold text-foreground">Edit Patient Details</h2>
-                    <button onClick={onClose} className="text-muted-foreground hover:text-white transition">✕</button>
-                </div>
+        <Dialog 
+            open={isOpen} 
+            onClose={onClose} 
+            maxWidth="sm" 
+            fullWidth
+            PaperProps={{ sx: { borderRadius: 3 } }}
+        >
+            <DialogTitle sx={{ 
+                borderBottom: 1, 
+                borderColor: 'divider', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center' 
+            }}>
+                <Typography variant="h6" fontWeight={800}>Edit Patient Details</Typography>
+                <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
+            </DialogTitle>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-error p-3 rounded text-sm">
-                            {error}
-                        </div>
-                    )}
+            <DialogContent sx={{ p: 4 }}>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <Stack spacing={3}>
+                        {error && <Alert severity="error">{error}</Alert>}
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Name</label>
-                            <input
-                                type="text"
-                                name="patient_name"
-                                value={formData.patient_name}
-                                onChange={handleChange}
-                                className="w-full bg-card border border-border rounded p-2 text-foreground focus:border-primary outline-none transition"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Phone</label>
-                            <input
-                                type="text"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                className="w-full bg-card border border-border rounded p-2 text-foreground focus:border-primary outline-none transition"
-                            />
-                        </div>
-                    </div>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Patient Name"
+                                    name="patient_name"
+                                    value={formData.patient_name}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Phone Number"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Age"
+                                    name="age"
+                                    value={formData.age}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Room Number"
+                                    name="room_number"
+                                    value={formData.room_number}
+                                    onChange={handleChange}
+                                />
+                            </Grid>
+                        </Grid>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Age</label>
-                            <input
-                                type="text"
-                                name="age"
-                                value={formData.age}
-                                onChange={handleChange}
-                                className="w-full bg-card border border-border rounded p-2 text-foreground focus:border-primary outline-none transition"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Room Number</label>
-                            <input
-                                type="text"
-                                name="room_number"
-                                value={formData.room_number}
-                                onChange={handleChange}
-                                className="w-full bg-card border border-border rounded p-2 text-foreground focus:border-primary outline-none transition"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Diagnosis</label>
-                        <input
-                            type="text"
+                        <TextField
+                            fullWidth
+                            label="Diagnosis"
                             name="diagnosis"
                             value={formData.diagnosis}
                             onChange={handleChange}
-                            className="w-full bg-card border border-border rounded p-2 text-foreground focus:border-primary outline-none transition"
                         />
-                    </div>
 
-                    <div>
-                        <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Notes / Special Instructions</label>
-                        <textarea
+                        <TextField
+                            fullWidth
+                            label="Notes / Special Instructions"
                             name="notes"
+                            multiline
+                            rows={4}
                             value={formData.notes}
                             onChange={handleChange}
-                            rows="3"
-                            className="w-full bg-card border border-border rounded p-2 text-foreground focus:border-primary outline-none transition"
-                        ></textarea>
-                    </div>
+                        />
+                    </Stack>
+                </Box>
+            </DialogContent>
 
-                    <div className="flex justify-end gap-3 pt-4 border-t border-border">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 rounded text-foreground hover:bg-[#565869] transition"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover transition disabled:opacity-50"
-                        >
-                            {loading ? 'Saving...' : 'Save Changes'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            <DialogActions sx={{ p: 3, borderTop: 1, borderColor: 'divider' }}>
+                <Button onClick={onClose} color="inherit">Cancel</Button>
+                <Button 
+                    onClick={handleSubmit} 
+                    variant="contained" 
+                    color="primary" 
+                    disabled={loading}
+                    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+                    sx={{ px: 4, fontWeight: 700 }}
+                >
+                    {loading ? 'Saving...' : 'Save Changes'}
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 };
 

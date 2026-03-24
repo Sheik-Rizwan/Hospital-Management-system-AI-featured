@@ -52,8 +52,8 @@ class Appointment:
             'rejection_reason': appointment_data.get('rejection_reason', ''),
             'created_by': appointment_data.get('created_by'),
             'created_by_id': appointment_data.get('created_by_id', ''),
-            'created_at': appointment_data.get('created_at'),
-            'updated_at': appointment_data.get('updated_at'),
+            'created_at': appointment_data.get('created_at').isoformat() if hasattr(appointment_data.get('created_at', ''), 'isoformat') else str(appointment_data.get('created_at', '')),
+            'updated_at': appointment_data.get('updated_at').isoformat() if hasattr(appointment_data.get('updated_at', ''), 'isoformat') else str(appointment_data.get('updated_at', '')),
             # Populated fields (joined from other collections)
             'doctor_name': appointment_data.get('doctor_name', ''),
             'doctor_specialization': appointment_data.get('doctor_specialization', '')
@@ -100,6 +100,7 @@ class DoctorSchedule:
         """
         Generate available time slots between start and end time.
         Handles overnight shifts (e.g. 22:00 to 07:00).
+        Tags post-midnight slots with next_day=True for display context.
         """
         slots = []
         
@@ -107,18 +108,21 @@ class DoctorSchedule:
         start_hour, start_min = map(int, start_time.split(':'))
         end_hour, end_min = map(int, end_time.split(':'))
         
-        current = datetime.now().replace(hour=start_hour, minute=start_min, second=0, microsecond=0)
+        base = datetime.now().replace(hour=start_hour, minute=start_min, second=0, microsecond=0)
+        current = base
         end = datetime.now().replace(hour=end_hour, minute=end_min, second=0, microsecond=0)
         
         # Handle overnight shift (end time is 'earlier' than start time)
-        if end <= current:
+        is_overnight = end <= current
+        if is_overnight:
             end += timedelta(days=1)
         
         while current + timedelta(minutes=slot_duration) <= end:
             slot_end = current + timedelta(minutes=slot_duration)
             slots.append({
                 'start': current.strftime('%H:%M'),
-                'end': slot_end.strftime('%H:%M')
+                'end': slot_end.strftime('%H:%M'),
+                'next_day': is_overnight and current.day != base.day
             })
             current = slot_end
         

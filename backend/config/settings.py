@@ -18,17 +18,18 @@ GENERATION_CONFIG = {
 # ── Sarvam AI (Voice & Translation) ──
 SARVAM_API_KEY = os.getenv('SARVAM_API_KEY', '')
 SARVAM_BASE_URL = os.getenv('SARVAM_BASE_URL', 'https://api.sarvam.ai')
-SARVAM_STT_URL = f'{SARVAM_BASE_URL}/speech-to-text-translate'
+SARVAM_STT_URL = f'{SARVAM_BASE_URL}/speech-to-text'
 SARVAM_TTS_URL = f'{SARVAM_BASE_URL}/text-to-speech'
 SARVAM_TRANSLATE_URL = f'{SARVAM_BASE_URL}/translate'
-SARVAM_CHAT_URL = f'{SARVAM_BASE_URL}/v2/chat/completions'
-SARVAM_MODEL = os.getenv('SARVAM_MODEL', 'sarvam-m')
+SARVAM_CHAT_URL = f'{SARVAM_BASE_URL}/v1/chat/completions'
+SARVAM_MODEL = os.getenv('SARVAM_MODEL', 'sarvam-30b')
 
 SARVAM_SUPPORTED_LANGUAGES = {
     'te': {'name': 'Telugu', 'tts_code': 'te-IN', 'display': 'తెలుగు'},
     'hi': {'name': 'Hindi', 'tts_code': 'hi-IN', 'display': 'हिन्दी'},
     'ur': {'name': 'Urdu', 'tts_code': 'ur-IN', 'display': 'اردو'},
     'kn': {'name': 'Kannada', 'tts_code': 'kn-IN', 'display': 'ಕನ್ನಡ'},
+    'ta': {'name': 'Tamil', 'tts_code': 'ta-IN', 'display': 'தமிழ்'},
     'en': {'name': 'English', 'tts_code': 'en-IN', 'display': 'English'},
 }
 SARVAM_DEFAULT_LANGUAGE = 'en'

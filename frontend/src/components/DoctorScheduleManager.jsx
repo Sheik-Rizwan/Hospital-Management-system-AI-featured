@@ -1,6 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE, getAuthHeaders } from '../utils/api';
 
+// MUI Components
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+import InputLabel from '@mui/material/InputLabel';
+
+// Icons
+import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import NightlightIcon from '@mui/icons-material/Nightlight';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+
 const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const DoctorScheduleManager = ({ onClose }) => {
@@ -24,15 +52,11 @@ const DoctorScheduleManager = ({ onClose }) => {
             const data = await res.json();
             
             if (data.success) {
-                // Map existing schedules to full week
                 const existingMap = {};
-                // Group by day to handle multiple shifts
                 data.schedules.forEach(s => {
                     if (!existingMap[s.day_of_week]) {
                         existingMap[s.day_of_week] = { shifts: [], raw: [] };
                     }
-                    
-                    // Identify shift type based on start time range (flexible — not exact match)
                     const hour = parseInt((s.start_time || '00:00').split(':')[0], 10);
                     let shiftType = '';
                     if (hour < 12) shiftType = 'morning';
@@ -65,17 +89,12 @@ const DoctorScheduleManager = ({ onClose }) => {
     const handleShiftToggle = (dayIndex, shiftKey) => {
         const updated = [...schedules];
         const day = updated[dayIndex];
-        
-        // Toggle the shift
         if (day.shifts.includes(shiftKey)) {
             day.shifts = day.shifts.filter(s => s !== shiftKey);
         } else {
             day.shifts.push(shiftKey);
         }
-        
-        // Update availability based on having at least one shift
         day.is_available = day.shifts.length > 0;
-        
         setSchedules(updated);
     };
 
@@ -100,9 +119,7 @@ const DoctorScheduleManager = ({ onClose }) => {
         setSuccess('');
 
         try {
-            // Flatten schedules for API (one entry per shift)
             const flattenedSchedules = [];
-            
             const SHIFT_TIMES = {
                 'morning': { start: '07:00', end: '14:00' },
                 'evening': { start: '14:00', end: '22:00' },
@@ -130,7 +147,6 @@ const DoctorScheduleManager = ({ onClose }) => {
             });
 
             const data = await res.json();
-
             if (data.success) {
                 setSuccess('Schedule saved successfully!');
                 setTimeout(() => setSuccess(''), 3000);
@@ -143,188 +159,178 @@ const DoctorScheduleManager = ({ onClose }) => {
         setSaving(false);
     };
 
-    const generateTimeOptions = () => {
-        const options = [];
-        for (let h = 6; h <= 22; h++) {
-            for (let m = 0; m < 60; m += 30) {
-                const hour = h.toString().padStart(2, '0');
-                const min = m.toString().padStart(2, '0');
-                options.push(`${hour}:${min}`);
-            }
-        }
-        return options;
-    };
-
-    const timeOptions = generateTimeOptions();
-
     if (loading) {
         return (
-            <div className="bg-surface rounded-lg shadow-xl p-8 max-w-3xl w-full">
-                <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-                </div>
-            </div>
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}>
+                <CircularProgress />
+            </Box>
         );
     }
 
     return (
-        <div className="bg-surface rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <Paper 
+            elevation={0}
+            sx={{ 
+                maxWidth: 800, 
+                width: '100%', 
+                maxHeight: '90vh',
+                bgcolor: 'background.paper',
+                borderRadius: 3,
+                overflowY: 'auto',
+                border: 1,
+                borderColor: 'divider'
+            }}
+        >
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-lg">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold">📅 Recurring Yearly Schedule</h2>
+            <Box sx={{ 
+                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', 
+                p: 3, 
+                color: 'white',
+                position: 'relative'
+            }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Box>
+                        <Stack direction="row" spacing={1.5} alignItems="center">
+                            <CalendarMonthIcon />
+                            <Typography variant="h5" fontWeight={800}>Recurring Yearly Schedule</Typography>
+                        </Stack>
+                        <Typography variant="body2" sx={{ opacity: 0.8, fontStyle: 'italic', mt: 0.5 }}>
+                            This schedule applies to every month of the year until updated.
+                        </Typography>
+                    </Box>
                     {onClose && (
-                        <button onClick={onClose} className="text-white hover:bg-surface/20 p-2 rounded transition">
-                            ✕
-                        </button>
+                        <IconButton onClick={onClose} sx={{ color: 'white' }}>
+                            <CloseIcon />
+                        </IconButton>
                     )}
-                </div>
-                <p className="mt-2 text-indigo-100 italic">This schedule applies to every month of the year until updated.</p>
-                <div className="mt-4 flex gap-2">
-                    <span className="bg-surface/20 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">✓ Recurring</span>
-                    <span className="bg-surface/20 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">✓ 2026-2027</span>
-                </div>
-            </div>
+                </Stack>
+                <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                    <Chip size="small" label="✓ Recurring" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600 }} />
+                    <Chip size="small" label="✓ 2026-2027" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 600 }} />
+                </Stack>
+            </Box>
 
-            <div className="p-6">
-                {/* Messages */}
-                {error && (
-                    <div className="mb-4 p-3 bg-error-soft border border-red-300 text-red-700 rounded-lg">
-                        {error}
-                    </div>
-                )}
-                {success && (
-                    <div className="mb-4 p-3 bg-success-soft border border-green-300 text-green-700 rounded-lg">
-                        ✓ {success}
-                    </div>
-                )}
+            <Box sx={{ p: 4 }}>
+                {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+                {success && <Alert severity="success" sx={{ mb: 3 }}>{success}</Alert>}
 
-                {/* Slot Duration */}
-                <div className="mb-6 p-4 bg-muted rounded-lg border border-border">
-                    <label className="block text-sm font-medium text-text-secondary mb-2">
-                        Appointment Duration (minutes)
-                    </label>
-                    <div className="flex justify-between items-center">
-                        <select
-                            value={slotDuration}
-                            onChange={(e) => setSlotDuration(parseInt(e.target.value))}
-                            className="px-4 py-2 bg-card text-foreground border border-border rounded-lg focus:ring-2 focus:ring-primary"
-                        >
-                            <option value={15}>15 minutes</option>
-                            <option value={20}>20 minutes</option>
-                            <option value={30}>30 minutes</option>
-                            <option value={45}>45 minutes</option>
-                            <option value={60}>60 minutes</option>
-                        </select>
-                        <button 
-                            onClick={handleApplyToAllDays}
-                            className="text-sm text-primary font-semibold hover:opacity-80 flex items-center gap-1 transition-colors"
-                        >
-                            📋 Apply Monday to All Days
-                        </button>
-                    </div>
-                </div>
+                {/* Settings Panel */}
+                <Paper variant="outlined" sx={{ p: 3, mb: 4, bgcolor: 'background.default', borderRadius: 2 }}>
+                    <Grid container spacing={3} alignItems="center">
+                        <Grid item xs={12} sm={6}>
+                            <FormControl fullWidth size="small">
+                                <InputLabel>Appointment Duration</InputLabel>
+                                <Select
+                                    label="Appointment Duration"
+                                    value={slotDuration}
+                                    onChange={(e) => setSlotDuration(e.target.value)}
+                                >
+                                    <MenuItem value={15}>15 minutes</MenuItem>
+                                    <MenuItem value={20}>20 minutes</MenuItem>
+                                    <MenuItem value={30}>30 minutes</MenuItem>
+                                    <MenuItem value={45}>45 minutes</MenuItem>
+                                    <MenuItem value={60}>60 minutes</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={6} textAlign={{ sm: 'right' }}>
+                            <Button 
+                                startIcon={<ContentPasteIcon />} 
+                                color="primary" 
+                                variant="text" 
+                                onClick={handleApplyToAllDays}
+                                sx={{ fontWeight: 700 }}
+                            >
+                                Apply Monday to All
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Paper>
 
-                {/* Weekly Schedule */}
-                <div className="space-y-3">
+                {/* Days Grid */}
+                <Stack spacing={2}>
                     {schedules.map((sched, idx) => (
-                        <div
-                            key={sched.day_of_week}
-                            className={`flex flex-col md:flex-row md:items-center gap-4 p-4 rounded-lg border-2 transition-all ${
-                                sched.is_available
-                                    ? 'border-primary/40 bg-primary/10'
-                                    : 'border-border bg-card'
-                            }`}
+                        <Paper 
+                            key={sched.day_of_week} 
+                            variant="outlined"
+                            sx={{ 
+                                p: 2, 
+                                borderRadius: 2,
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                alignItems: 'center',
+                                gap: 2,
+                                borderColor: sched.is_available ? 'primary.main' : 'divider',
+                                transition: 'all 0.2s',
+                                '&:hover': { borderColor: 'primary.main', boxShadow: theme => theme.shadows[2] }
+                            }}
                         >
-                            {/* Day Name */}
-                            <span className={`w-28 font-bold text-lg ${sched.is_available ? 'text-primary' : 'text-muted-foreground'}`}>
+                            <Typography 
+                                variant="h6" 
+                                sx={{ 
+                                    width: 120, 
+                                    fontWeight: 800,
+                                    color: sched.is_available ? 'primary.main' : 'text.secondary'
+                                }}
+                            >
                                 {sched.day_of_week}
-                            </span>
+                            </Typography>
 
-                            {/* Shift Checkboxes */}
-                            <div className="flex flex-wrap gap-4 flex-1">
-                                <label className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition ${
-                                    sched.shifts.includes('morning') 
-                                    ? 'bg-blue-500/20 border-blue-400/60 text-blue-300' 
-                                    : 'bg-card border-border text-muted-foreground hover:border-blue-400/50'
-                                }`}>
-                                    <input 
-                                        type="checkbox" 
-                                        className="w-4 h-4 accent-blue-500 rounded"
-                                        checked={sched.shifts.includes('morning')}
-                                        onChange={() => handleShiftToggle(idx, 'morning')}
+                            <Stack direction="row" spacing={1.5} flex={1} flexWrap="wrap">
+                                {[
+                                    { key: 'morning', label: 'Morning', time: '7AM-2PM', icon: <WbSunnyIcon fontSize="small" />, color: 'info' },
+                                    { key: 'evening', label: 'Evening', time: '2PM-10PM', icon: <NightlightIcon fontSize="small" />, color: 'warning' },
+                                    { key: 'night', label: 'Night', time: '10PM-7AM', icon: <DarkModeIcon fontSize="small" />, color: 'secondary' }
+                                ].map(shift => (
+                                    <Chip
+                                        key={shift.key}
+                                        icon={shift.icon}
+                                        label={
+                                            <Box sx={{ textAlign: 'left' }}>
+                                                <Typography variant="caption" sx={{ display: 'block', fontWeight: 700 }}>{shift.label}</Typography>
+                                                <Typography variant="caption" sx={{ opacity: 0.8 }}>{shift.time}</Typography>
+                                            </Box>
+                                        }
+                                        onClick={() => handleShiftToggle(idx, shift.key)}
+                                        color={sched.shifts.includes(shift.key) ? shift.color : 'default'}
+                                        variant={sched.shifts.includes(shift.key) ? 'filled' : 'outlined'}
+                                        sx={{ 
+                                            height: 48, 
+                                            px: 1, 
+                                            borderRadius: 2,
+                                            '& .MuiChip-label': { px: 1.5 }
+                                        }}
                                     />
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold">Morning</span>
-                                        <span className="text-xs opacity-75">07:00 - 14:00</span>
-                                    </div>
-                                </label>
-
-                                <label className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition ${
-                                    sched.shifts.includes('evening') 
-                                    ? 'bg-orange-500/20 border-orange-400/60 text-orange-300' 
-                                    : 'bg-card border-border text-muted-foreground hover:border-orange-400/50'
-                                }`}>
-                                    <input 
-                                        type="checkbox" 
-                                        className="w-4 h-4 accent-orange-500 rounded"
-                                        checked={sched.shifts.includes('evening')}
-                                        onChange={() => handleShiftToggle(idx, 'evening')}
-                                    />
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold">Evening</span>
-                                        <span className="text-xs opacity-75">14:00 - 22:00</span>
-                                    </div>
-                                </label>
-
-                                <label className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition ${
-                                    sched.shifts.includes('night') 
-                                    ? 'bg-purple-500/20 border-purple-400/60 text-purple-300' 
-                                    : 'bg-card border-border text-muted-foreground hover:border-purple-400/50'
-                                }`}>
-                                    <input 
-                                        type="checkbox" 
-                                        className="w-4 h-4 accent-purple-500 rounded"
-                                        checked={sched.shifts.includes('night')}
-                                        onChange={() => handleShiftToggle(idx, 'night')}
-                                    />
-                                    <div className="flex flex-col">
-                                        <span className="font-semibold">Night</span>
-                                        <span className="text-xs opacity-75">22:00 - 07:00</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
+                                ))}
+                            </Stack>
+                        </Paper>
                     ))}
-                </div>
+                </Stack>
 
-                {/* Actions */}
-                <div className="flex justify-end mt-8 gap-3">
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 5 }}>
                     {onClose && (
-                        <button
+                        <Button 
+                            variant="outlined" 
+                            color="inherit" 
                             onClick={onClose}
-                            className="px-6 py-2 border border-border text-text-secondary rounded-lg hover:bg-background transition"
+                            sx={{ px: 4 }}
                         >
                             Cancel
-                        </button>
+                        </Button>
                     )}
-                    <button
+                    <Button 
+                        variant="contained" 
+                        size="large" 
                         onClick={handleSave}
                         disabled={saving}
-                        className="px-8 py-2 bg-primary hover:bg-primary-hover text-primary-foreground rounded-lg disabled:opacity-50 transition flex items-center gap-2"
+                        startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+                        sx={{ px: 6, py: 1.5, borderRadius: 2, fontWeight: 800 }}
                     >
-                        {saving ? (
-                            <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                Saving...
-                            </>
-                        ) : (
-                            <>💾 Save Schedule</>
-                        )}
-                    </button>
-                </div>
-            </div>
-        </div>
+                        {saving ? 'Saving...' : 'Save Schedule'}
+                    </Button>
+                </Box>
+            </Box>
+        </Paper>
     );
 };
 

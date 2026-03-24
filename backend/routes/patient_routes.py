@@ -1,16 +1,27 @@
 # patient_routes.py - Patient Dashboard & Appointment Routes
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from mongodb_config import MongoDatabase
 from services.appointment_service import AppointmentService
 from datetime import datetime
 import json
+import os
+import tempfile
+import uuid
 
 try:
     from services.chatbot import ask_nurse_assistant
 except Exception:
     ask_nurse_assistant = None
+
+try:
+    from services.voice_booking_service import VoiceBookingService
+    voice_booking_service = VoiceBookingService()
+except Exception as _vbs_err:
+    import logging
+    logging.getLogger(__name__).warning(f"VoiceBookingService unavailable: {_vbs_err}")
+    voice_booking_service = None
 
 patient_bp = Blueprint('patient_bp', __name__)
 db = MongoDatabase()
@@ -207,7 +218,135 @@ def cancel_appointment(appointment_id):
             'message': 'Appointment cancelled successfully'
         }), 200
 
+
     except ValueError as ve:
         return jsonify({'success': False, 'error': str(ve)}), 400
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ============ VOICE BOOKING ============
+
+@patient_bp.route('/voice/booking/languages', methods=['GET'])
+@jwt_required()
+def voice_booking_languages():
+    """Return supported language options for voice booking UI."""
+    if not voice_booking_service:
+        return jsonify({'success': False, 'error': 'Voice booking service unavailable'}), 503
+    return jsonify({
+        'success': True,
+        'languages': voice_booking_service.get_supported_languages()
+    }), 200
+
+
+@patient_bp.route('/voice/booking/stt', methods=['POST'])
+@jwt_required()
+def voice_booking_stt():
+    """
+    Convert patient's spoken audio to text.
+    Accepts multipart/form-data:  audio (file) + language_code (str, default 'en')
+    Returns: { transcript, language_code }
+    """
+    if not voice_booking_service:
+        return jsonify({'success': False, 'error': 'Voice booking service unavailable'}), 503
+
+    audio_file = request.files.get('audio')
+    if not audio_file:
+        return jsonify({'success': False, 'error': 'No audio file provided'}), 400
+
+    language_code = request.form.get('language_code', 'en')
+    if language_code not in ('en', 'hi', 'te', 'kn', 'ur'):
+        language_code = 'en'
+
+    # Save upload to a temp file
+    suffix = os.path.splitext(audio_file.filename or 'audio.webm')[1] or '.webm'
+    tmp_path = os.path.join(tempfile.gettempdir(), f"voice_stt_{uuid.uuid4().hex}{suffix}")
+    try:
+        audio_file.save(tmp_path)
+        result = voice_booking_service.transcribe_audio(tmp_path, language_code)
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'Transcription error: {str(e)}'}), 500
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+    if not result.get('transcript'):
+        return jsonify({'success': False, 'error': result.get('error', 'Transcription failed')}), 422
+
+    return jsonify({
+        'success': True,
+        'transcript': result['transcript'],
+        'language_code': result.get('language_code', language_code)
+    }), 200
+
+
+@patient_bp.route('/voice/booking/turn', methods=['POST'])
+@jwt_required()
+def voice_booking_turn():
+    """
+    Process one conversation turn with the AI booking assistant.
+    Body: { messages: [{role, content}], language_code: 'en'|'hi'|'te'|'kn' }
+    Returns: { reply_text, booking_confirmed, appointment_data? }
+    """
+    if not voice_booking_service:
+        return jsonify({'success': False, 'error': 'Voice booking service unavailable'}), 503
+
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        messages = data.get('messages', [])
+        language_code = data.get('language_code', 'en')
+
+        if not messages:
+            return jsonify({'success': False, 'error': 'messages array is required'}), 400
+
+        result = voice_booking_service.process_turn(
+            messages=messages,
+            language_code=language_code,
+            patient_id=user_id
+        )
+
+        return jsonify({
+            'success': True,
+            'reply_text': result['reply_text'],
+            'booking_confirmed': result['booking_confirmed'],
+            'appointment_data': result.get('appointment_data')
+        }), 200
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@patient_bp.route('/voice/booking/tts', methods=['POST'])
+@jwt_required()
+def voice_booking_tts():
+    """
+    Convert AI reply text to speech audio.
+    Body: { text: str, language_code: 'en'|'hi'|'te'|'kn' }
+    Returns: audio/wav file stream
+    """
+    if not voice_booking_service:
+        return jsonify({'success': False, 'error': 'Voice booking service unavailable'}), 503
+
+    try:
+        data = request.get_json()
+        text = data.get('text', '').strip()
+        language_code = data.get('language_code', 'en')
+
+        if not text:
+            return jsonify({'success': False, 'error': 'text is required'}), 400
+
+        audio_path = voice_booking_service.synthesize_speech(text, language_code)
+
+        if not audio_path or not os.path.exists(audio_path):
+            return jsonify({'success': False, 'error': 'TTS generation failed'}), 500
+
+        return send_file(
+            audio_path,
+            mimetype='audio/wav',
+            as_attachment=False,
+            download_name=f"reply_{language_code}.wav"
+        )
+
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

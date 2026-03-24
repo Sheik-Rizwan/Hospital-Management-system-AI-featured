@@ -3,8 +3,32 @@ import { API_BASE, getAuthHeaders, formatDate, connectSocket, getRoleAuth, clear
 import { useRealtimeEvents } from '../hooks/useRealtimeEvents';
 import ProfileModal from '../components/ProfileModal';
 import ChatInterface from '../components/ChatInterface';
-import ThemeToggle from '../components/ThemeToggle';
+import DashboardLayout from '../layout/DashboardLayout';
+import AppNotification from '../components/ui/AppNotification';
+import PageHeader from '../components/ui/PageHeader';
+import StatusChip from '../components/ui/StatusChip';
 import { jsPDF } from 'jspdf';
+
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Grid from '@mui/material/Grid';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const VendorDashboard = () => {
     const [user, setUser] = useState(null);
@@ -30,15 +54,10 @@ const VendorDashboard = () => {
 
     const fetchVendorProfile = async () => {
         try {
-            const res = await fetch(`${API_BASE}/vendor/profile`, {
-                headers: getAuthHeaders('vendor')
-            });
+            const res = await fetch(`${API_BASE}/vendor/profile`, { headers: getAuthHeaders('vendor') });
             const data = await res.json();
-            if (data.success && data.vendor) {
-                setUser(prev => ({ ...prev, ...data.vendor }));
-            }
-        } catch (e) {
-        }
+            if (data.success && data.vendor) setUser(prev => ({ ...prev, ...data.vendor }));
+        } catch (e) { }
     };
 
     const showNotify = (msg, type = 'info') => {
@@ -68,28 +87,19 @@ const VendorDashboard = () => {
             const dRes = await fetch(`${API_BASE}/vendor/dashboard`, { headers });
             const dData = await dRes.json();
             if (dData.success) setOpenRequests(dData.open_requests || []);
-        } catch (error) {
-        }
+        } catch (error) { }
         setLoading(false);
     };
 
     const handleStatusUpdate = async (poId, status) => {
         try {
             const res = await fetch(`${API_BASE}/vendor/orders/${poId}/status`, {
-                method: 'PUT',
-                headers: getAuthHeaders('vendor'),
-                body: JSON.stringify({ status })
+                method: 'PUT', headers: getAuthHeaders('vendor'), body: JSON.stringify({ status })
             });
             const data = await res.json();
-            if (data.success) {
-                showNotify(`Order updated to ${status}`, 'success');
-                loadData();
-            } else {
-                showNotify(data.error || 'Update failed', 'error');
-            }
-        } catch (error) {
-            showNotify('Error updating status', 'error');
-        }
+            if (data.success) { showNotify(`Order updated to ${status}`, 'success'); loadData(); }
+            else showNotify(data.error || 'Update failed', 'error');
+        } catch (error) { showNotify('Error updating status', 'error'); }
     };
 
     const handleSubmitQuotation = async (e) => {
@@ -104,9 +114,7 @@ const VendorDashboard = () => {
                 notes: quoteForm.notes || ''
             };
             const res = await fetch(`${API_BASE}/vendor/quotations`, {
-                method: 'POST',
-                headers: getAuthHeaders('vendor'),
-                body: JSON.stringify(payload)
+                method: 'POST', headers: getAuthHeaders('vendor'), body: JSON.stringify(payload)
             });
             const data = await res.json();
             if (data.success) {
@@ -115,54 +123,31 @@ const VendorDashboard = () => {
                 setQuoteForm({ request_id: '', unit_price: '', total_price: '', delivery_days: 7, validity_days: 30, notes: '' });
                 setQuoteQuantity(0);
                 loadData();
-            } else {
-                showNotify(data.error || 'Submission failed', 'error');
-            }
-        } catch (error) {
-            showNotify('Error submitting quotation', 'error');
-        }
+            } else showNotify(data.error || 'Submission failed', 'error');
+        } catch (error) { showNotify('Error submitting quotation', 'error'); }
     };
 
-    const handleLogout = () => {
-        clearRoleAuth('vendor');
-        window.location.href = '/vendor-login';
-    };
+    const handleLogout = () => { clearRoleAuth('vendor'); window.location.href = '/vendor-login'; };
 
     const generateVendorPO = async (poId) => {
         try {
-            const res = await fetch(`${API_BASE}/vendor/orders/${poId}/pdf-data`, {
-                headers: getAuthHeaders('vendor')
-            });
+            const res = await fetch(`${API_BASE}/vendor/orders/${poId}/pdf-data`, { headers: getAuthHeaders('vendor') });
             const data = await res.json();
             if (!data.success) { showNotify(data.error || 'Failed to load PO data', 'error'); return; }
-
             const { order, vendor } = data;
             const doc = new jsPDF();
             const pageWidth = doc.internal.pageSize.getWidth();
             let y = 20;
-
-            doc.setFontSize(18);
-            doc.setFont('helvetica', 'bold');
-            doc.text('PURCHASE ORDER', pageWidth / 2, y, { align: 'center' });
-            y += 10;
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`PO Number: ${order.po_id}`, pageWidth / 2, y, { align: 'center' });
-            y += 6;
-            doc.text(`Date: ${formatDate(order.created_at)}`, pageWidth / 2, y, { align: 'center' });
-            y += 6;
-            doc.text(`Status: ${order.status.toUpperCase()}`, pageWidth / 2, y, { align: 'center' });
-            y += 12;
-
-            doc.setDrawColor(100);
-            doc.line(14, y, pageWidth - 14, y);
-            y += 8;
-            doc.setFontSize(13);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Vendor Details', 14, y);
-            y += 8;
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+            doc.text('PURCHASE ORDER', pageWidth / 2, y, { align: 'center' }); y += 10;
+            doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+            doc.text(`PO Number: ${order.po_id}`, pageWidth / 2, y, { align: 'center' }); y += 6;
+            doc.text(`Date: ${formatDate(order.created_at)}`, pageWidth / 2, y, { align: 'center' }); y += 6;
+            doc.text(`Status: ${order.status.toUpperCase()}`, pageWidth / 2, y, { align: 'center' }); y += 12;
+            doc.setDrawColor(100); doc.line(14, y, pageWidth - 14, y); y += 8;
+            doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+            doc.text('Vendor Details', 14, y); y += 8;
+            doc.setFontSize(10); doc.setFont('helvetica', 'normal');
             doc.text(`Company: ${vendor.company_name}`, 14, y); y += 6;
             doc.text(`Contact Person: ${vendor.contact_person}`, 14, y); y += 6;
             doc.text(`Phone: ${vendor.phone}`, 14, y); y += 6;
@@ -170,23 +155,12 @@ const VendorDashboard = () => {
             if (vendor.address) { doc.text(`Address: ${vendor.address}`, 14, y); y += 6; }
             if (vendor.gst_number) { doc.text(`GST: ${vendor.gst_number}`, 14, y); y += 6; }
             y += 6;
-
-            doc.line(14, y, pageWidth - 14, y);
-            y += 8;
-            doc.setFontSize(13);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Order Items', 14, y);
-            y += 8;
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.text('Item', 14, y);
-            doc.text('Qty', 90, y);
-            doc.text('Unit Price', 115, y);
-            doc.text('Total', 155, y);
-            y += 2;
-            doc.line(14, y, pageWidth - 14, y);
-            y += 6;
-
+            doc.line(14, y, pageWidth - 14, y); y += 8;
+            doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+            doc.text('Order Items', 14, y); y += 8;
+            doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+            doc.text('Item', 14, y); doc.text('Qty', 90, y); doc.text('Unit Price', 115, y); doc.text('Total', 155, y);
+            y += 2; doc.line(14, y, pageWidth - 14, y); y += 6;
             doc.setFont('helvetica', 'normal');
             (order.items || []).forEach(item => {
                 doc.text(item.item_name || '', 14, y);
@@ -195,292 +169,192 @@ const VendorDashboard = () => {
                 doc.text(`Rs.${(item.total || 0).toLocaleString()}`, 155, y);
                 y += 7;
             });
-            y += 2;
-            doc.line(14, y, pageWidth - 14, y);
-            y += 6;
-
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(12);
-            doc.text(`Total Amount: Rs.${(order.total_amount || 0).toLocaleString()}`, 14, y);
-            y += 6;
+            y += 2; doc.line(14, y, pageWidth - 14, y); y += 6;
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(12);
+            doc.text(`Total Amount: Rs.${(order.total_amount || 0).toLocaleString()}`, 14, y); y += 6;
             if (order.department) { doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Department: ${order.department}`, 14, y); y += 6; }
             if (order.expected_delivery) { doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Expected Delivery: ${formatDate(order.expected_delivery)}`, 14, y); y += 6; }
-
             doc.save(`PO_${order.po_id}.pdf`);
             showNotify('PO PDF downloaded', 'success');
         } catch (e) { showNotify('Error generating PDF', 'error'); }
     };
 
+    const sidebarItems = [
+        { id: 'orders', icon: '📦', label: 'My Orders' },
+        { id: 'quotations', icon: '📄', label: 'My Quotations' },
+        { id: 'requests', icon: '📢', label: 'Open Requests' },
+        { id: 'chat', icon: '💬', label: 'Doctor Chat' },
+    ];
+
     return (
-        <div className="flex h-screen bg-background text-foreground font-sans">
-            {/* Sidebar */}
-            <aside className="w-[260px] bg-sidebar flex flex-col border-r border-border">
-                <div className="p-4 border-b border-border">
-                    <h1 className="text-xl font-bold flex items-center gap-2">
-                        <span>🚚</span> Vendor Portal
-                    </h1>
-                    <p className="text-sm font-semibold text-text-secondary mt-2 truncate">{user?.contact_person || user?.full_name || 'Vendor'}</p>
-                    <p className="text-xs text-muted-foreground mt-1 truncate">🏢 {user?.company_name || 'N/A'}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5 truncate">✉️ {user?.email || 'N/A'}</p>
-                </div>
+        <DashboardLayout
+            title="Vendor Portal"
+            subtitle={user?.company_name || ''}
+            sidebarItems={sidebarItems}
+            activeView={activeTab}
+            onViewChange={setActiveTab}
+            user={{ ...user, role: 'vendor' }}
+            onLogout={handleLogout}
+            onProfileClick={() => setShowProfile(true)}
+        >
+            {loading && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                    <CircularProgress size={32} />
+                </Box>
+            )}
 
-                <nav className="flex-1 p-2 space-y-1">
-                    {[
-                        { id: 'orders', icon: '📦', label: 'My Orders' },
-                        { id: 'quotations', icon: '📄', label: 'My Quotations' },
-                        { id: 'requests', icon: '📢', label: 'Open Requests' },
-                        { id: 'chat', icon: '💬', label: 'Doctor Chat' },
-                    ].map(item => (
-                        <button
-                            key={item.id}
-                            onClick={() => setActiveTab(item.id)}
-                            className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${
-                                activeTab === item.id
-                                    ? 'bg-primary-soft text-primary font-medium'
-                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                            }`}
-                        >
-                            <span>{item.icon}</span> {item.label}
-                        </button>
-                    ))}
-                </nav>
-
-                <div className="p-4 border-t border-border flex items-center justify-between">
-                    <button onClick={() => setShowProfile(true)} className="p-2 text-muted-foreground hover:text-primary rounded-md transition" title="Profile">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    </button>
-                    <button onClick={handleLogout} className="flex-1 ml-2 px-3 py-2 text-left text-error hover:bg-error-soft rounded-md transition flex items-center gap-2">
-                        <span>🚪</span> Logout
-                    </button>
-                </div>
-            </aside>
-
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto p-8 bg-background relative">
-                <div className="absolute top-4 right-4 z-50">
-                    <ThemeToggle />
-                </div>
-                {loading && <div className="text-center text-muted-foreground">Loading data...</div>}
-
-                {/* Orders View */}
-                {activeTab === 'orders' && (
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold">Purchase Orders</h2>
-                        <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
-                            <table className="w-full text-left">
-                                <thead className="bg-surface border-b border-border">
-                                    <tr>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">PO #</th>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Item</th>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Qty</th>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Status</th>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-border">
-                                    {orders.map(order => (
-                                        <tr key={order.po_id} className="hover:bg-muted transition">
-                                            <td className="p-4 font-mono text-sm">{order.po_id}</td>
-                                            <td className="p-4">{order.items[0]?.item_name}</td>
-                                            <td className="p-4">{order.items[0]?.quantity}</td>
-                                            <td className="p-4">
-                                                <span className={`px-2 py-1 rounded text-xs uppercase font-bold ${
-                                                    order.status === 'delivered' ? 'bg-success-soft text-success' :
-                                                    order.status === 'shipped' ? 'bg-primary-soft text-primary' :
-                                                    'bg-warning-soft text-warning'
-                                                }`}>
-                                                    {order.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 flex gap-2">
+            {/* Orders */}
+            {activeTab === 'orders' && (
+                <Stack spacing={3}>
+                    <PageHeader title="Purchase Orders" />
+                    <TableContainer component={Paper} variant="outlined">
+                        <Table>
+                            <TableHead><TableRow>
+                                <TableCell>PO #</TableCell><TableCell>Item</TableCell><TableCell>Qty</TableCell><TableCell>Status</TableCell><TableCell>Actions</TableCell>
+                            </TableRow></TableHead>
+                            <TableBody>
+                                {orders.map(order => (
+                                    <TableRow key={order.po_id} hover>
+                                        <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{order.po_id}</TableCell>
+                                        <TableCell>{order.items[0]?.item_name}</TableCell>
+                                        <TableCell>{order.items[0]?.quantity}</TableCell>
+                                        <TableCell><StatusChip status={order.status} /></TableCell>
+                                        <TableCell>
+                                            <Stack direction="row" spacing={1}>
                                                 {(order.status === 'created' || order.status === 'sent') && (
-                                                    <button onClick={() => handleStatusUpdate(order.po_id, 'acknowledged')} className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded hover:bg-primary-hover transition">Acknowledge</button>
+                                                    <Button size="small" variant="contained" onClick={() => handleStatusUpdate(order.po_id, 'acknowledged')}>Acknowledge</Button>
                                                 )}
                                                 {order.status === 'acknowledged' && (
-                                                    <button onClick={() => handleStatusUpdate(order.po_id, 'shipped')} className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded hover:bg-secondary-hover transition">Ship</button>
+                                                    <Button size="small" variant="contained" color="secondary" onClick={() => handleStatusUpdate(order.po_id, 'shipped')}>Ship</Button>
                                                 )}
                                                 {order.status === 'shipped' && (
-                                                    <button onClick={() => handleStatusUpdate(order.po_id, 'delivered')} className="text-xs bg-success text-success-foreground px-2 py-1 rounded hover:opacity-90 transition">Mark Delivered</button>
+                                                    <Button size="small" variant="contained" color="success" onClick={() => handleStatusUpdate(order.po_id, 'delivered')}>Mark Delivered</Button>
                                                 )}
-                                                <button
-                                                    onClick={() => generateVendorPO(order.po_id)}
-                                                    className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded hover:bg-secondary-hover transition"
-                                                    title="Download PO PDF"
-                                                >
-                                                    📄 PO
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {orders.length === 0 && <tr><td colSpan="5" className="p-8 text-center text-muted-foreground">No orders found.</td></tr>}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
+                                                <Button size="small" variant="outlined" onClick={() => generateVendorPO(order.po_id)}>📄 PO</Button>
+                                            </Stack>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {orders.length === 0 && (
+                                    <TableRow><TableCell colSpan={5} align="center" sx={{ py: 6 }}><Typography color="text.secondary">No orders found.</Typography></TableCell></TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Stack>
+            )}
 
-                {/* Requests View */}
-                {activeTab === 'requests' && (
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold">Open Requests for Quotation</h2>
-                        <div className="grid gap-4">
-                            {openRequests.map(req => (
-                                <div key={req.request_id} className="bg-card p-4 rounded-lg border border-border flex justify-between items-center shadow-sm hover:shadow-md transition">
-                                    <div>
-                                        <h3 className="font-bold text-lg">{req.item_name}</h3>
-                                        <p className="text-muted-foreground text-sm">Qty Needed: {req.quantity} | Required by: {formatDate(req.created_at)}</p>
-                                    </div>
-                                    <button 
-                                        onClick={() => {
-                                            setQuoteForm({ ...quoteForm, request_id: req.request_id });
-                                            setQuoteQuantity(req.quantity || 0);
-                                            setShowQuoteModal(true);
-                                        }}
-                                        className="bg-primary hover:bg-primary-hover px-4 py-2 rounded text-primary-foreground font-medium transition"
-                                    >
-                                        Submit Quote
-                                    </button>
-                                </div>
-                            ))}
-                            {openRequests.length === 0 && <p className="text-muted-foreground">No open requests available for your category.</p>}
-                        </div>
-                    </div>
-                )}
+            {/* Open Requests */}
+            {activeTab === 'requests' && (
+                <Stack spacing={3}>
+                    <PageHeader title="Open Requests for Quotation" />
+                    <Stack spacing={2}>
+                        {openRequests.map(req => (
+                            <Card key={req.request_id} sx={{ transition: 'box-shadow 0.2s', '&:hover': { boxShadow: 4 } }}>
+                                <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Box>
+                                        <Typography variant="subtitle1" fontWeight={700}>{req.item_name}</Typography>
+                                        <Typography variant="body2" color="text.secondary">Qty Needed: {req.quantity} | Required by: {formatDate(req.created_at)}</Typography>
+                                    </Box>
+                                    <Button variant="contained" onClick={() => {
+                                        setQuoteForm({ ...quoteForm, request_id: req.request_id });
+                                        setQuoteQuantity(req.quantity || 0);
+                                        setShowQuoteModal(true);
+                                    }}>Submit Quote</Button>
+                                </CardContent>
+                            </Card>
+                        ))}
+                        {openRequests.length === 0 && <Typography color="text.secondary">No open requests available for your category.</Typography>}
+                    </Stack>
+                </Stack>
+            )}
 
-                {/* Quotations View */}
-                {activeTab === 'quotations' && (
-                    <div className="space-y-6">
-                        <h2 className="text-2xl font-bold">My Submitted Quotations</h2>
-                        <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
-                            <table className="w-full text-left">
-                                <thead className="bg-surface border-b border-border">
-                                    <tr>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Ref #</th>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Request ID</th>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Price</th>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Status</th>
-                                        <th className="p-4 text-xs uppercase text-muted-foreground font-semibold">Submitted On</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-border">
-                                    {quotations.map(q => (
-                                        <tr key={q.quotation_id} className="hover:bg-muted transition">
-                                            <td className="p-4 font-mono text-sm">{q.quotation_id}</td>
-                                            <td className="p-4 font-mono text-sm">{q.request_id}</td>
-                                            <td className="p-4 font-bold text-primary">{q.total_price}</td>
-                                            <td className="p-4">
-                                                <span className={`px-2 py-1 rounded text-xs uppercase font-bold ${
-                                                    q.status === 'accepted' ? 'bg-success-soft text-success' :
-                                                    q.status === 'rejected' ? 'bg-error-soft text-error' :
-                                                    'bg-muted text-muted-foreground'
-                                                }`}>
-                                                    {q.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-muted-foreground">{formatDate(q.created_at)}</td>
-                                        </tr>
-                                    ))}
-                                    {quotations.length === 0 && <tr><td colSpan="5" className="p-8 text-center text-muted-foreground">No quotations submitted.</td></tr>}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
+            {/* Quotations */}
+            {activeTab === 'quotations' && (
+                <Stack spacing={3}>
+                    <PageHeader title="My Submitted Quotations" />
+                    <TableContainer component={Paper} variant="outlined">
+                        <Table>
+                            <TableHead><TableRow>
+                                <TableCell>Ref #</TableCell><TableCell>Request ID</TableCell><TableCell>Price</TableCell><TableCell>Status</TableCell><TableCell>Submitted On</TableCell>
+                            </TableRow></TableHead>
+                            <TableBody>
+                                {quotations.map(q => (
+                                    <TableRow key={q.quotation_id} hover>
+                                        <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{q.quotation_id}</TableCell>
+                                        <TableCell sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{q.request_id}</TableCell>
+                                        <TableCell sx={{ fontWeight: 700, color: 'primary.main' }}>{q.total_price}</TableCell>
+                                        <TableCell><StatusChip status={q.status === 'accepted' ? 'approved' : q.status} /></TableCell>
+                                        <TableCell sx={{ color: 'text.secondary' }}>{formatDate(q.created_at)}</TableCell>
+                                    </TableRow>
+                                ))}
+                                {quotations.length === 0 && (
+                                    <TableRow><TableCell colSpan={5} align="center" sx={{ py: 6 }}><Typography color="text.secondary">No quotations submitted.</Typography></TableCell></TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Stack>
+            )}
 
-                {/* Doctor Chat View */}
-                {activeTab === 'chat' && (
-                    <ChatInterface showNotify={showNotify} userRole="vendor" />
-                )}
-            </main>
-
-            {/* Notification */}
-            {notification && (
-                <div className={`fixed top-4 right-4 z-[100] px-6 py-3 rounded-lg shadow-lg text-white font-medium ${notification.type === 'error' ? 'bg-error' : 'bg-primary'}`}>
-                    {notification.message}
-                </div>
+            {/* Chat */}
+            {activeTab === 'chat' && (
+                <ChatInterface showNotify={showNotify} userRole="vendor" />
             )}
 
             {/* Quote Modal */}
-            {showQuoteModal && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div className="bg-popover text-popover-foreground p-6 rounded-xl w-full max-w-md border border-border shadow-xl">
-                        <h2 className="text-xl font-bold mb-4">Submit Quotation</h2>
-                        <form onSubmit={handleSubmitQuotation} className="space-y-4">
-                            <div>
-                                <label className="block text-sm text-muted-foreground mb-1">Unit Price (₹)</label>
-                                <input 
-                                    type="number" 
-                                    step="0.01" 
-                                    required 
-                                    className="w-full bg-input border border-border rounded-md p-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring transition"
-                                    value={quoteForm.unit_price}
-                                    onChange={e => {
-                                        const unitPrice = e.target.value;
-                                        const total = quoteQuantity > 0 ? (parseFloat(unitPrice) * quoteQuantity).toFixed(2) : '';
-                                        setQuoteForm({...quoteForm, unit_price: unitPrice, total_price: total});
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-muted-foreground mb-1">Total Price (₹) — Qty: {quoteQuantity}</label>
-                                <input 
-                                    type="number" 
-                                    step="0.01" 
-                                    required 
-                                    className="w-full bg-input border border-border rounded-md p-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring transition"
-                                    value={quoteForm.total_price}
-                                    onChange={e => setQuoteForm({...quoteForm, total_price: e.target.value})}
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-sm text-muted-foreground mb-1">Delivery Days</label>
-                                    <input 
-                                        type="number" 
-                                        required 
-                                        className="w-full bg-input border border-border rounded-md p-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring transition"
-                                        value={quoteForm.delivery_days}
-                                        onChange={e => setQuoteForm({...quoteForm, delivery_days: e.target.value})}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm text-muted-foreground mb-1">Validity Days</label>
-                                    <input 
-                                        type="number" 
-                                        required 
-                                        className="w-full bg-input border border-border rounded-md p-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring transition"
-                                        value={quoteForm.validity_days}
-                                        onChange={e => setQuoteForm({...quoteForm, validity_days: e.target.value})}
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm text-muted-foreground mb-1">Notes (optional)</label>
-                                <input 
-                                    type="text" 
-                                    className="w-full bg-input border border-border rounded-md p-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring transition"
-                                    value={quoteForm.notes}
-                                    onChange={e => setQuoteForm({...quoteForm, notes: e.target.value})}
-                                    placeholder="e.g. Premium quality, bulk discount"
-                                />
-                            </div>
-                            <div className="flex justify-end gap-3 mt-4">
-                                <button type="button" onClick={() => setShowQuoteModal(false)} className="px-4 py-2 bg-muted text-foreground rounded-md hover:bg-border transition">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary-hover transition">Submit</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+            <Dialog open={showQuoteModal} onClose={() => setShowQuoteModal(false)} maxWidth="sm" fullWidth>
+                <DialogTitle sx={{ fontWeight: 700 }}>Submit Quotation</DialogTitle>
+                <DialogContent>
+                    <Box component="form" id="quote-form" onSubmit={handleSubmitQuotation} sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+                        <TextField
+                            label="Unit Price (₹)"
+                            type="number"
+                            inputProps={{ step: '0.01' }}
+                            required
+                            value={quoteForm.unit_price}
+                            onChange={e => {
+                                const unitPrice = e.target.value;
+                                const total = quoteQuantity > 0 ? (parseFloat(unitPrice) * quoteQuantity).toFixed(2) : '';
+                                setQuoteForm({ ...quoteForm, unit_price: unitPrice, total_price: total });
+                            }}
+                        />
+                        <TextField
+                            label={`Total Price (₹) — Qty: ${quoteQuantity}`}
+                            type="number"
+                            inputProps={{ step: '0.01' }}
+                            required
+                            value={quoteForm.total_price}
+                            onChange={e => setQuoteForm({ ...quoteForm, total_price: e.target.value })}
+                        />
+                        <Grid container spacing={2}>
+                            <Grid size={6}>
+                                <TextField label="Delivery Days" type="number" required fullWidth value={quoteForm.delivery_days} onChange={e => setQuoteForm({ ...quoteForm, delivery_days: e.target.value })} />
+                            </Grid>
+                            <Grid size={6}>
+                                <TextField label="Validity Days" type="number" required fullWidth value={quoteForm.validity_days} onChange={e => setQuoteForm({ ...quoteForm, validity_days: e.target.value })} />
+                            </Grid>
+                        </Grid>
+                        <TextField label="Notes (optional)" value={quoteForm.notes} onChange={e => setQuoteForm({ ...quoteForm, notes: e.target.value })} placeholder="e.g. Premium quality, bulk discount" />
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={() => setShowQuoteModal(false)}>Cancel</Button>
+                    <Button type="submit" form="quote-form" variant="contained">Submit</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Notification */}
+            <AppNotification open={!!notification} message={notification?.message || ''} type={notification?.type} onClose={() => setNotification(null)} />
 
             {/* Profile Modal */}
-            <ProfileModal 
-                isOpen={showProfile} 
-                onClose={() => setShowProfile(false)} 
-                user={{...user, role: 'vendor'}} 
+            <ProfileModal
+                isOpen={showProfile}
+                onClose={() => setShowProfile(false)}
+                user={{ ...user, role: 'vendor' }}
                 onUpdate={(updatedUser) => setUser(updatedUser)}
             />
-        </div>
+        </DashboardLayout>
     );
 };
 

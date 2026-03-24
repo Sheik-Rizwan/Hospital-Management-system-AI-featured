@@ -10,7 +10,7 @@ from services.notification_service import NotificationService
 from services.patient_service import PatientService
 from services.doctor_service import DoctorService
 from services.socket_service import (notify_task_assigned, notify_appointment_status,
-                                      notify_new_appointment)
+                                      notify_new_appointment, notify_schedule_updated)
 import logging
 logger = logging.getLogger(__name__)
 
@@ -18,6 +18,133 @@ doctor_bp = Blueprint('doctor_bp', __name__)
 
 # Initialize DB connection (or reuse global db from app)
 db = MongoDatabase()
+
+
+# ============ DASHBOARD KPI & SEARCH ============
+
+@doctor_bp.route('/dashboard-stats', methods=['GET'])
+@jwt_required()
+def get_dashboard_stats():
+    """Return KPI counts + 7-day trend history for the dashboard stat cards."""
+    try:
+        from datetime import timedelta
+        doctor_id = get_jwt_identity()
+        now = datetime.datetime.now()
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # ── Current counts ──
+        patient_count = db.patients.count_documents({})
+        pending_task_count = db.db.tasks.count_documents({'status': 'pending'})
+        today_handoff_count = db.db.handoffs.count_documents({
+            'timestamp': {'$gte': today_start}
+        })
+        total_appt_count = db.appointments.count_documents({
+            'doctor_id': doctor_id,
+            'status': {'$nin': ['cancelled']}
+        })
+
+        # ── 7-day history helper ──
+        def daily_counts(collection, date_field, extra_query=None):
+            history = []
+            for i in range(6, -1, -1):
+                day_start = (today_start - timedelta(days=i))
+                day_end = day_start + timedelta(days=1)
+                query = {date_field: {'$gte': day_start, '$lt': day_end}}
+                if extra_query:
+                    query.update(extra_query)
+                count = collection.count_documents(query)
+                history.append({'date': day_start.strftime('%Y-%m-%d'), 'count': count})
+            return history
+
+        patients_history = daily_counts(db.patients, 'created_at')
+        tasks_history = daily_counts(db.db.tasks, 'created_at', {'status': 'pending'})
+        handoffs_history = daily_counts(db.db.handoffs, 'timestamp')
+        appts_history = daily_counts(db.appointments, 'created_at', {
+            'doctor_id': doctor_id, 'status': {'$nin': ['cancelled']}
+        })
+
+        # ── Trend percentage (today vs yesterday) ──
+        def calc_trend(history):
+            if len(history) < 2:
+                return 0
+            today_val = history[-1]['count']
+            yesterday_val = history[-2]['count']
+            if yesterday_val == 0:
+                return 100.0 if today_val > 0 else 0
+            return round(((today_val - yesterday_val) / yesterday_val) * 100, 1)
+
+        return jsonify({
+            'success': True,
+            'stats': {
+                'patients': {
+                    'current': patient_count,
+                    'trend_percent': calc_trend(patients_history),
+                    'history': patients_history
+                },
+                'pending_tasks': {
+                    'current': pending_task_count,
+                    'trend_percent': calc_trend(tasks_history),
+                    'history': tasks_history
+                },
+                'handoffs_today': {
+                    'current': today_handoff_count,
+                    'trend_percent': calc_trend(handoffs_history),
+                    'history': handoffs_history
+                },
+                'appointments': {
+                    'current': total_appt_count,
+                    'trend_percent': calc_trend(appts_history),
+                    'history': appts_history
+                }
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error getting dashboard stats: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@doctor_bp.route('/search', methods=['GET'])
+@jwt_required()
+def global_search():
+    """Search patients and tasks by query string (case-insensitive regex)."""
+    try:
+        import re
+        q = request.args.get('q', '').strip()
+        if not q or len(q) < 2:
+            return jsonify({'success': True, 'patients': [], 'tasks': []})
+
+        pattern = re.compile(re.escape(q), re.IGNORECASE)
+
+        # Search patients
+        patient_results = list(db.patients.find(
+            {'$or': [
+                {'patient_name': pattern},
+                {'patient_id': pattern},
+                {'room_number': pattern},
+                {'diagnosis': pattern}
+            ]},
+            {'_id': 0, 'patient_id': 1, 'patient_name': 1, 'room_number': 1, 'diagnosis': 1}
+        ).limit(10))
+
+        # Search tasks
+        task_results = list(db.db.tasks.find(
+            {'$or': [
+                {'description': pattern},
+                {'patient_name': pattern},
+                {'title': pattern}
+            ]},
+            {'_id': 0, 'task_id': 1, 'description': 1, 'patient_name': 1, 'status': 1, 'task_type': 1}
+        ).limit(10))
+
+        return jsonify({
+            'success': True,
+            'patients': patient_results,
+            'tasks': task_results
+        })
+    except Exception as e:
+        logger.error(f"Error in global search: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 @doctor_bp.route('/care-plans', methods=['POST'])
 @jwt_required()
@@ -188,7 +315,7 @@ def get_handoffs_doctor():
             if 'timestamp' in h and hasattr(h['timestamp'], 'isoformat'):
                 h['timestamp'] = h['timestamp'].isoformat()
             
-            # Enrich
+            # Enrich patient name
             if 'patient_id' in h:
                 patient = db.get_patient(h['patient_id'])
                 if patient:
@@ -197,6 +324,11 @@ def get_handoffs_doctor():
                 else:
                     h['room_number'] = 'N/A'
                     h['patient_name'] = h.get('structured_report', {}).get('patient_name', 'Unknown')
+            # Enrich nurse name (live lookup so edits propagate)
+            if 'nurse_id' in h:
+                nurse = db.get_user_by_id(h['nurse_id'])
+                if nurse:
+                    h['nurse_name'] = nurse.get('full_name', h.get('nurse_name', 'Unknown'))
 
         return jsonify({'success': True, 'handoffs': handoffs})
     except Exception as e:
@@ -217,10 +349,17 @@ def get_patients_vitals_doctor():
 def get_all_tasks_doctor():
     """Get all tasks (Doctor access) to see AI assignment status."""
     try:
-        # We need a method in DB to get *all* tasks or filter by doctor's patients
-        # For now, let's assume we want all tasks to oversee the ward.
-        # Assuming db.get_all_tasks() exists or we use raw mongo
         tasks = list(db.db.tasks.find({}, {'_id': 0}).sort('scheduled_time', 1))
+        # Enrich with live patient & nurse names so edits propagate
+        for t in tasks:
+            if t.get('patient_id'):
+                patient = db.get_patient(t['patient_id'])
+                if patient:
+                    t['patient_name'] = patient.get('patient_name', t.get('patient_name', 'Unknown'))
+            if t.get('assigned_nurse_id'):
+                nurse = db.get_user_by_id(t['assigned_nurse_id'])
+                if nurse:
+                    t['assigned_nurse_name'] = nurse.get('full_name', t.get('assigned_nurse_name', 'Unknown'))
         return jsonify({'success': True, 'tasks': tasks, 'count': len(tasks)})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -552,12 +691,17 @@ def get_meals():
         
         meals = db.get_meals(patient_id=patient_id, day=day)
         
-        # Format timestamps
+        # Format timestamps & enrich patient name
         for meal in meals:
             if 'created_at' in meal and hasattr(meal['created_at'], 'isoformat'):
                 meal['created_at'] = meal['created_at'].isoformat()
             if 'served_at' in meal and hasattr(meal['served_at'], 'isoformat'):
                 meal['served_at'] = meal['served_at'].isoformat()
+            # Enrich patient_name live so edits propagate
+            if meal.get('patient_id'):
+                patient = db.get_patient(meal['patient_id'])
+                if patient:
+                    meal['patient_name'] = patient.get('patient_name', meal.get('patient_name', 'Unknown'))
         
         return jsonify({
             'success': True,
@@ -653,6 +797,12 @@ def create_or_update_schedule():
             
             created_schedules.append(schedule_data)
         
+        # Notify all clients so booking UIs refresh with new schedule
+        try:
+            notify_schedule_updated(doctor_id)
+        except Exception:
+            pass  # Non-critical: schedule is saved regardless
+
         return jsonify({
             'success': True,
             'message': f'Schedule updated for {len(created_schedules)} days',
@@ -726,7 +876,22 @@ def get_doctor_appointments():
         if status:
             query['status'] = status
         
+        # Optional month/year filter for calendar view
+        month = request.args.get('month')   # 1-12
+        year = request.args.get('year')     # e.g. 2026
+        if month and year:
+            try:
+                m = int(month)
+                y = int(year)
+                query['date'] = {
+                    '$gte': f'{y}-{m:02d}-01',
+                    '$lte': f'{y}-{m:02d}-31'
+                }
+            except (ValueError, TypeError):
+                pass  # ignore invalid values, return all
+        
         appointments = list(db.appointments.find(query).sort('date', -1))
+
         
         # Enrich with patient info and booking source details
         result = []
@@ -831,10 +996,10 @@ def update_appointment_status(appointment_id):
         # ── Send WhatsApp Notification ──
         try:
             # Fetch patient info — try patients collection directly
-            patient = db.db.patients.find_one({'patient_id': appointment['patient_id']})
+            patient = db.patients.find_one({'patient_id': appointment['patient_id']})
             
             # Get doctor info
-            doctor = db.db.doctors.find_one({'user_id': doctor_id}, {'full_name': 1, '_id': 0})
+            doctor = db.doctors.find_one({'user_id': doctor_id}, {'full_name': 1, '_id': 0})
             doctor_name = doctor.get('full_name', '') if doctor else ''
             
             if patient and patient.get('phone'):
@@ -920,10 +1085,21 @@ def update_patient_details(patient_id):
         update_fields['updated_by'] = doctor_id
         
         # Update in DB
-        db.db.patients.update_one(
+        db.patients.update_one(
             {'patient_id': patient_id},
             {'$set': update_fields}
         )
+        
+        # Propagate patient_name to denormalized copies
+        if 'patient_name' in update_fields:
+            new_name = update_fields['patient_name']
+            try:
+                db.db.appointments.update_many({'patient_id': patient_id}, {'$set': {'patient_name': new_name}})
+                db.db.tasks.update_many({'patient_id': patient_id}, {'$set': {'patient_name': new_name}})
+                db.healthcare_db['patient_meals'].update_many({'patient_id': patient_id}, {'$set': {'patient_name': new_name}})
+                db.db.wa_users.update_many({'patient_id': patient_id}, {'$set': {'name': new_name}})
+            except Exception:
+                pass  # best-effort propagation
         
         return jsonify({'success': True, 'message': 'Patient updated successfully'})
 

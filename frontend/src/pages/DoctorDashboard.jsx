@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { API_BASE, getAuthHeaders, formatDate, connectSocket, getRoleAuth } from '../utils/api';
+import { API_BASE, getAuthHeaders, formatDate, formatTimeAmPm, connectSocket, getRoleAuth } from '../utils/api';
 import { useRealtimeEvents } from '../hooks/useRealtimeEvents';
 import ViewHandoffModal from '../components/ViewHandoffModal';
 import ProfileModal from '../components/ProfileModal';
@@ -9,7 +9,94 @@ import ChatInterface from '../components/ChatInterface';
 import VendorRequests from './VendorRequests';
 import InventoryPanel from '../components/procurement/InventoryPanel';
 import ThemeToggle from '../components/ThemeToggle';
-import '../App.css';
+import AppointmentCalendar from '../components/AppointmentCalendar';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import Snackbar from '@mui/material/Snackbar';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Avatar from '@mui/material/Avatar';
+import Badge from '@mui/material/Badge';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Popover from '@mui/material/Popover';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PageHeader from '../components/ui/PageHeader';
+import StatusChip from '../components/ui/StatusChip';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import CircularProgress from '@mui/material/CircularProgress';
+import { SparkLineChart } from '@mui/x-charts/SparkLineChart';
+
+// MUI Icons
+import MenuIcon from '@mui/icons-material/Menu';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import SearchIcon from '@mui/icons-material/Search';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import LocalHospitalOutlinedIcon from '@mui/icons-material/LocalHospitalOutlined';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
+import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import MedicalServicesOutlinedIcon from '@mui/icons-material/MedicalServicesOutlined';
+import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
+import SendIcon from '@mui/icons-material/Send';
+
+const DRAWER_WIDTH = 260;
+const DRAWER_WIDTH_COLLAPSED = 72;
 
 const DoctorDashboard = () => {
     const [user, setUser] = useState(null);
@@ -53,6 +140,21 @@ const DoctorDashboard = () => {
     });
     const [unassignedTasks, setUnassignedTasks] = useState([]);
 
+    // Dashboard KPI Stats
+    const [dashboardStats, setDashboardStats] = useState(null);
+
+    // Global Search
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState({ patients: [], tasks: [] });
+    const [showSearchResults, setShowSearchResults] = useState(false);
+    const searchTimeout = useRef(null);
+
+    // Notification System
+    const [notifications, setNotifications] = useState([]);
+    const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+    const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
     // Modals
     const [showCreatePlan, setShowCreatePlan] = useState(false);
     const [showAddNurse, setShowAddNurse] = useState(false);
@@ -85,7 +187,7 @@ const DoctorDashboard = () => {
     });
 
     const [nurseForm, setNurseForm] = useState({
-        full_name: '', email: '', password: '', employee_id: '', department: ''
+        full_name: '', employee_id: '', email: '', password: '', confirm_password: '', department: '', phone: ''
     });
 
     // Chatbot State
@@ -101,27 +203,49 @@ const DoctorDashboard = () => {
     useEffect(() => {
         const { user: u } = getRoleAuth('doctor');
         if (u) setUser(u);
+
+        // Fetch fresh profile so name/details reflect edits without re-login
+        fetch(`${API_BASE}/user/profile`, { headers: getAuthHeaders('doctor') })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.user) {
+                    setUser(data.user);
+                    sessionStorage.setItem('doctor_user', JSON.stringify(data.user));
+                }
+            })
+            .catch(console.error);
+
         connectSocket('doctor');
         loadData();
+        loadDashboardStats();
+    }, []);
+
+    // Push a notification into the bell
+    const pushNotification = useCallback((msg, type = 'info') => {
+        setNotifications(prev => [{ id: Date.now(), message: msg, type, time: new Date().toLocaleTimeString() }, ...prev].slice(0, 30));
     }, []);
 
     // Real-time socket events — mutate state directly, no re-fetching
     useRealtimeEvents({
         // Task events: re-fetch tasks/general area AND nurse assignments
-        'task_completed': (data) => { showNotify(`✅ Task completed: ${data.description || 'A task'}`, 'success'); loadGeneralData(); loadNurseAssignments(); },
-        'task_rejected': (data) => { showNotify(`❌ Task rejected by ${data.nurse_name}: ${data.reason}`, 'error'); loadGeneralData(); loadNurseAssignments(); },
+        'task_completed': (data) => { const msg = `✅ Task completed: ${data.description || 'A task'}`; showNotify(msg, 'success'); pushNotification(msg, 'success'); loadGeneralData(); loadNurseAssignments(); loadDashboardStats(); },
+        'task_rejected': (data) => { const msg = `❌ Task rejected by ${data.nurse_name}: ${data.reason}`; showNotify(msg, 'error'); pushNotification(msg, 'error'); loadGeneralData(); loadNurseAssignments(); loadDashboardStats(); },
         // Nurse status changed (online/offline/emergency)
         'nurse_status_changed': (data) => {
             const emoji = data.status === 'emergency' ? '🚨' : data.status === 'offline' ? '🔴' : '🟢';
-            showNotify(`${emoji} Nurse ${data.nurse_name || ''} is now ${data.status}${data.reassigned_tasks ? ` (${data.reassigned_tasks} tasks reassigned)` : ''}`, data.status === 'emergency' ? 'error' : 'info');
+            const msg = `${emoji} Nurse ${data.nurse_name || ''} is now ${data.status}${data.reassigned_tasks ? ` (${data.reassigned_tasks} tasks reassigned)` : ''}`;
+            showNotify(msg, data.status === 'emergency' ? 'error' : 'info');
+            pushNotification(msg, data.status === 'emergency' ? 'error' : 'info');
             loadNurseAssignments();
             loadGeneralData();
         },
         // New appointment booked (WhatsApp / patient portal / nurse)
-        // Re-fetch so the full card with all fields appears correctly
         'new_appointment': (data) => {
-            showNotify(`📅 New appointment: ${data.patient_name || 'Patient'}${data.date ? ' on ' + data.date : ''}`, 'info');
+            const msg = `📅 New appointment: ${data.patient_name || 'Patient'}${data.date ? ' on ' + data.date : ''}`;
+            showNotify(msg, 'info');
+            pushNotification(msg, 'info');
             loadAppointments();
+            loadDashboardStats();
         },
         // Status changed externally (e.g. patient cancels via WhatsApp)
         'appointment_status': (data) => {
@@ -229,6 +353,40 @@ const DoctorDashboard = () => {
         if (showLoading) setLoading(false);
     };
 
+    // Load dashboard KPI stats
+    const loadDashboardStats = async () => {
+        try {
+            const res = await fetch(`${API_BASE}/doctor/dashboard-stats`, {
+                headers: getAuthHeaders('doctor'), cache: 'no-store'
+            });
+            const data = await res.json();
+            if (data.success) setDashboardStats(data.stats);
+        } catch { /* silent */ }
+    };
+
+    // Debounced global search
+    const handleSearch = (query) => {
+        setSearchQuery(query);
+        if (searchTimeout.current) clearTimeout(searchTimeout.current);
+        if (!query || query.length < 2) {
+            setSearchResults({ patients: [], tasks: [] });
+            setShowSearchResults(false);
+            return;
+        }
+        searchTimeout.current = setTimeout(async () => {
+            try {
+                const res = await fetch(`${API_BASE}/doctor/search?q=${encodeURIComponent(query)}`, {
+                    headers: getAuthHeaders('doctor')
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setSearchResults({ patients: data.patients || [], tasks: data.tasks || [] });
+                    setShowSearchResults(true);
+                }
+            } catch { /* silent */ }
+        }, 300);
+    };
+
     // Load unassigned tasks (for warning panel)
     const loadUnassignedTasks = async () => {
         try {
@@ -324,6 +482,9 @@ const DoctorDashboard = () => {
 
     const handleAddNurse = async (e) => {
         e.preventDefault();
+        if (nurseForm.password !== nurseForm.confirm_password) {
+            return showNotify("Passwords don't match", 'error');
+        }
         try {
             const res = await fetch(`${API_BASE}/doctor/nurses`, {
                 method: 'POST',
@@ -334,6 +495,7 @@ const DoctorDashboard = () => {
             if (data.success) {
                 showNotify('Nurse Added', 'success');
                 setShowAddNurse(false);
+                setNurseForm({ full_name: '', employee_id: '', email: '', password: '', confirm_password: '', department: '', phone: '' });
                 loadGeneralData();
             } else showNotify(data.error || 'Failed to add nurse', 'error');
         } catch (e) { showNotify('Network Error', 'error'); }
@@ -479,18 +641,7 @@ const DoctorDashboard = () => {
         }
     };
 
-    const getAppointmentStatusBadge = (status) => {
-        const badges = {
-            pending: 'bg-warning-soft text-warning border-warning/30',
-            pending_doctor_approval: 'bg-warning-soft text-warning border-warning/30',
-            approved: 'bg-success-soft text-success border-success/30',
-            confirmed: 'bg-success-soft text-success border-success/30',
-            rejected: 'bg-error-soft text-error border-error/30',
-            completed: 'bg-primary-soft text-primary border-primary/30',
-            cancelled: 'bg-muted text-muted-foreground border-border'
-        };
-        return badges[status] || badges.pending;
-    };
+
 
     const handleLogout = () => {
         sessionStorage.removeItem('token');
@@ -570,19 +721,16 @@ const DoctorDashboard = () => {
     };
 
     // Helper for Timeline
-    // Helper for Timeline (Updated to Big Box Layout)
     const renderTimeline = (handoffList) => (
-        <div className="relative pb-20 max-w-[99%] mx-auto">
-            {/* Center Line */}
-            <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 w-[2px] bg-primary h-full top-0"></div>
-
+        <Stack spacing={4} sx={{ position: 'relative', py: 4 }}>
+            {/* Vertical Line */}
+            <Box sx={{ position: 'absolute', left: { xs: 24, md: '50%' }, top: 0, bottom: 0, width: 2, bgcolor: 'divider', transform: 'translateX(-50%)' }} />
+            
             {handoffList.length === 0 ? (
-                <div className="relative z-10 text-center py-20">
-                     <div className="inline-block p-8 bg-card rounded-2xl border border-dashed border-border text-muted-foreground">
-                         <span className="text-4xl block mb-2">📝</span>
-                         <p>No handoff records found.</p>
-                     </div>
-                </div>
+                <Paper sx={{ p: 6, textAlign: 'center', bgcolor: 'action.hover', borderRadius: 4 }}>
+                    <Typography sx={{ fontSize: 48, mb: 2 }}>📝</Typography>
+                    <Typography color="text.secondary">No observations recorded for this patient.</Typography>
+                </Paper>
             ) : (
                 handoffList.map((h, idx) => {
                     const matchedPatient = patients.find(p => p.patient_id === h.patient_id);
@@ -590,305 +738,577 @@ const DoctorDashboard = () => {
                          return candidates.find(c => c && c !== 'Not mentioned' && c !== 'Unknown' && c.trim() !== '') || h.patient_id;
                     };
                     const patientName = getValidName(h.patient_name, matchedPatient?.patient_name, h.structured_report?.patient_name);
-                    const roomNumber = h.room_number || matchedPatient?.room_number || h.structured_report?.room_number;
                     const isLeft = idx % 2 === 0;
 
                     return (
-                        <div key={h.handoff_id} className={`flex flex-col md:flex-row items-center justify-between mb-12 w-full relative ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                        <Box key={h.handoff_id || idx} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: isLeft ? 'flex-start' : 'flex-end' }, position: 'relative', width: '100%' }}>
+                            {/* Dot */}
+                            <Box 
+                                sx={{ 
+                                    position: 'absolute', 
+                                    left: { xs: 24, md: '50%' }, 
+                                    top: 24, 
+                                    width: 12, 
+                                    height: 12, 
+                                    borderRadius: '50%', 
+                                    bgcolor: 'primary.main', 
+                                    border: 4, 
+                                    borderColor: 'background.default',
+                                    transform: 'translateX(-50%)',
+                                    zIndex: 2
+                                }} 
+                            />
                             
-                            {/* Timeline Cube Marker (Center) */}
-                            <div className="absolute left-2 md:left-1/2 top-8 w-4 h-4 bg-primary z-20 md:-translate-x-1/2 border-4 border-border rounded-full shadow-glow"></div>
-                            
-                            {/* Card Container - 49.5% width */}
-                            <div className="w-full md:w-[49.5%] pl-12 md:pl-0">
-                                <div 
-                                    onClick={() => setSelectedHandoff(h)}
-                                    className="bg-card border border-border p-6 rounded-lg cursor-pointer transition-all hover:scale-[1.01] hover:shadow-xl relative flex flex-col min-h-[500px] overflow-hidden group shadow-lg"
-                                >
-                                    {/* Connector Line */}
-                                    <div className={`hidden md:block absolute top-[2.4rem] w-4 h-[2px] bg-primary opacity-50 ${isLeft ? '-right-4' : '-left-4'}`}></div>
+                            <Card 
+                                variant="outlined" 
+                                onClick={() => setSelectedHandoff(h)}
+                                sx={{ 
+                                    width: { xs: 'calc(100% - 56px)', md: '45%' }, 
+                                    ml: { xs: '56px', md: 0 },
+                                    cursor: 'pointer',
+                                    transition: '0.2s',
+                                    borderRadius: 3,
+                                    '&:hover': { boxShadow: 4, transform: 'translateY(-2px)', borderColor: 'primary.main' }
+                                }}
+                            >
+                                <CardContent sx={{ p: 2.5 }}>
+                                    <Stack spacing={2}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                            <Box>
+                                                <Typography variant="h6" sx={{ fontWeight: 800, color: 'primary.main', lineHeight: 1.2 }}>{patientName}</Typography>
+                                                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>Nurse: {h.nurse_name} • {h.shift || 'Shift'}</Typography>
+                                            </Box>
+                                            <Chip label={formatDate(h.timestamp)} size="small" variant="soft" />
+                                        </Box>
 
-                                    {/* Header Section */}
-                                    <div className="flex flex-col gap-4 mb-6 shrink-0 relative z-10">
-                                        <div className="flex justify-between items-start w-full">
-                                            <div className="flex flex-col">
-                                                <h3 className="text-3xl font-bold text-primary transition-colors truncate max-w-[350px] leading-tight" title={patientName}>
-                                                    {patientName}
-                                                </h3>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-xs font-mono text-muted-foreground">ID: {h.patient_id}</span>
-                                                    {roomNumber && (
-                                                        <span className="text-xs font-bold text-foreground whitespace-nowrap">
-                                                            Rm {roomNumber}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <span className="text-xs font-bold uppercase tracking-wider bg-muted text-primary px-3 py-1.5 rounded border border-border shadow-sm whitespace-nowrap shrink-0 ml-2">
-                                                {h.shift || 'Shift'}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
-                                            <span>{formatDate(h.timestamp)}</span>
-                                            <span className="hidden sm:inline">•</span>
-                                            <span className="truncate max-w-[150px]">Nurse: {h.nurse_name}</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 -mr-2"> 
-                                        {h.structured_report && (h.structured_report.observation || h.structured_report.vitals || h.structured_report.Observation || h.structured_report.recommendation || h.structured_report.Recommendation) ? (
-                                            <div className="space-y-4 pb-4 pr-2">
-                                                {h.structured_report.vitals && (
-                                                    <div className="bg-muted p-4 rounded border border-border/50">
-                                                        <span className="text-primary font-bold text-xs uppercase block mb-2 flex items-center gap-2">
-                                                            <span>💓</span> Vitals
-                                                        </span>
-                                                        {typeof h.structured_report.vitals === 'string' ? (
-                                                            <p className="text-sm text-foreground font-mono whitespace-pre-wrap">{h.structured_report.vitals}</p>
-                                                        ) : (
-                                                            <div className="flex flex-wrap gap-3">
-                                                                <span className="text-sm text-foreground bg-card px-3 py-1.5 rounded border border-border font-medium whitespace-nowrap">❤️ {renderVitalValue(h.structured_report.vitals.heart_rate)}</span>
-                                                                <span className="text-sm text-foreground bg-card px-3 py-1.5 rounded border border-border font-medium whitespace-nowrap">🩸 {renderVitalValue(h.structured_report.vitals.blood_pressure)}</span>
-                                                                <span className="text-sm text-foreground bg-card px-3 py-1.5 rounded border border-border font-medium whitespace-nowrap">🌡 {renderVitalValue(h.structured_report.vitals.temperature)}</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                        {h.structured_report?.vitals && (
+                                            <Stack direction="row" spacing={1} sx={{ bgcolor: 'action.hover', p: 1, borderRadius: 2 }}>
+                                                {typeof h.structured_report.vitals !== 'string' && (
+                                                    <>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>❤️ {renderVitalValue(h.structured_report.vitals.heart_rate)}</Typography>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>🩸 {renderVitalValue(h.structured_report.vitals.blood_pressure)}</Typography>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>🌡 {renderVitalValue(h.structured_report.vitals.temperature)}</Typography>
+                                                    </>
                                                 )}
-
-
-
-                                                {/* Handoff Report Summary Box */}
-
-                                                {/* Handoff Report Summary Box (Always Show) */}
-                                                <div className="bg-border p-4 rounded-lg border border-border mt-3 flex-1 flex flex-col justify-center min-h-[100px] shadow-sm">
-                                                    <div className="flex items-center gap-2 mb-2 border-b border-border/50 pb-2">
-                                                        <span className="text-lg">📋</span>
-                                                        <span className="text-primary font-bold text-xs uppercase tracking-wider">Handoff Report</span>
-                                                    </div>
-                                                    <p className="text-sm text-foreground leading-relaxed font-light line-clamp-3 opacity-90">
-                                                        {(h.structured_report.observation || h.structured_report.Observation) ? (
-                                                            <>
-                                                                {h.structured_report.observation || h.structured_report.Observation}
-                                                                {h.structured_report.recommendation && (
-                                                                    <>
-                                                                        <span className="mx-1 text-muted-foreground">•</span>
-                                                                        <span className="font-medium text-primary">Rec: </span>
-                                                                        {h.structured_report.recommendation}
-                                                                    </>
-                                                                )}
-                                                            </>
-                                                        ) : (
-                                                            /* Fallback to transcript if only vitals are present */
-                                                            <span className="italic text-muted-foreground">{h.transcript || "No additional notes recorded."}</span>
-                                                        )}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="bg-muted p-4 rounded border border-border/50 h-full">
-                                                <p className="text-foreground leading-relaxed text-sm whitespace-pre-wrap">{h.transcript}</p>
-                                            </div>
+                                            </Stack>
                                         )}
-                                    </div>
-                                    
-                                    <div className="mt-4 pt-4 border-t border-border flex items-center gap-2 text-primary text-sm group-hover:underline shrink-0">
-                                        View Full Report <span>→</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {/* Spacer */}
-                            <div className="hidden md:block w-[49.5%]"></div>
-                        </div>
+
+                                        <Box sx={{ bgcolor: 'background.default', p: 1.5, borderRadius: 2, border: 1, borderColor: 'divider' }}>
+                                            <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                                                {h.structured_report?.observation || h.structured_report?.Observation || h.transcript || "No notes."}
+                                            </Typography>
+                                            {(h.structured_report?.recommendation || h.structured_report?.Recommendation) && (
+                                                <Typography variant="caption" sx={{ mt: 1, display: 'block', fontWeight: 600, color: 'warning.main' }}>
+                                                    Rec: {h.structured_report?.recommendation || h.structured_report?.Recommendation}
+                                                </Typography>
+                                            )}
+                                        </Box>
+
+                                        <Typography variant="caption" sx={{ textAlign: 'right', fontWeight: 700, color: 'primary.main', display: 'block' }}>
+                                            View Full Report →
+                                        </Typography>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
+                        </Box>
                     );
                 })
             )}
-        </div>
+        </Stack>
     );
 
 
+    // Notification popover anchor
+    const [notifAnchor, setNotifAnchor] = useState(null);
+    const [profileAnchor, setProfileAnchor] = useState(null);
+    const [searchAnchor, setSearchAnchor] = useState(null);
+
+    const drawerWidth = sidebarCollapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH;
+
+    // Sidebar nav sections
+    const navSections = [
+        {
+            title: 'Overview',
+            items: [
+                { key: 'dashboard', icon: <DashboardOutlinedIcon />, label: 'Dashboard' },
+                { key: 'patients', icon: <PeopleOutlineIcon />, label: 'Patients' },
+                { key: 'tasks', icon: <AssignmentOutlinedIcon />, label: 'Tasks' },
+                { key: 'appointments', icon: <CalendarTodayOutlinedIcon />, label: 'Schedule' },
+            ]
+        },
+        {
+            title: 'Clinical',
+            items: [
+                { key: 'care-plans', icon: <LocalHospitalOutlinedIcon />, label: 'Care Plans' },
+                { key: 'handoffs', icon: <SwapHorizIcon />, label: 'Handoffs' },
+                { key: 'nurses', icon: <GroupsOutlinedIcon />, label: 'Manage Nurses' },
+                { key: 'medication-history', icon: <MedicationOutlinedIcon />, label: 'Medications' },
+            ]
+        },
+        {
+            title: 'Scheduling',
+            items: [
+                { key: 'appointment-requests', icon: <EventNoteOutlinedIcon />, label: 'Requests', badge: pendingAppointments },
+                { key: '_schedule_mgr', icon: <SettingsOutlinedIcon />, label: 'Manage Slots', onClick: () => setShowScheduleManager(true) },
+                { key: '_schedule_med', icon: <MedicationOutlinedIcon />, label: 'Schedule Meds', onClick: () => { setShowScheduledMed(true); loadUnassignedTasks(); } },
+            ]
+        },
+        {
+            title: 'Communication',
+            items: [
+                { key: 'inventory', icon: <InventoryOutlinedIcon />, label: 'Inventory' },
+                { key: 'vendor-chat', icon: <ForumOutlinedIcon />, label: 'Vendor Chat' },
+                { key: 'vendor-requests', icon: <MailOutlineIcon />, label: 'Vendor Requests', badge: vendorPendingCount, action: () => loadVendorRequestCount() },
+                { key: 'doctor-chat', icon: <MedicalServicesOutlinedIcon />, label: 'Doctor Chat' },
+            ]
+        },
+        {
+            title: 'Analytics',
+            items: [
+                { key: 'nurse-assignments', icon: <BarChartOutlinedIcon />, label: 'Nurse Stats', action: () => loadNurseAssignments() },
+                { key: 'all-nurses', icon: <PeopleOutlineIcon />, label: 'All Nurses', action: () => loadNurseAssignments() },
+            ]
+        }
+    ];
+
+    // KPI card config
+    const kpiCards = [
+        { key: 'patients', label: 'Active Patients', color: '#1890ff', icon: <PeopleOutlineIcon />, nav: 'patients' },
+        { key: 'pending_tasks', label: 'Pending Tasks', color: '#faad14', icon: <AssignmentOutlinedIcon />, nav: 'tasks' },
+        { key: 'handoffs_today', label: 'Handoffs Today', color: '#722ed1', icon: <SwapHorizIcon />, nav: 'handoffs' },
+        { key: 'appointments', label: 'Appointments', color: '#13c2c2', icon: <CalendarTodayOutlinedIcon />, nav: 'appointments' },
+    ];
+
     return (
-        <div className="flex h-screen bg-background text-foreground font-sans">
-            {/* Sidebar */}
-            <aside className="w-[280px] bg-sidebar flex flex-col border-r border-border flex-shrink-0">
-                <div className="p-4 border-b border-border flex justify-between items-center">
-                    <h1 className="text-xl font-bold flex items-center gap-2">
-                        <span>🩺</span> Dr. {user?.full_name ? user.full_name.charAt(0).toUpperCase() + user.full_name.slice(1) : ''}
-                    </h1>
-                    <div className="flex items-center gap-2">
-                        <button onClick={() => setShowProfile(true)} className="p-2 rounded hover:bg-muted transition" title="Profile">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        </button>
-                        <button onClick={loadData} className={`p-2 rounded hover:bg-muted transition ${loading ? 'animate-spin' : ''}`} title="Refresh Data">
-                            🔄
-                        </button>
-                    </div>
-                </div>
-
-                <div className="p-4 space-y-3 border-b border-border">
-                    <div onClick={() => setView('patients')} className="bg-muted p-3 rounded-md cursor-pointer hover:bg-border transition">
-                        <p className="text-xs text-muted-foreground uppercase mb-1">Active Patients</p>
-                        <p className="text-2xl font-bold">{stats.patients}</p>
-                    </div>
-                    <div onClick={() => setView('tasks')} className="bg-muted p-3 rounded-md cursor-pointer hover:bg-border transition">
-                        <p className="text-xs text-muted-foreground uppercase mb-1">Pending Tasks</p>
-                        <p className="text-2xl font-bold text-warning">{stats.tasks}</p>
-                    </div>
-                    <div onClick={() => setView('handoffs')} className="bg-muted p-3 rounded-md cursor-pointer hover:bg-border transition">
-                        <p className="text-xs text-muted-foreground uppercase mb-1">Handoffs Today</p>
-                        <p className="text-2xl font-bold">{stats.handoffs}</p>
-                    </div>
-                </div>
-
-                <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
-                    <button onClick={() => setView('dashboard')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'dashboard' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                        <span>🖥️</span> Dashboard
-                    </button>
-                    <button onClick={() => setView('patients')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'patients' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                        <span>👥</span> All Patients
-                    </button>
-                    <button onClick={() => setView('care-plans')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'care-plans' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                        <span>🏥</span> Patients Care
-                    </button>
-                    <button onClick={() => setView('tasks')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'tasks' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                        <span>📝</span> Tasks & AI assignments
-                    </button>
-                    <button onClick={() => { setShowScheduledMed(true); loadUnassignedTasks(); }} className="w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition hover:bg-muted text-primary">
-                        <span>💊</span> Schedule Medication
-                    </button>
-                    <button onClick={() => setView('handoffs')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'handoffs' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                        <span>📋</span> Nurse Handoffs
-                    </button>
-                    <button onClick={() => setView('nurses')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'nurses' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                        <span>👩‍⚕️</span> Manage Nurses
-                    </button>
-                    
-                    {/* New Enhanced Views */}
-                    <div className="mt-4 pt-3 border-t border-border">
-                        <p className="text-xs text-muted-foreground uppercase px-3 mb-2">Scheduling</p>
-                        <button onClick={() => setShowScheduleManager(true)} className="w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition hover:bg-muted text-primary">
-                            <span>📅</span> Manage Schedule
-                        </button>
-                        <button onClick={() => setView('appointments')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'appointments' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                            <span>📋</span> Appointment Requests
-                            {pendingAppointments > 0 && (
-                                <span className="ml-auto bg-amber-500 text-black text-xs px-2 py-0.5 rounded-full font-bold">{pendingAppointments}</span>
-                            )}
-                        </button>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-border">
-                        <p className="text-xs text-muted-foreground uppercase px-3 mb-2">Supply & Communication</p>
-                        <button onClick={() => setView('inventory')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'inventory' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                            <span>📦</span> Inventory
-                        </button>
-                        <button onClick={() => setView('vendor-chat')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'vendor-chat' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                            <span>💬</span> Vendor Chat
-                        </button>
-                        <button onClick={() => { setView('vendor-requests'); loadVendorRequestCount(); }} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'vendor-requests' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                            <span>📩</span> Vendor Requests
-                            {vendorPendingCount > 0 && (
-                                <span className="ml-auto bg-amber-500 text-black text-xs px-2 py-0.5 rounded-full font-bold">{vendorPendingCount}</span>
-                            )}
-                        </button>
-                        <button onClick={() => setView('doctor-chat')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'doctor-chat' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                            <span>🩺</span> Doctor Chat
-                        </button>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-border">
-                        <p className="text-xs text-muted-foreground uppercase px-3 mb-2">Analytics</p>
-                        <button onClick={() => { setView('nurse-assignments'); loadNurseAssignments(); }} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'nurse-assignments' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                            <span>📊</span> Nurse Assignments
-                        </button>
-                        <button onClick={() => setView('medication-history')} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'medication-history' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                            <span>💊</span> Medication History
-                        </button>
-                        <button onClick={() => { setView('all-nurses'); loadNurseAssignments(); }} className={`w-full text-left px-3 py-3 rounded-md flex items-center gap-3 transition ${view === 'all-nurses' ? 'bg-primary-soft text-primary' : 'hover:bg-muted'}`}>
-                            <span>👥</span> All Nurses
-                        </button>
-                    </div>
-                </nav>
-
-                <div className="p-4 border-t border-border">
-                    <button onClick={handleLogout} className="w-full px-3 py-2 text-left text-red-400 hover:bg-muted rounded-md transition flex items-center gap-2">
-                        <span>🚪</span> Logout
-                    </button>
-                </div>
-            </aside>
-
-            {/* Main Content */}
-            <main className="flex-1 flex flex-col relative overflow-hidden bg-background">
-                {/* Theme Toggle */}
-                <div className="absolute top-4 right-4 z-50">
-                    <ThemeToggle />
-                </div>
-                <div className="flex-1 overflow-y-auto p-6 pb-48 custom-scrollbar">
-
-                    {view === 'dashboard' && (
-                        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-6">
-                            <h2 className="text-4xl font-bold text-foreground">AI Care Orchestrator</h2>
-                            <p className="text-text-secondary max-w-lg">Manage assigned tasks, verify nurse handoffs, and monitor patient vitals in real-time.</p>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl w-full mt-8">
-                                <div onClick={() => setView('tasks')} className="p-6 bg-card rounded-xl hover:bg-border transition cursor-pointer border border-border">
-                                    <h3 className="text-xl font-bold mb-2 text-warning">View Pending Tasks</h3>
-                                    <p className="text-sm text-muted-foreground">Oversee {stats.tasks} tasks assigned by AI to nurses.</p>
-                                </div>
-                                <div onClick={() => setView('handoffs')} className="p-6 bg-card rounded-xl hover:bg-border transition cursor-pointer border border-border">
-                                    <h3 className="text-xl font-bold mb-2 text-foreground">Detailed Handoffs</h3>
-                                    <p className="text-sm text-muted-foreground">Review nurse observations on the timeline.</p>
-                                </div>
-                                <div onClick={() => setView('appointments')} className="p-6 bg-card rounded-xl hover:bg-border transition cursor-pointer border border-border">
-                                    <h3 className="text-xl font-bold mb-2 text-primary">Appointments</h3>
-                                    <p className="text-sm text-muted-foreground">{pendingAppointments} pending requests to review.</p>
-                                </div>
-                            </div>
-                        </div>
+        <Box sx={{ display: 'flex', height: '100vh', bgcolor: 'background.default' }}>
+            {/* ======================== SIDEBAR ======================== */}
+            <Drawer
+                variant="permanent"
+                sx={{
+                    width: drawerWidth,
+                    flexShrink: 0,
+                    transition: 'width 0.3s',
+                    '& .MuiDrawer-paper': {
+                        width: drawerWidth,
+                        boxSizing: 'border-box',
+                        transition: 'width 0.3s',
+                        overflowX: 'hidden',
+                        bgcolor: 'background.paper'
+                    }
+                }}
+            >
+                {/* Logo / Brand */}
+                <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: 1, borderColor: 'divider' }}>
+                    <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.lighter', color: 'primary.main' }}>
+                        <LocalHospitalOutlinedIcon fontSize="small" />
+                    </Avatar>
+                    {!sidebarCollapsed && (
+                        <Typography variant="subtitle1" noWrap sx={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
+                            MedCore AI
+                        </Typography>
                     )}
+                    <IconButton onClick={() => setSidebarCollapsed(!sidebarCollapsed)} size="small" sx={{ ml: 'auto', color: 'text.secondary' }}>
+                        {sidebarCollapsed ? <MenuIcon fontSize="small" /> : <MenuOpenIcon fontSize="small" />}
+                    </IconButton>
+                </Box>
+
+                {/* Nav Sections */}
+                <Box sx={{ flex: 1, overflowY: 'auto', py: 1, px: 1 }}>
+                    {navSections.map((section) => (
+                        <Box key={section.title} sx={{ mb: 1 }}>
+                            {!sidebarCollapsed && (
+                                <Typography variant="caption" sx={{ px: 1.5, pt: 2, pb: 0.5, display: 'block', color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, fontSize: '0.65rem' }}>
+                                    {section.title}
+                                </Typography>
+                            )}
+                            <List disablePadding>
+                                {section.items.map((item) => (
+                                    <Tooltip key={item.key} title={sidebarCollapsed ? item.label : ''} placement="right">
+                                        <ListItemButton
+                                            selected={view === item.key}
+                                            onClick={() => { item.onClick ? item.onClick() : setView(item.key); if (item.action) item.action(); }}
+                                            sx={{
+                                                borderRadius: 1.5,
+                                                mb: 0.3,
+                                                minHeight: 40,
+                                                px: sidebarCollapsed ? 1.5 : 1.5,
+                                                justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                                            }}
+                                        >
+                                            <ListItemIcon sx={{ minWidth: sidebarCollapsed ? 0 : 36, justifyContent: 'center', color: view === item.key ? 'primary.main' : 'text.secondary' }}>
+                                                {item.icon}
+                                            </ListItemIcon>
+                                            {!sidebarCollapsed && (
+                                                <ListItemText primary={item.label} primaryTypographyProps={{ variant: 'body2', fontWeight: view === item.key ? 600 : 400 }} />
+                                            )}
+                                            {!sidebarCollapsed && item.badge > 0 && (
+                                                <Chip label={item.badge} size="small" color="error" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }} />
+                                            )}
+                                        </ListItemButton>
+                                    </Tooltip>
+                                ))}
+                            </List>
+                        </Box>
+                    ))}
+                </Box>
+
+                {/* Logout */}
+                <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
+                    <ListItemButton onClick={handleLogout} sx={{ borderRadius: 1.5, color: 'error.main' }}>
+                        <ListItemIcon sx={{ minWidth: sidebarCollapsed ? 0 : 36, justifyContent: 'center', color: 'error.main' }}>
+                            <LogoutIcon fontSize="small" />
+                        </ListItemIcon>
+                        {!sidebarCollapsed && <ListItemText primary="Logout" primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />}
+                    </ListItemButton>
+                </Box>
+            </Drawer>
+
+            {/* ======================== MAIN AREA ======================== */}
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                {/* ── TOP BAR ── */}
+                <AppBar position="static" color="inherit" sx={{ zIndex: 40 }}>
+                    <Toolbar sx={{ gap: 2 }}>
+                        {/* Global Search */}
+                        <Box sx={{ position: 'relative', flex: 1, maxWidth: 420 }}>
+                            <OutlinedInput
+                                size="small"
+                                fullWidth
+                                placeholder="Search patients, tasks..."
+                                value={searchQuery}
+                                onChange={e => handleSearch(e.target.value)}
+                                onFocus={() => searchResults.patients.length + searchResults.tasks.length > 0 && setSearchAnchor(document.activeElement)}
+                                onBlur={() => setTimeout(() => setSearchAnchor(null), 200)}
+                                startAdornment={<InputAdornment position="start"><SearchIcon fontSize="small" sx={{ color: 'text.disabled' }} /></InputAdornment>}
+                                sx={{ bgcolor: 'action.hover', '& fieldset': { borderColor: 'divider' } }}
+                            />
+                            {/* Search Results Dropdown */}
+                            {showSearchResults && (searchResults.patients.length > 0 || searchResults.tasks.length > 0) && (
+                                <Paper sx={{ position: 'absolute', top: '100%', left: 0, right: 0, mt: 0.5, zIndex: 50, maxHeight: 320, overflow: 'auto', border: 1, borderColor: 'divider' }}>
+                                    {searchResults.patients.length > 0 && (
+                                        <>
+                                            <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', bgcolor: 'action.hover', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'text.disabled', fontWeight: 600 }}>Patients</Typography>
+                                            {searchResults.patients.map(p => (
+                                                <MenuItem key={p.patient_id} onClick={() => { setSearchQuery(''); setShowSearchResults(false); setSelectedPatient(patients.find(pat => pat.patient_id === p.patient_id) || p); setView('patient-details'); }}>
+                                                    <Avatar sx={{ width: 28, height: 28, bgcolor: 'primary.lighter', color: 'primary.main', fontSize: '0.75rem', fontWeight: 700, mr: 1.5 }}>{(p.patient_name || '?')[0]}</Avatar>
+                                                    <Box>
+                                                        <Typography variant="body2" fontWeight={500}>{p.patient_name}</Typography>
+                                                        <Typography variant="caption" color="text.secondary">{p.room_number ? `Room ${p.room_number}` : p.patient_id} • {p.diagnosis || ''}</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                            ))}
+                                        </>
+                                    )}
+                                    {searchResults.tasks.length > 0 && (
+                                        <>
+                                            <Typography variant="caption" sx={{ px: 2, py: 1, display: 'block', bgcolor: 'action.hover', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'text.disabled', fontWeight: 600, borderTop: 1, borderColor: 'divider' }}>Tasks</Typography>
+                                            {searchResults.tasks.map((t, i) => (
+                                                <MenuItem key={t.task_id || i} onClick={() => { setSearchQuery(''); setShowSearchResults(false); setView('tasks'); }}>
+                                                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', mr: 1.5, flexShrink: 0, bgcolor: t.status === 'completed' ? 'success.main' : t.status === 'pending' ? 'warning.main' : 'text.disabled' }} />
+                                                    <Box>
+                                                        <Typography variant="body2">{t.description || t.task_type || 'Task'}</Typography>
+                                                        <Typography variant="caption" color="text.secondary">{t.patient_name || ''} • {t.status}</Typography>
+                                                    </Box>
+                                                </MenuItem>
+                                            ))}
+                                        </>
+                                    )}
+                                </Paper>
+                            )}
+                        </Box>
+
+                        <Box sx={{ flex: 1 }} />
+
+                        {/* Refresh */}
+                        <Tooltip title="Refresh">
+                            <IconButton onClick={() => { loadData(); loadDashboardStats(); }} size="small" sx={{ color: 'text.secondary' }}>
+                                <RefreshIcon fontSize="small" sx={{ animation: loading ? 'spin 1s linear infinite' : 'none', '@keyframes spin': { '0%': { transform: 'rotate(0deg)' }, '100%': { transform: 'rotate(360deg)' } } }} />
+                            </IconButton>
+                        </Tooltip>
+
+                        {/* Notifications */}
+                        <Tooltip title="Notifications">
+                            <IconButton onClick={(e) => { setNotifAnchor(notifAnchor ? null : e.currentTarget); setProfileAnchor(null); }} size="small" sx={{ color: 'text.secondary' }}>
+                                <Badge variant="dot" invisible={notifications.length === 0} color="error">
+                                    <NotificationsNoneIcon fontSize="small" />
+                                </Badge>
+                            </IconButton>
+                        </Tooltip>
+                        <Popover
+                            open={Boolean(notifAnchor)}
+                            anchorEl={notifAnchor}
+                            onClose={() => setNotifAnchor(null)}
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            slotProps={{ paper: { sx: { width: 320, maxHeight: 400, mt: 1 } } }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
+                                <Typography variant="subtitle1">Notifications</Typography>
+                                {notifications.length > 0 && <Button size="small" color="error" onClick={() => setNotifications([])}>Clear</Button>}
+                            </Box>
+                            {notifications.length === 0 ? (
+                                <Typography variant="body2" sx={{ py: 6, textAlign: 'center', color: 'text.disabled' }}>No notifications</Typography>
+                            ) : (
+                                notifications.map(n => (
+                                    <Box key={n.id} sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider', '&:hover': { bgcolor: 'action.hover' } }}>
+                                        <Typography variant="body2">{n.message}</Typography>
+                                        <Typography variant="caption" color="text.disabled">{n.time}</Typography>
+                                    </Box>
+                                ))
+                            )}
+                        </Popover>
+
+                        {/* Messages */}
+                        <Tooltip title="Messages">
+                            <IconButton onClick={() => setView('doctor-chat')} size="small" sx={{ color: 'text.secondary' }}>
+                                <ChatBubbleOutlineIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+
+                        <ThemeToggle />
+
+                        {/* Profile */}
+                        <Tooltip title="Profile">
+                            <IconButton onClick={(e) => { setProfileAnchor(profileAnchor ? null : e.currentTarget); setNotifAnchor(null); }} size="small" sx={{ p: 0.25 }}>
+                                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem', fontWeight: 700 }}>
+                                    {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'D'}
+                                </Avatar>
+                            </IconButton>
+                        </Tooltip>
+                        <Menu
+                            anchorEl={profileAnchor}
+                            open={Boolean(profileAnchor)}
+                            onClose={() => setProfileAnchor(null)}
+                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            slotProps={{ paper: { sx: { width: 200, mt: 1 } } }}
+                        >
+                            <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
+                                <Typography variant="subtitle2" fontWeight={700}>Dr. {user?.full_name || ''}</Typography>
+                                <Typography variant="caption" color="text.secondary">{user?.email || ''}</Typography>
+                            </Box>
+                            <MenuItem onClick={() => { setShowProfile(true); setProfileAnchor(null); }}>
+                                <ListItemIcon><PersonOutlineIcon fontSize="small" /></ListItemIcon>
+                                <ListItemText>Profile</ListItemText>
+                            </MenuItem>
+                            <MenuItem onClick={() => { setShowScheduleManager(true); setProfileAnchor(null); }}>
+                                <ListItemIcon><CalendarTodayOutlinedIcon fontSize="small" /></ListItemIcon>
+                                <ListItemText>My Schedule</ListItemText>
+                            </MenuItem>
+                            <Divider />
+                            <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                                <ListItemIcon><LogoutIcon fontSize="small" sx={{ color: 'error.main' }} /></ListItemIcon>
+                                <ListItemText>Logout</ListItemText>
+                            </MenuItem>
+                        </Menu>
+                    </Toolbar>
+                </AppBar>
+
+                {/* ── CONTENT ── */}
+                <Box sx={{ flex: 1, overflow: 'auto', p: 3, pb: 10 }}>
+
+                    {view === 'dashboard' && (() => {
+                        const todayStr = new Date().toISOString().split('T')[0];
+                        const todayAppts = appointments.filter(a => a.date === todayStr && a.status !== 'cancelled' && a.status !== 'rejected').sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''));
+
+                        return (
+                            <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+                                {/* Welcome */}
+                                <Box sx={{ mb: 3 }}>
+                                    <Typography variant="h4">Welcome back, Dr. {user?.full_name?.split(' ')[0] || ''}</Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Here's what's happening today across your practice.</Typography>
+                                </Box>
+
+                                {/* KPI Cards */}
+                                <Grid container spacing={3} sx={{ mb: 3 }}>
+                                    {kpiCards.map(card => {
+                                        const stat = dashboardStats?.[card.key];
+                                        const current = stat?.current ?? (card.key === 'patients' ? stats.patients : card.key === 'pending_tasks' ? stats.tasks : card.key === 'handoffs_today' ? stats.handoffs : appointments.length);
+                                        const trend = stat?.trend_percent ?? 0;
+                                        const historyData = (stat?.history || []).map(d => d.count);
+
+                                        return (
+                                            <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={card.key}>
+                                                <Card sx={{ cursor: 'pointer', transition: '0.2s', '&:hover': { boxShadow: 6 } }} onClick={() => setView(card.nav)}>
+                                                    <CardContent>
+                                                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                                                            <Box>
+                                                                <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>{card.label}</Typography>
+                                                                <Typography variant="h3" sx={{ mt: 0.5 }}>{current}</Typography>
+                                                            </Box>
+                                                            <Avatar sx={{ width: 40, height: 40, bgcolor: `${card.color}15`, color: card.color }}>
+                                                                {card.icon}
+                                                            </Avatar>
+                                                        </Stack>
+                                                        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1 }}>
+                                                            {trend > 0 ? <TrendingUpIcon sx={{ fontSize: 16, color: 'success.main' }} /> : trend < 0 ? <TrendingDownIcon sx={{ fontSize: 16, color: 'error.main' }} /> : null}
+                                                            <Typography variant="caption" sx={{ color: trend > 0 ? 'success.main' : trend < 0 ? 'error.main' : 'text.disabled', fontWeight: 600 }}>
+                                                                {Math.abs(trend)}%
+                                                            </Typography>
+                                                            <Typography variant="caption" color="text.disabled">vs yesterday</Typography>
+                                                        </Stack>
+                                                        {historyData.length > 0 && (
+                                                            <Box sx={{ mt: 1.5, height: 40 }}>
+                                                                <SparkLineChart data={historyData} height={40} curve="natural" colors={[card.color]} area showHighlight showTooltip />
+                                                            </Box>
+                                                        )}
+                                                    </CardContent>
+                                                </Card>
+                                            </Grid>
+                                        );
+                                    })}
+                                </Grid>
+
+                                {/* Bottom Grid: Handoffs Table + Today's Appointments */}
+                                <Grid container spacing={3}>
+                                    {/* Handoffs Table */}
+                                    <Grid size={{ xs: 12, lg: 8 }}>
+                                        <Card>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2.5, py: 2, borderBottom: 1, borderColor: 'divider' }}>
+                                                <Typography variant="subtitle1">Recent Handoffs</Typography>
+                                                <Button size="small" onClick={() => setView('handoffs')}>View All →</Button>
+                                            </Box>
+                                            <TableContainer>
+                                                <Table size="small">
+                                                    <TableHead>
+                                                        <TableRow>
+                                                            <TableCell>Status</TableCell>
+                                                            <TableCell>Patient</TableCell>
+                                                            <TableCell>Nurse</TableCell>
+                                                            <TableCell>Shift</TableCell>
+                                                            <TableCell>Time</TableCell>
+                                                            <TableCell>Action</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {handoffs.slice(0, 8).map(h => (
+                                                            <TableRow key={h._id || h.handoff_id || `${h.patient_id}-${h.timestamp}`} hover>
+                                                                <TableCell>
+                                                                    <Chip
+                                                                        label={h.status || 'pending'}
+                                                                        size="small"
+                                                                        color={h.status === 'completed' || h.status === 'approved' ? 'success' : 'warning'}
+                                                                        variant="outlined"
+                                                                        sx={{ textTransform: 'capitalize', fontWeight: 600, fontSize: '0.7rem' }}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell><Typography variant="body2" fontWeight={500}>{h.patient_name || h.patient_id}</Typography></TableCell>
+                                                                <TableCell><Typography variant="body2" color="text.secondary">{h.nurse_name || '—'}</Typography></TableCell>
+                                                                <TableCell><Chip label={h.shift || '—'} size="small" variant="outlined" color="primary" sx={{ fontSize: '0.7rem' }} /></TableCell>
+                                                                <TableCell><Typography variant="caption" color="text.secondary">{h.timestamp ? new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}</Typography></TableCell>
+                                                                <TableCell>
+                                                                    <Button size="small" startIcon={<VisibilityOutlinedIcon sx={{ fontSize: 14 }} />} onClick={() => setSelectedHandoff(h)}>View</Button>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                        {handoffs.length === 0 && (
+                                                            <TableRow><TableCell colSpan={6} align="center" sx={{ py: 6, color: 'text.disabled' }}>No handoffs recorded yet</TableCell></TableRow>
+                                                        )}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        </Card>
+                                    </Grid>
+
+                                    {/* Today's Appointments */}
+                                    <Grid size={{ xs: 12, lg: 4 }}>
+                                        <Card sx={{ height: '100%' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2.5, py: 2, borderBottom: 1, borderColor: 'divider' }}>
+                                                <Typography variant="subtitle1">Today's Schedule</Typography>
+                                                <Button size="small" onClick={() => setView('appointments')}>View All →</Button>
+                                            </Box>
+                                            <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+                                                {todayAppts.length === 0 ? (
+                                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
+                                                        <CalendarTodayOutlinedIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
+                                                        <Typography variant="body2" color="text.disabled">No appointments today</Typography>
+                                                    </Box>
+                                                ) : (
+                                                    <List disablePadding>
+                                                        {todayAppts.map(apt => (
+                                                            <React.Fragment key={apt.appointment_id}>
+                                                                <ListItemButton sx={{ px: 2.5, py: 1.5 }}>
+                                                                    <Typography variant="subtitle2" sx={{ width: 60, flexShrink: 0, color: 'primary.main', fontFamily: 'monospace' }}>
+                                                                        {formatTimeAmPm(apt.start_time)}
+                                                                    </Typography>
+                                                                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                                        <Typography variant="body2" fontWeight={500} noWrap>{apt.patient_name || 'Patient'}</Typography>
+                                                                        <Typography variant="caption" color="text.secondary" noWrap>{apt.service_name || apt.notes || 'General'}</Typography>
+                                                                    </Box>
+                                                                    <Chip
+                                                                        label={apt.status}
+                                                                        size="small"
+                                                                        color={apt.status === 'confirmed' || apt.status === 'approved' ? 'success' : apt.status === 'completed' ? 'default' : 'warning'}
+                                                                        variant="outlined"
+                                                                        sx={{ textTransform: 'capitalize', fontSize: '0.65rem' }}
+                                                                    />
+                                                                </ListItemButton>
+                                                                <Divider />
+                                                            </React.Fragment>
+                                                        ))}
+                                                    </List>
+                                                )}
+                                            </Box>
+                                        </Card>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        );
+                    })()}
 
                     {view === 'appointments' && (
-                        <div className="space-y-6 max-w-5xl mx-auto">
-                            <div className="flex justify-between items-center border-b border-border pb-4">
-                                <div>
-                                    <h2 className="text-3xl font-bold text-foreground">Appointments</h2>
-                                    {appointments.length > 0 && (
-                                        <p className="text-xs text-muted-foreground mt-1">{appointments.length} total appointments loaded</p>
-                                    )}
-                                </div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => loadAppointments()} className="px-3 py-2 bg-muted hover:bg-border text-foreground rounded-md font-medium transition text-sm flex items-center gap-1 border border-border">
-                                        🔄 Refresh
-                                    </button>
-                                    <button onClick={() => setShowScheduleManager(true)} className="px-4 py-2 bg-primary hover:bg-primary-hover text-primary-foreground rounded-md font-medium transition shadow-lg flex items-center gap-2">
-                                        <span>📅</span> Manage My Schedule
-                                    </button>
-                                </div>
-                            </div>
+                        <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+                            <PageHeader 
+                                title="Appointment Calendar" 
+                                subtitle="View and manage your monthly schedule"
+                                actionLabel="Manage Slots"
+                                onAction={() => setShowScheduleManager(true)}
+                                actionIcon={<SettingsOutlinedIcon />}
+                            />
+                            <Paper variant="outlined" sx={{ borderRadius: 3, overflow: 'hidden', mt: 3 }}>
+                                <AppointmentCalendar
+                                    appointments={appointments}
+                                    handleAppointmentAction={handleAppointmentAction}
+                                    loadAppointments={loadAppointments}
+                                    onManageSchedule={() => setShowScheduleManager(true)}
+                                />
+                            </Paper>
+                        </Box>
+                    )}
+
+                    {view === 'appointment-requests' && (
+                        <Stack spacing={3} sx={{ maxWidth: 1200, mx: 'auto' }}>
+                            <PageHeader 
+                                title="Appointment Requests" 
+                                subtitle={`${appointments.length} total appointments loaded`}
+                                actionLabel="Manage My Schedule"
+                                onAction={() => setShowScheduleManager(true)}
+                                actionIcon={<CalendarTodayOutlinedIcon />}
+                            />
 
                             {/* Filter Tabs */}
-                            <div className="flex gap-2 flex-wrap">
+                            <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 1 }}>
                                 {[
-                                    { key: 'pending', label: '⏳ Pending', statuses: ['pending', 'pending_doctor_approval'] },
-                                    { key: 'confirmed', label: '✅ Confirmed', statuses: ['approved', 'confirmed'] },
-                                    { key: 'history', label: '📋 History', statuses: ['completed', 'rejected', 'cancelled'] }
-                                ].map(({ key, label, statuses }) => {
+                                    { key: 'pending', label: 'Pending', icon: '⏳', statuses: ['pending', 'pending_doctor_approval'] },
+                                    { key: 'confirmed', label: 'Confirmed', icon: '✅', statuses: ['approved', 'confirmed'] },
+                                    { key: 'history', label: 'History', icon: '📋', statuses: ['completed', 'rejected', 'cancelled'] }
+                                ].map(({ key, label, icon, statuses }) => {
                                     const count = appointments.filter(a => statuses.includes(a.status)).length;
                                     return (
-                                        <button key={key} onClick={() => setApptTab(key)}
-                                            className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${apptTab === key ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:text-foreground border border-border'}`}>
-                                            {label}
-                                            {count > 0 && (
-                                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${apptTab === key ? 'bg-white/20 text-white' : 'bg-muted text-foreground'}`}>
-                                                    {count}
-                                                </span>
-                                            )}
-                                        </button>
+                                        <Button
+                                            key={key}
+                                            variant={apptTab === key ? 'contained' : 'outlined'}
+                                            onClick={() => setApptTab(key)}
+                                            startIcon={<span>{icon}</span>}
+                                            sx={{ borderRadius: 2, px: 2, whiteSpace: 'nowrap' }}
+                                        >
+                                            {label} {count > 0 && <Chip label={count} size="small" sx={{ ml: 1, height: 20, bgcolor: apptTab === key ? 'white' : 'action.selected', color: apptTab === key ? 'primary.main' : 'text.primary', fontWeight: 700 }} />}
+                                        </Button>
                                     );
                                 })}
-                            </div>
+                                <IconButton onClick={() => loadAppointments()} size="small" sx={{ border: 1, borderColor: 'divider' }}>
+                                    <RefreshIcon fontSize="small" />
+                                </IconButton>
+                            </Stack>
 
                             {/* Appointment Cards */}
                             {(() => {
@@ -900,320 +1320,365 @@ const DoctorDashboard = () => {
                                 const filtered = appointments.filter(a => statusMap[apptTab]?.includes(a.status));
                                 if (filtered.length === 0) {
                                     return (
-                                        <div className="flex flex-col items-center justify-center py-20 text-center">
-                                            <span className="text-5xl mb-4">
+                                        <Box sx={{ py: 10, textAlign: 'center', opacity: 0.5 }}>
+                                            <Typography variant="h1" sx={{ mb: 2 }}>
                                                 {apptTab === 'pending' ? '⏳' : apptTab === 'confirmed' ? '✅' : '📋'}
-                                            </span>
-                                            <p className="text-xl text-muted-foreground">
-                                                {apptTab === 'pending' ? 'No pending requests' : apptTab === 'confirmed' ? 'No confirmed appointments' : 'No history yet'}
-                                            </p>
-                                            {apptTab === 'pending' && <p className="text-sm text-muted-foreground mt-2">New booking requests will appear here</p>}
-                                        </div>
+                                            </Typography>
+                                            <Typography variant="h6">No {apptTab} requests found</Typography>
+                                            <Typography variant="body2">New booking requests will appear here</Typography>
+                                        </Box>
                                     );
                                 }
                                 return (
-                                    <div className="space-y-4">
+                                    <Stack spacing={2}>
                                         {filtered.map(apt => (
-                                            <div key={apt.appointment_id} className="bg-card p-5 rounded-xl border border-border">
-                                                <div className="flex flex-col md:flex-row justify-between gap-4">
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center gap-3 mb-3">
-                                                            <span className={`px-3 py-1 text-xs font-bold rounded border ${getAppointmentStatusBadge(apt.status)}`}>
-                                                                {apt.status?.replace('_', ' ').toUpperCase()}
-                                                            </span>
-                                                            <span className="text-xs text-muted-foreground font-mono">{apt.appointment_id}</span>
-                                                            {apt.shift && (
-                                                                <span className="text-xs px-2 py-0.5 rounded bg-primary-soft text-primary font-medium">
-                                                                    🕐 {apt.shift}
-                                                                </span>
-                                                            )}
-                                                            {apt.created_by === 'whatsapp' || apt.created_by?.includes('sarvam') ? (
-                                                                <span className="text-xs px-2 py-0.5 rounded bg-success/10 text-success font-medium">💬 WhatsApp</span>
-                                                            ) : null}
-                                                        </div>
-                                                        <p className="font-bold text-lg text-foreground">{apt.patient_name || 'Patient'}</p>
-                                                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
-                                                            <p className="text-sm text-muted-foreground">
-                                                                📅 {apt.date} &nbsp;|&nbsp; ⏰ {apt.start_time} – {apt.end_time}
-                                                            </p>
-                                                            {apt.service_name && (
-                                                                <p className="text-sm text-muted-foreground">🏥 {apt.service_name}</p>
-                                                            )}
-                                                            {apt.patient_phone && (
-                                                                <p className="text-sm text-muted-foreground">📱 {apt.patient_phone}</p>
-                                                            )}
-                                                            {apt.whatsapp_number && (
-                                                                <p className="text-xs text-success font-medium">💬 {apt.whatsapp_number}</p>
-                                                            )}
-                                                        </div>
-                                                        {apt.notes && (
-                                                            <p className="text-sm text-text-secondary mt-2 bg-muted p-2 rounded">📝 {apt.notes}</p>
-                                                        )}
-                                                    </div>
+                                            <Card key={apt.appointment_id}>
+                                                <CardContent>
+                                                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2 }}>
+                                                        <Box sx={{ flex: 1 }}>
+                                                            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+                                                                <StatusChip status={apt.status} />
+                                                                <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>#{apt.appointment_id}</Typography>
+                                                                {apt.shift && <Chip label={apt.shift} size="small" variant="soft" color="primary" sx={{ height: 22, fontSize: '0.65rem' }} />}
+                                                                {apt.whatsapp_number && <Chip label="WhatsApp" size="small" variant="soft" color="success" sx={{ height: 22, fontSize: '0.65rem' }} />}
+                                                            </Stack>
+                                                            
+                                                            <Typography variant="h6" sx={{ fontWeight: 700 }}>{apt.patient_name || 'Patient'}</Typography>
+                                                            
+                                                            <Grid container spacing={2} sx={{ mt: 1 }}>
+                                                                <Grid item>
+                                                                    <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                        📅 {apt.date}
+                                                                    </Typography>
+                                                                </Grid>
+                                                                <Grid item>
+                                                                    <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                        ⏰ {apt.start_time} – {apt.end_time}
+                                                                    </Typography>
+                                                                </Grid>
+                                                                {apt.service_name && (
+                                                                    <Grid item><Typography variant="body2" color="text.secondary">🏥 {apt.service_name}</Typography></Grid>
+                                                                )}
+                                                            </Grid>
 
-                                                    {/* Action buttons by status */}
-                                                    {(apt.status === 'pending' || apt.status === 'pending_doctor_approval') && (
-                                                        <div className="flex gap-2 items-start flex-shrink-0">
-                                                            <button
-                                                                onClick={() => handleAppointmentAction(apt.appointment_id, 'approve')}
-                                                                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition font-medium"
-                                                            >
-                                                                ✓ Approve
-                                                            </button>
-                                                            <button
-                                                                onClick={() => {
-                                                                    const reason = window.prompt('Rejection reason (optional):');
-                                                                    handleAppointmentAction(apt.appointment_id, 'reject', reason || '');
-                                                                }}
-                                                                className="px-4 py-2 bg-error text-primary-foreground rounded-lg hover:opacity-80 transition font-medium"
-                                                            >
-                                                                ✗ Reject
-                                                            </button>
-                                                        </div>
+                                                            {apt.notes && (
+                                                                <Box sx={{ mt: 2, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
+                                                                    <Typography variant="body2" color="text.secondary">📝 {apt.notes}</Typography>
+                                                                </Box>
+                                                            )}
+                                                        </Box>
+
+                                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                                                            {(apt.status === 'pending' || apt.status === 'pending_doctor_approval') && (
+                                                                <>
+                                                                    <Button variant="contained" size="small" onClick={() => handleAppointmentAction(apt.appointment_id, 'approve')}>Approve</Button>
+                                                                    <Button variant="outlined" color="error" size="small" onClick={() => {
+                                                                        const reason = window.prompt('Rejection reason:');
+                                                                        handleAppointmentAction(apt.appointment_id, 'reject', reason || '');
+                                                                    }}>Reject</Button>
+                                                                </>
+                                                            )}
+                                                            {(apt.status === 'approved' || apt.status === 'confirmed') && (
+                                                                <Button variant="contained" color="success" size="small" onClick={() => handleAppointmentAction(apt.appointment_id, 'complete')}>Mark Complete</Button>
+                                                            )}
+                                                        </Box>
+                                                    </Box>
+                                                    {apt.rejection_reason && (
+                                                        <Typography variant="caption" color="error" sx={{ mt: 2, display: 'block', pt: 1, borderTop: 1, borderColor: 'divider' }}>
+                                                            ❌ Reason: {apt.rejection_reason}
+                                                        </Typography>
                                                     )}
-                                                    {(apt.status === 'approved' || apt.status === 'confirmed') && (
-                                                        <button
-                                                            onClick={() => handleAppointmentAction(apt.appointment_id, 'complete')}
-                                                            className="px-4 py-2 bg-success text-success-foreground rounded-lg hover:opacity-90 transition font-medium flex items-center gap-2 border border-success/30 flex-shrink-0 self-start"
-                                                        >
-                                                            ✅ Mark as Complete
-                                                        </button>
-                                                    )}
-                                                </div>
-                                                {apt.rejection_reason && (
-                                                    <p className="text-sm text-error mt-3 border-t border-border pt-3">
-                                                        ❌ Rejection Reason: {apt.rejection_reason}
-                                                    </p>
-                                                )}
-                                            </div>
+                                                </CardContent>
+                                            </Card>
                                         ))}
-                                    </div>
+                                    </Stack>
                                 );
                             })()}
-                        </div>
+                        </Stack>
                     )}
 
                     {view === 'vendor-chat' && (
-                        <div className="max-w-6xl mx-auto h-[calc(100vh-140px)]">
+                        <Box sx={{ maxWidth: 1200, mx: 'auto', height: 'calc(100vh - 160px)' }}>
                             <ChatInterface showNotify={showNotify} filterRole="vendor" userRole="doctor" />
-                        </div>
+                        </Box>
                     )}
 
                     {view === 'vendor-requests' && (
-                        <div className="max-w-5xl mx-auto">
+                        <Box sx={{ maxWidth: 1000, mx: 'auto' }}>
                             <VendorRequests showNotify={showNotify} />
-                        </div>
+                        </Box>
                     )}
 
                     {view === 'doctor-chat' && (
-                        <div className="max-w-6xl mx-auto h-[calc(100vh-140px)]">
+                        <Box sx={{ maxWidth: 1200, mx: 'auto', height: 'calc(100vh - 160px)' }}>
                             <ChatInterface showNotify={showNotify} filterRole="doctor" userRole="doctor" />
-                        </div>
+                        </Box>
                     )}
 
                     {view === 'patients' && (
-                        <div className="space-y-6 max-w-6xl mx-auto">
-                            <div className="flex justify-between items-center border-b border-border pb-4">
-                                <h2 className="text-3xl font-bold text-foreground">Patient Vitals & Plans</h2>
-                                <button onClick={() => { setShowCreatePlan(true); }} className="px-4 py-2 bg-primary hover:bg-primary-hover text-primary-foreground rounded-md font-medium transition shadow-lg">
-                                    + Create Care Plan
-                                </button>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <Stack spacing={3} sx={{ maxWidth: 1200, mx: 'auto' }}>
+                            <PageHeader 
+                                title="Patient Vitals & Plans" 
+                                subtitle="Monitor patient health status and active care routines"
+                                actionLabel="Create Care Plan"
+                                onAction={() => setShowCreatePlan(true)}
+                            />
+                            <Grid container spacing={3}>
                                 {patients.map(p => (
-                                    <div key={p.patient_id} onClick={() => { setSelectedPatient(p); setView('patient-details'); }} className="bg-card p-5 rounded-xl border border-border shadow-sm hover:border-primary transition cursor-pointer group">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div>
-                                                <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition">{p.patient_name}</h3>
-                                                <p className="text-xs text-muted-foreground">ID: {p.patient_id}</p>
-                                            </div>
-                                            <span className={`text-xs px-2 py-1 rounded font-medium ${p.room_number ? 'bg-primary/20 text-primary' : 'bg-error-soft text-error'}`}>
-                                                {p.room_number ? `Room ${p.room_number}` : 'No Room'}
-                                            </span>
-                                        </div>
+                                    <Grid item key={p.patient_id}>
+                                        <Card 
+                                            onClick={() => { setSelectedPatient(p); setView('patient-details'); }} 
+                                            sx={{ 
+                                                cursor: 'pointer', 
+                                                width: 252.55,
+                                                height: 222.81,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                transition: '0.2s',
+                                                '&:hover': { borderColor: 'primary.main', boxShadow: 4, transform: 'translateY(-4px)' }
+                                            }}
+                                            variant="outlined"
+                                        >
+                                            <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 2, pb: '16px !important' }}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                    <Box>
+                                                        <Typography variant="h6" sx={{ fontWeight: 700 }}>{p.patient_name}</Typography>
+                                                        <Typography variant="caption" color="text.secondary">ID: {p.patient_id}</Typography>
+                                                    </Box>
+                                                    <Chip 
+                                                        label={p.room_number ? `Room ${p.room_number}` : 'No Room'} 
+                                                        size="small" 
+                                                        color={p.room_number ? 'primary' : 'error'} 
+                                                        variant="soft" 
+                                                        sx={{ fontWeight: 600 }}
+                                                    />
+                                                </Box>
 
-                                        {/* Vitals Section */}
-                                        <div className="space-y-2 text-sm">
-                                            <h4 className="text-muted-foreground text-xs uppercase tracking-wide mb-1">Latest Vitals</h4>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                <div className="bg-muted p-2 rounded text-center">
-                                                    <span className="block text-muted-foreground text-[10px]">HR</span>
-                                                    <span className={`font-mono ${getVitalColor('heart_rate', p.latest_vitals?.heart_rate)}`}>
-                                                        {renderVitalValue(p.latest_vitals?.heart_rate)}
-                                                    </span>
-                                                </div>
-                                                <div className="bg-muted p-2 rounded text-center">
-                                                    <span className="block text-muted-foreground text-[10px]">BP</span>
-                                                    <span className={`font-mono ${getVitalColor('blood_pressure', p.latest_vitals?.blood_pressure)}`}>
-                                                        {renderVitalValue(p.latest_vitals?.blood_pressure)}
-                                                    </span>
-                                                </div>
-                                                <div className="bg-muted p-2 rounded text-center">
-                                                    <span className="block text-muted-foreground text-[10px]">Temp</span>
-                                                    <span className={`font-mono ${getVitalColor('temperature', p.latest_vitals?.temperature)}`}>
-                                                        {renderVitalValue(p.latest_vitals?.temperature)}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p className="text-center text-xs text-primary mt-3 opacity-0 group-hover:opacity-100 transition">Click for detailed report</p>
-                                    </div>
+                                                <Box sx={{ mt: 2 }}>
+                                                    <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 900, fontSize: '0.65rem' }}>Latest Vitals</Typography>
+                                                    <Grid container spacing={1} sx={{ mt: 0.5 }}>
+                                                        <Grid item xs={4}>
+                                                            <Paper variant="outlined" sx={{ p: 1, textAlign: 'center', bgcolor: 'action.hover' }}>
+                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>HR</Typography>
+                                                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 700, color: getVitalColor('heart_rate', p.latest_vitals?.heart_rate) }}>
+                                                                    {renderVitalValue(p.latest_vitals?.heart_rate)}
+                                                                </Typography>
+                                                            </Paper>
+                                                        </Grid>
+                                                        <Grid item xs={4}>
+                                                            <Paper variant="outlined" sx={{ p: 1, textAlign: 'center', bgcolor: 'action.hover' }}>
+                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>BP</Typography>
+                                                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 700, color: getVitalColor('blood_pressure', p.latest_vitals?.blood_pressure) }}>
+                                                                    {renderVitalValue(p.latest_vitals?.blood_pressure)}
+                                                                </Typography>
+                                                            </Paper>
+                                                        </Grid>
+                                                        <Grid item xs={4}>
+                                                            <Paper variant="outlined" sx={{ p: 1, textAlign: 'center', bgcolor: 'action.hover' }}>
+                                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.6rem' }}>TEMP</Typography>
+                                                                <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 700, color: getVitalColor('temperature', p.latest_vitals?.temperature) }}>
+                                                                    {renderVitalValue(p.latest_vitals?.temperature)}
+                                                                </Typography>
+                                                            </Paper>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Box>
+                                                <Box sx={{ mt: 'auto', pt: 1.5, borderTop: 1, borderColor: 'divider', textAlign: 'center' }}>
+                                                    <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>CLICK FOR DETAILED REPORT →</Typography>
+                                                </Box>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
                                 ))}
-                            </div>
-                        </div>
+                            </Grid>
+                        </Stack>
                     )}
 
                     {view === 'care-plans' && (
-                        <div className="h-full flex gap-6 max-h-[calc(100vh-140px)]">
+                        <Grid container spacing={3} sx={{ height: 'calc(100vh - 160px)' }}>
                             {/* Left: Patient List */}
-                            <div className="w-1/3 bg-card rounded-xl border border-border flex flex-col overflow-hidden">
-                                <div className="p-4 border-b border-border bg-muted">
-                                    <h3 className="font-bold text-foreground">Select Patient</h3>
-                                </div>
-                                <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
-                                    {patients.map(p => (
-                                        <div 
-                                            key={p.patient_id} 
-                                            onClick={() => { setSelectedPatient(p); fetchCarePlan(p.patient_id); }}
-                                            className={`p-3 rounded-lg cursor-pointer border transition flex justify-between items-center ${selectedPatient?.patient_id === p.patient_id ? 'bg-primary/20 border-primary' : 'bg-muted border-transparent hover:border-border'}`}
-                                        >
-                                            <div>
-                                                <p className="font-bold text-foreground text-sm">{p.patient_name}</p>
-                                                <p className="text-xs text-muted-foreground">{p.patient_id}</p>
-                                            </div>
-                                            {selectedPatient?.patient_id === p.patient_id && <span className="text-primary">●</span>}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+                            <Grid item xs={12} md={4} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                <Paper 
+                                    variant="outlined" 
+                                    sx={{ 
+                                        height: '100%', 
+                                        display: 'flex', 
+                                        flexDirection: 'column', 
+                                        borderRadius: 3,
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <Box sx={{ p: 2.5, bgcolor: 'action.hover', borderBottom: 1, borderColor: 'divider' }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>Select Patient</Typography>
+                                    </Box>
+                                    <List sx={{ flex: 1, overflow: 'auto', p: 1 }}>
+                                        {patients.map(p => (
+                                            <ListItemButton 
+                                                key={p.patient_id} 
+                                                selected={selectedPatient?.patient_id === p.patient_id}
+                                                onClick={() => { setSelectedPatient(p); fetchCarePlan(p.patient_id); }}
+                                                sx={{ borderRadius: 2, mb: 0.5 }}
+                                            >
+                                                <ListItemText 
+                                                    primary={p.patient_name} 
+                                                    secondary={p.patient_id}
+                                                    primaryTypographyProps={{ variant: 'body2', fontWeight: 700 }}
+                                                    secondaryTypographyProps={{ variant: 'caption' }}
+                                                />
+                                                {selectedPatient?.patient_id === p.patient_id && <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'primary.main' }} />}
+                                            </ListItemButton>
+                                        ))}
+                                    </List>
+                                </Paper>
+                            </Grid>
 
                             {/* Right: Care Plan Details */}
-                            <div className="flex-1 bg-card rounded-xl border border-border p-6 overflow-y-auto custom-scrollbar">
-                                {selectedPatient ? (
-                                    activeCarePlan ? (
-                                        <div className="space-y-8 animate-fade-in-up">
-                                            <div className="flex justify-between items-start border-b border-border pb-4">
-                                                <div>
-                                                    <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                                                        <span>🏥</span> Care Plan: {selectedPatient.patient_name}
-                                                    </h2>
-                                                    <p className="text-muted-foreground text-sm mt-1">Plan ID: {activeCarePlan.plan_id} • Updated: {formatDate(activeCarePlan.updated_at)}</p>
-                                                </div>
-                                                <span className="px-3 py-1 bg-primary/20 text-primary rounded border border-primary/30 text-sm font-bold">Active</span>
-                                            </div>
+                            <Grid item xs={12} md={8} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                <Paper 
+                                    variant="outlined" 
+                                    sx={{ 
+                                        height: '100%', 
+                                        p: 4, 
+                                        borderRadius: 3, 
+                                        overflow: 'auto',
+                                        bgcolor: 'background.paper'
+                                    }}
+                                >
+                                    {selectedPatient ? (
+                                        activeCarePlan ? (
+                                            <Stack spacing={4}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: 1, borderColor: 'divider', pb: 3 }}>
+                                                    <Box>
+                                                        <Typography variant="h4" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                            <span>🏥</span> Care Plan: {selectedPatient.patient_name}
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>Plan ID: {activeCarePlan.plan_id} • Updated: {formatDate(activeCarePlan.updated_at)}</Typography>
+                                                    </Box>
+                                                    <Chip label="Active" color="primary" variant="soft" sx={{ fontWeight: 700, px: 2 }} />
+                                                </Box>
 
-                                            {/* Medications */}
-                                            <div>
-                                                <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-                                                    <span className="text-xl">💊</span> Medications
-                                                </h3>
-                                                <div className="bg-muted rounded-lg border border-border overflow-hidden">
-                                                    <table className="w-full text-left text-sm">
-                                                        <thead className="bg-surface text-muted-foreground">
-                                                            <tr>
-                                                                <th className="p-3 font-medium">Medication</th>
-                                                                <th className="p-3 font-medium">Dose</th>
-                                                                <th className="p-3 font-medium">Time</th>
-                                                                <th className="p-3 font-medium">Freq</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody className="divide-y divide-border">
-                                                            {activeCarePlan.medications?.map((m, i) => (
-                                                                <tr key={i}>
-                                                                    <td className="p-3 text-foreground font-medium">{m.name}</td>
-                                                                    <td className="p-3 text-text-secondary">{m.dose || '-'}</td>
-                                                                    <td className="p-3 text-primary font-mono">{m.time || '-'}</td>
-                                                                    <td className="p-3 text-text-secondary">{m.frequency}</td>
-                                                                </tr>
-                                                            ))}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
+                                                <Box>
+                                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                        <span>💊</span> Medications
+                                                    </Typography>
+                                                    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
+                                                        <Table size="small">
+                                                            <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                                                <TableRow>
+                                                                    <TableCell sx={{ fontWeight: 700 }}>Medication</TableCell>
+                                                                    <TableCell sx={{ fontWeight: 700 }}>Dose</TableCell>
+                                                                    <TableCell sx={{ fontWeight: 700 }}>Time</TableCell>
+                                                                    <TableCell sx={{ fontWeight: 700 }}>Frequency</TableCell>
+                                                                </TableRow>
+                                                            </TableHead>
+                                                            <TableBody>
+                                                                {activeCarePlan.medications?.map((m, i) => (
+                                                                    <TableRow key={i}>
+                                                                        <TableCell sx={{ fontWeight: 600 }}>{m.name}</TableCell>
+                                                                        <TableCell sx={{ color: 'text.secondary' }}>{m.dose || '-'}</TableCell>
+                                                                        <TableCell sx={{ color: 'primary.main', fontWeight: 700, fontFamily: 'monospace' }}>{m.time || '-'}</TableCell>
+                                                                        <TableCell sx={{ color: 'text.secondary' }}>{m.frequency}</TableCell>
+                                                                    </TableRow>
+                                                                ))}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </TableContainer>
+                                                </Box>
 
-                                            {/* Meals */}
-                                            <div>
-                                                <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-                                                    <span className="text-xl">🍽️</span> Meal Plan
-                                                </h3>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div className="bg-muted p-4 rounded-lg border border-border">
-                                                        <p className="text-muted-foreground text-xs uppercase tracking-wide mb-2">Breakfast • {activeCarePlan.meals?.morning_time}</p>
-                                                        <p className="text-foreground font-medium">{activeCarePlan.meals?.morning || 'No selection'}</p>
-                                                    </div>
-                                                    <div className="bg-muted p-4 rounded-lg border border-border">
-                                                        <p className="text-muted-foreground text-xs uppercase tracking-wide mb-2">Lunch • {activeCarePlan.meals?.afternoon_time}</p>
-                                                        <p className="text-foreground font-medium">{activeCarePlan.meals?.afternoon || 'No selection'}</p>
-                                                    </div>
-                                                    <div className="bg-muted p-4 rounded-lg border border-border">
-                                                        <p className="text-muted-foreground text-xs uppercase tracking-wide mb-2">Dinner • {activeCarePlan.meals?.night_time}</p>
-                                                        <p className="text-foreground font-medium">{activeCarePlan.meals?.night || 'No selection'}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                <Box>
+                                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                        <span>🍽️</span> Meal Plan
+                                                    </Typography>
+                                                    <Grid container spacing={2}>
+                                                        {[
+                                                            { label: 'Breakfast', time: activeCarePlan.meals?.morning_time, val: activeCarePlan.meals?.morning },
+                                                            { label: 'Lunch', time: activeCarePlan.meals?.afternoon_time, val: activeCarePlan.meals?.afternoon },
+                                                            { label: 'Dinner', time: activeCarePlan.meals?.night_time, val: activeCarePlan.meals?.night }
+                                                        ].map((meal, i) => (
+                                                            <Grid item xs={12} md={4} key={i}>
+                                                                <Paper variant="outlined" sx={{ p: 2, bgcolor: 'action.hover' }}>
+                                                                    <Typography variant="caption" sx={{ fontWeight: 900, color: 'text.secondary', display: 'block', mb: 1, textTransform: 'uppercase' }}>{meal.label} • {meal.time}</Typography>
+                                                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{meal.val || 'No selection'}</Typography>
+                                                                </Paper>
+                                                            </Grid>
+                                                        ))}
+                                                    </Grid>
+                                                </Box>
 
-                                            {/* Instructions */}
-                                            {activeCarePlan.special_instructions && (
-                                                <div className="bg-card p-4 rounded-lg border border-amber-500/30 bg-amber-500/5">
-                                                    <h4 className="text-warning font-bold mb-2 text-sm uppercase">Special Instructions</h4>
-                                                    <p className="text-foreground text-sm">{activeCarePlan.special_instructions}</p>
-                                                </div>
-                                            )}
+                                                {activeCarePlan.special_instructions && (
+                                                    <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: 'warning.soft', border: 1, borderColor: 'warning.border' }}>
+                                                        <Typography variant="caption" sx={{ color: 'warning.main', fontWeight: 900, display: 'block', mb: 1, textTransform: 'uppercase' }}>Special Instructions</Typography>
+                                                        <Typography variant="body2">{activeCarePlan.special_instructions}</Typography>
+                                                    </Box>
+                                                )}
 
-                                            {/* Create New Care Plan */}
-                                            <div className="pt-4 border-t border-border flex justify-end">
-                                                <button
+                                                <Box sx={{ pt: 3, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'flex-end' }}>
+                                                    <Button
+                                                        variant="contained"
+                                                        onClick={() => { setShowCreatePlan(true); setPlanForm(prev => ({ ...prev, patient_id: selectedPatient.patient_id })); }}
+                                                        startIcon={<span>➕</span>}
+                                                        sx={{ borderRadius: 2, px: 3, py: 1.2, fontWeight: 700, boxShadow: 4 }}
+                                                    >
+                                                        Create New Care Plan
+                                                    </Button>
+                                                </Box>
+                                            </Stack>
+                                        ) : (
+                                            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
+                                                <Typography variant="h1" sx={{ mb: 2 }}>📋</Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 700 }}>No Active Care Plan</Typography>
+                                                <Typography variant="body2" sx={{ mb: 3 }}>Create a care plan for this patient to see details here.</Typography>
+                                                <Button 
+                                                    variant="contained" 
                                                     onClick={() => { setShowCreatePlan(true); setPlanForm(prev => ({ ...prev, patient_id: selectedPatient.patient_id })); }}
-                                                    className="px-5 py-2.5 bg-primary hover:bg-primary-hover text-primary-foreground rounded-lg font-medium transition flex items-center gap-2 shadow-lg"
+                                                    sx={{ borderRadius: 2 }}
                                                 >
-                                                    <span>➕</span> Create New Care Plan
-                                                </button>
-                                            </div>
-                                        </div>
+                                                    Create Care Plan
+                                                </Button>
+                                            </Box>
+                                        )
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center h-full text-center opacity-50">
-                                            <span className="text-4xl mb-4">📋</span>
-                                            <p className="text-xl font-bold">No Active Care Plan</p>
-                                            <p className="text-sm">Create a care plan for this patient to see details here.</p>
-                                            <button onClick={() => { setShowCreatePlan(true); setPlanForm(prev => ({ ...prev, patient_id: selectedPatient.patient_id })); }} className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary-hover">
-                                                Create Care Plan
-                                            </button>
-                                        </div>
-                                    )
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center h-full text-center opacity-50">
-                                        <span className="text-4xl mb-4">👈</span>
-                                        <p className="text-xl font-bold">Select a Patient</p>
-                                        <p className="text-sm">Choose a patient from the list to view their care plan.</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                                        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
+                                            <Typography variant="h1" sx={{ mb: 2 }}>👈</Typography>
+                                            <Typography variant="h5" sx={{ fontWeight: 700 }}>Select a Patient</Typography>
+                                            <Typography variant="body2">Choose a patient from the list to view their care plan.</Typography>
+                                        </Box>
+                                    )}
+                                </Paper>
+                            </Grid>
+                        </Grid>
                     )}
 
                     {view === 'patient-details' && selectedPatient && (
-                        <div className="space-y-8 max-w-5xl mx-auto">
-                            <button onClick={() => setView('patients')} className="text-muted-foreground hover:text-foreground mb-4">← Back to Patients</button>
+                        <Stack spacing={3} sx={{ maxWidth: 1000, mx: 'auto' }}>
+                            <Button 
+                                startIcon={<ArrowBackIcon />} 
+                                onClick={() => setView('patients')} 
+                                sx={{ alignSelf: 'flex-start', color: 'text.secondary' }}
+                            >
+                                Back to Patients
+                            </Button>
 
-                            {/* Patient Header */}
-                            <div className="bg-card p-6 rounded-xl border border-border shadow-lg flex justify-between items-start">
-                                <div>
-                                    <h2 className="text-3xl font-bold text-foreground">{selectedPatient.patient_name}</h2>
-                                    <p className="text-muted-foreground text-sm">ID: {selectedPatient.patient_id} • Age: {selectedPatient.age || 'N/A'}</p>
-                                    <p className="mt-2 text-text-secondary">Diagnosis: <span className="font-medium text-foreground">{selectedPatient.diagnosis}</span></p>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-2xl font-bold text-primary bg-primary/10 px-4 py-2 rounded-lg border border-primary/20">
+                            <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', boxShadow: 3 }}>
+                                <Box>
+                                    <Typography variant="h3" sx={{ fontWeight: 800, color: 'text.primary' }}>{selectedPatient.patient_name}</Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>ID: {selectedPatient.patient_id} • Age: {selectedPatient.age || 'N/A'}</Typography>
+                                    <Typography variant="body1" sx={{ mt: 2 }}>Diagnosis: <Box component="span" sx={{ fontWeight: 700, color: 'primary.main' }}>{selectedPatient.diagnosis}</Box></Typography>
+                                </Box>
+                                <Stack direction="row" spacing={2} alignItems="center">
+                                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'primary.main', bgcolor: 'primary.soft', px: 3, py: 1.5, borderRadius: 3, border: 1, borderColor: 'primary.border' }}>
                                         Room {selectedPatient.room_number || 'N/A'}
-                                    </span>
-                                    <button 
+                                    </Typography>
+                                    <Button 
+                                        variant="outlined" 
                                         onClick={() => setShowEditPatient(true)}
-                                        className="ml-4 px-4 py-2 bg-card hover:bg-muted text-foreground rounded-lg border border-border transition"
+                                        startIcon={<span>✏️</span>}
+                                        sx={{ height: 'fit-content', borderRadius: 2 }}
                                     >
-                                        ✏️ Edit
-                                    </button>
-                                </div>
-                            </div>
+                                        Edit
+                                    </Button>
+                                </Stack>
+                            </Paper>
                             
                             <PatientEditModal 
                                 isOpen={showEditPatient} 
@@ -1225,503 +1690,565 @@ const DoctorDashboard = () => {
                                 }} 
                             />
 
-                            {/* Latest Vitals & Stats — abnormal highlighted first, with emojis */}
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <Grid container spacing={2}>
                                 {buildSortedVitals(selectedPatient.latest_vitals).map(vital => {
                                     const isAbnormal = isVitalAbnormal(vital.type, vital.value);
                                     return (
-                                        <div key={vital.key} className={`p-4 rounded-lg border text-center relative transition ${
-                                            isAbnormal
-                                                ? 'bg-error/10 border-error/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]'
-                                                : 'bg-muted border-border'
-                                        }`}>
-                                            {isAbnormal && (
-                                                <span className="absolute top-1.5 right-2 text-[10px] text-error font-bold uppercase tracking-wide">⚠ Alert</span>
-                                            )}
-                                            <span className="text-2xl block mb-1">{vital.emoji}</span>
-                                            <span className="text-muted-foreground text-[10px] uppercase tracking-wide block">{vital.label}</span>
-                                            <p className={`text-2xl font-mono mt-1 ${getVitalColor(vital.type, vital.value)}`}>
-                                                {renderVitalValue(vital.value)}
-                                                <span className="text-xs text-muted-foreground ml-1">{vital.unit}</span>
-                                            </p>
-                                        </div>
+                                        <Grid item xs={6} md={2.4} key={vital.key}>
+                                            <Paper 
+                                                variant="outlined" 
+                                                sx={{ 
+                                                    p: 2, 
+                                                    textAlign: 'center', 
+                                                    position: 'relative',
+                                                    ...(isAbnormal && {
+                                                        bgcolor: 'error.soft',
+                                                        borderColor: 'error.main',
+                                                        boxShadow: '0 0 10px rgba(239,68,68,0.1)'
+                                                    })
+                                                }}
+                                            >
+                                                {isAbnormal && (
+                                                    <Typography variant="caption" sx={{ position: 'absolute', top: 6, right: 8, color: 'error.main', fontWeight: 900, fontSize: '0.6rem' }}>⚠ ALERT</Typography>
+                                                )}
+                                                <Typography sx={{ fontSize: '1.5rem', mb: 0.5 }}>{vital.emoji}</Typography>
+                                                <Typography variant="overline" color="text.secondary" sx={{ display: 'block', lineHeight: 1, mb: 1 }}>{vital.label}</Typography>
+                                                <Typography variant="h5" sx={{ fontFamily: 'monospace', fontWeight: 700, color: getVitalColor(vital.type, vital.value) }}>
+                                                    {renderVitalValue(vital.value)}
+                                                    <Box component="span" sx={{ fontSize: '0.75rem', ml: 0.5, color: 'text.secondary' }}>{vital.unit}</Box>
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
                                     );
                                 })}
-                            </div>
+                            </Grid>
                             
-                            {/* Nurse Observations & Recommendations */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-card p-6 rounded-xl border border-border">
-                                    <h3 className="text-lg font-bold text-foreground mb-4 border-b border-border pb-2">Latest Nurse Observations</h3>
-                                    {selectedPatient.latest_observations?.length > 0 ? (
-                                        <ul className="space-y-2 list-disc pl-5 text-text-secondary">
-                                            {selectedPatient.latest_observations.map((obs, i) => <li key={i}>{obs}</li>)}
-                                        </ul>
-                                    ) : <p className="text-muted-foreground italic">No observations recorded.</p>}
-                                </div>
-                                <div className="bg-card p-6 rounded-xl border border-border">
-                                    <h3 className="text-lg font-bold text-foreground mb-4 border-b border-border pb-2">Recommendations / Action Items</h3>
-                                    {selectedPatient.action_items?.length > 0 ? (
-                                        <ul className="space-y-2 list-none pl-0">
-                                            {selectedPatient.action_items.map((item, i) => (
-                                                <li key={i} className="flex items-center gap-2 text-text-secondary">
-                                                    <span className="text-warning">⚠</span> {item}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : <p className="text-muted-foreground italic">No specific recommendations.</p>}
-                                </div>
-                            </div>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} md={6}>
+                                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, height: '100%' }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, borderBottom: 1, borderColor: 'divider', pb: 1 }}>Nurse Observations</Typography>
+                                        {selectedPatient.latest_observations?.length > 0 ? (
+                                            <List dense>
+                                                {selectedPatient.latest_observations.map((obs, i) => (
+                                                    <ListItem key={i} sx={{ px: 0 }}>
+                                                        <ListItemIcon sx={{ minWidth: 28 }}>•</ListItemIcon>
+                                                        <ListItemText primary={obs} primaryTypographyProps={{ variant: 'body2' }} />
+                                                    </ListItem>
+                                                ))}
+                                            </List>
+                                        ) : <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>No observations recorded.</Typography>}
+                                    </Paper>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, height: '100%' }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, borderBottom: 1, borderColor: 'divider', pb: 1 }}>Recommendations</Typography>
+                                        {selectedPatient.action_items?.length > 0 ? (
+                                            <List dense>
+                                                {selectedPatient.action_items.map((item, i) => (
+                                                    <ListItem key={i} sx={{ px: 0 }}>
+                                                        <ListItemIcon sx={{ minWidth: 28, color: 'warning.main' }}>⚠</ListItemIcon>
+                                                        <ListItemText primary={item} primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }} />
+                                                    </ListItem>
+                                                ))}
+                                            </List>
+                                        ) : <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>No specific recommendations.</Typography>}
+                                    </Paper>
+                                </Grid>
+                            </Grid>
 
-                            {/* Detailed Handoff History (Timeline) */}
-                            <div className="mt-8">
-                                <h3 className="text-2xl font-bold text-foreground mb-6 text-center">Recent Handoff History</h3>
+                            <Box sx={{ mt: 4 }}>
+                                <Typography variant="h5" sx={{ fontWeight: 800, mb: 3, textAlign: 'center' }}>Recent Handoff History</Typography>
                                 {renderTimeline(handoffs.filter(h => h.patient_id === selectedPatient.patient_id))}
-                            </div>
-                        </div>
+                            </Box>
+                        </Stack>
                     )}
 
                     {view === 'tasks' && (
-                        <div className="space-y-6 max-w-6xl mx-auto">
-                            <div className="flex justify-between items-center border-b border-border pb-4">
-                                <h2 className="text-3xl font-bold text-foreground">Pending Tasks & AI Assignment</h2>
-                                <button onClick={() => { setShowScheduledMed(true); loadUnassignedTasks(); }} className="px-4 py-2 bg-primary hover:bg-primary-hover text-primary-foreground rounded-md font-medium transition shadow-lg flex items-center gap-2">
-                                    <span>💊</span> Schedule Medication
-                                </button>
-                            </div>
+                        <Stack spacing={3} sx={{ maxWidth: 1200, mx: 'auto' }}>
+                            <PageHeader 
+                                title="Pending Tasks & AI Assignment" 
+                                actionLabel="Schedule Medication"
+                                actionIcon={<span>💊</span>}
+                                onAction={() => { setShowScheduledMed(true); loadUnassignedTasks(); }}
+                            />
 
                             {/* Unassigned Tasks Warning */}
                             {unassignedTasks.length > 0 && (
-                                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <span className="text-2xl">⚠️</span>
-                                        <h3 className="text-lg font-bold text-warning">
-                                            {unassignedTasks.length} Task{unassignedTasks.length > 1 ? 's' : ''} Unassigned
-                                        </h3>
-                                    </div>
-                                    <p className="text-text-secondary text-sm mb-3">These tasks have no nurse assigned. Consider adding more nurses for the relevant shifts.</p>
-                                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                                <Alert 
+                                    severity="warning" 
+                                    variant="outlined"
+                                    sx={{ borderRadius: 3, bgcolor: 'warning.lighter' }}
+                                    action={
+                                        <Button color="warning" size="small" variant="contained" onClick={() => setView('all-nurses')}>
+                                            View Nurses
+                                        </Button>
+                                    }
+                                >
+                                    <AlertTitle sx={{ fontWeight: 700 }}>{unassignedTasks.length} Task{unassignedTasks.length > 1 ? 's' : ''} Unassigned</AlertTitle>
+                                    These tasks have no nurse assigned. Consider adding more nurses for the relevant shifts.
+                                    <Box sx={{ mt: 1.5, maxHeight: 150, overflowY: 'auto', p: 1, borderRadius: 1, border: 1, borderColor: 'warning.light' }}>
                                         {unassignedTasks.slice(0, 5).map((t, idx) => (
-                                            <div key={t.task_id || idx} className="flex justify-between items-center bg-muted rounded px-3 py-2 text-sm">
-                                                <span className="text-foreground">{t.description}</span>
-                                                <span className="text-muted-foreground">{t.patient_name || t.patient_id} • {t.shift || 'Any'}</span>
-                                            </div>
+                                            <Box key={t.task_id || idx} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5, px: 1 }}>
+                                                <Typography variant="caption" sx={{ fontWeight: 500 }}>{t.description}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{t.patient_name || t.patient_id} • {t.shift || 'Any'}</Typography>
+                                            </Box>
                                         ))}
                                         {unassignedTasks.length > 5 && (
-                                            <p className="text-muted-foreground text-xs text-center">+ {unassignedTasks.length - 5} more</p>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center', mt: 0.5 }}>
+                                                + {unassignedTasks.length - 5} more
+                                            </Typography>
                                         )}
-                                    </div>
-                                </div>
+                                    </Box>
+                                </Alert>
                             )}
-                            <div className="bg-card rounded-lg overflow-hidden border border-border shadow-lg">
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-surface text-muted-foreground text-sm uppercase">
-                                        <tr>
-                                            <th className="p-4 border-b border-border">Task Description</th>
-                                            <th className="p-4 border-b border-border">Patient</th>
-                                            <th className="p-4 border-b border-border">Scheduled</th>
-                                            <th className="p-4 border-b border-border">Assigned Nurse (AI)</th>
-                                            <th className="p-4 border-b border-border">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-border">
+
+                            <TableContainer component={Paper} variant="outlined">
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Task Description</TableCell>
+                                            <TableCell>Patient</TableCell>
+                                            <TableCell>Scheduled</TableCell>
+                                            <TableCell>Assigned Nurse (AI)</TableCell>
+                                            <TableCell>Status</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
                                         {tasks.filter(t => t.status !== 'completed').map(t => {
                                             const taskPatient = patients.find(p => p.patient_id === t.patient_id);
                                             return (
-                                            <tr key={t.task_id || t._id || `${t.patient_id}-${t.scheduled_time}-${t.task_type}`} className="hover:bg-border transition">
-                                                <td className="p-4 font-medium text-foreground">{t.description || <span className="text-muted-foreground italic">No Description</span>}</td>
-                                                <td className="p-4">
-                                                    <p className="text-foreground font-medium">{taskPatient?.patient_name || t.patient_name || '—'}</p>
-                                                    <p className="text-xs text-muted-foreground font-mono">{t.patient_id}</p>
-                                                </td>
-                                                <td className="p-4 text-text-secondary">{formatDate(t.scheduled_time)}</td>
-                                                <td className="p-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-primary font-bold">{t.assigned_nurse_name || 'Unassigned'}</span>
-                                                        {t.ai_score && (
-                                                            <span className="text-[10px] text-muted-foreground" title={t.assignment_reason}>
-                                                                AI Score: {t.ai_score}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                                <td className="p-4">
-                                                    <span className={`px-2 py-1 rounded text-xs uppercase font-bold ${t.status === 'pending' ? 'bg-warning-soft text-warning' : 'bg-primary/20 text-primary'}`}>
-                                                        {t.status}
-                                                    </span>
-                                                </td>
-                                            </tr>
+                                                <TableRow key={t.task_id || t._id || `${t.patient_id}-${t.scheduled_time}-${t.task_type}`} hover>
+                                                    <TableCell sx={{ fontWeight: 500 }}>
+                                                        {t.description || <Typography variant="body2" color="text.secondary" fontStyle="italic">No Description</Typography>}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography variant="body2" fontWeight={600}>{taskPatient?.patient_name || t.patient_name || '—'}</Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>{t.patient_id}</Typography>
+                                                    </TableCell>
+                                                    <TableCell sx={{ color: 'text.secondary' }}>
+                                                        {formatDate(t.scheduled_time)}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Box>
+                                                            <Typography variant="body2" color="primary" sx={{ fontWeight: 700 }}>
+                                                                {t.assigned_nurse_name || 'Unassigned'}
+                                                            </Typography>
+                                                            {t.ai_score && (
+                                                                <Tooltip title={t.assignment_reason || ''}>
+                                                                    <Typography variant="caption" color="text.secondary" sx={{ fontSize: '10px', display: 'block' }}>
+                                                                        AI Score: {t.ai_score}
+                                                                    </Typography>
+                                                                </Tooltip>
+                                                            )}
+                                                        </Box>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <StatusChip status={t.status} />
+                                                    </TableCell>
+                                                </TableRow>
                                             );
                                         })}
                                         {tasks.length === 0 && (
-                                            <tr><td colSpan="5" className="p-8 text-center text-muted-foreground">No tasks found. Create a care plan to generate tasks.</td></tr>
+                                            <TableRow>
+                                                <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                                                    <Typography color="text.secondary">No tasks found. Create a care plan to generate tasks.</Typography>
+                                                </TableCell>
+                                            </TableRow>
                                         )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Stack>
                     )}
 
                     {view === 'handoffs' && (
-                        <div className="space-y-6 max-w-5xl mx-auto">
-                            <h2 className="text-3xl font-bold text-foreground text-center mb-8">Nurse Observations Timeline</h2>
+                        <Stack spacing={4} sx={{ maxWidth: 1000, mx: 'auto' }}>
+                            <PageHeader title="Nurse Observations Timeline" />
                             {renderTimeline(handoffs)}
-                        </div>
+                        </Stack>
                     )}
 
                     {view === 'nurses' && (
-                        <div className="space-y-6 max-w-5xl mx-auto">
-                            {/* ... same nurse table ... */}
-                            <div className="flex justify-between items-center border-b border-border pb-4">
-                                <h2 className="text-3xl font-bold text-foreground">Manage Nursing Staff</h2>
-                                <button onClick={() => setShowAddNurse(true)} className="px-4 py-2 bg-primary hover:bg-primary-hover text-primary-foreground rounded-md font-medium transition shadow-lg">
-                                    + Add New Nurse
-                                </button>
-                            </div>
-                            <div className="bg-card rounded-lg overflow-hidden border border-border shadow-md">
-                                <table className="w-full text-left border-collapse">
-                                    <thead className="bg-surface text-muted-foreground text-sm uppercase tracking-wider">
-                                        <tr>
-                                            <th className="p-4 font-medium border-b border-border">Name</th>
-                                            <th className="p-4 font-medium border-b border-border">Employee ID</th>
-                                            <th className="p-4 font-medium border-b border-border">Department</th>
-                                            <th className="p-4 font-medium border-b border-border">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-border">
+                        <Stack spacing={3} sx={{ maxWidth: 1000, mx: 'auto' }}>
+                            <PageHeader 
+                                title="Manage Nursing Staff" 
+                                actionLabel="Add New Nurse"
+                                onAction={() => setShowAddNurse(true)}
+                                actionIcon={<span>+</span>}
+                            />
+                            <TableContainer component={Paper} variant="outlined">
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Name</TableCell>
+                                            <TableCell>Employee ID</TableCell>
+                                            <TableCell>Department</TableCell>
+                                            <TableCell>Actions</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
                                         {nurses.map(n => (
-                                            <tr key={n.user_id} className="hover:bg-border transition">
-                                                <td className="p-4 text-foreground font-medium">{n.full_name}</td>
-                                                <td className="p-4 text-text-secondary">{n.employee_id}</td>
-                                                <td className="p-4 text-text-secondary">{n.department || '-'}</td>
-                                                <td className="p-4">
-                                                    <button onClick={() => handleDeleteNurse(n.user_id)} className="text-error hover:text-error font-medium text-sm transition bg-error-soft px-3 py-1 rounded">Remove</button>
-                                                </td>
-                                            </tr>
+                                            <TableRow key={n.user_id} hover>
+                                                <TableCell sx={{ fontWeight: 600 }}>{n.full_name}</TableCell>
+                                                <TableCell sx={{ color: 'text.secondary' }}>{n.employee_id}</TableCell>
+                                                <TableCell sx={{ color: 'text.secondary' }}>{n.department || '-'}</TableCell>
+                                                <TableCell>
+                                                    <Button variant="soft" color="error" size="small" onClick={() => handleDeleteNurse(n.user_id)}>
+                                                        Remove
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
                                         ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Stack>
                     )}
 
                     {/* Nurse Assignments View */}
                     {view === 'nurse-assignments' && (
-                        <div className="space-y-6 max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-foreground border-b border-border pb-4">📊 Nurse Assignments & Completed Tasks</h2>
+                        <Stack spacing={3} sx={{ maxWidth: 1200, mx: 'auto' }}>
+                            <PageHeader 
+                                title="Nurse Assignments & Completed Tasks" 
+                                subtitle="Overview of nurse activity and shift performance"
+                            />
                             {nurseAssignments.length === 0 ? (
-                                <div className="text-center py-20 text-muted-foreground">
-                                    <span className="text-5xl block mb-4">📭</span>
-                                    <p>No nurse assignment data available</p>
-                                </div>
+                                <Box sx={{ py: 10, textAlign: 'center', opacity: 0.5 }}>
+                                    <Typography variant="h1" sx={{ mb: 2 }}>📭</Typography>
+                                    <Typography variant="h6">No nurse assignment data available</Typography>
+                                </Box>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <Grid container spacing={3}>
                                     {nurseAssignments.map(nurse => (
-                                        <div key={nurse.nurse_id} onClick={() => loadNurseDetails(nurse.nurse_id)} className="bg-card rounded-xl border border-border p-5 hover:border-primary transition cursor-pointer group">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div>
-                                                    <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition">{nurse.nurse_name}</h3>
-                                                    <p className="text-xs text-muted-foreground">Current Shift: <span className="text-primary">{nurse.current_shift}</span></p>
-                                                </div>
-                                                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                                    nurse.status === 'online' ? 'bg-success-soft text-success' 
-                                                    : nurse.status === 'emergency' ? 'bg-error/20 text-error'
-                                                    : 'bg-muted text-muted-foreground'
-                                                }`}>
-                                                    {nurse.status === 'emergency' ? '🚨 Emergency' : nurse.status || 'offline'}
-                                                </span>
-                                            </div>
-                                            
-                                            {/* Shifts breakdown */}
-                                            {nurse.shifts?.length > 0 ? (
-                                                <div className="space-y-3">
-                                                    {nurse.shifts.map((shift, idx) => (
-                                                        <div key={idx} className="bg-muted p-3 rounded-lg border border-border">
-                                                            <div className="flex justify-between items-center mb-2">
-                                                                <span className="font-medium text-foreground">{shift.shift} Shift</span>
-                                                                <span className="text-xs text-muted-foreground">{shift.completed_tasks}/{shift.total_tasks} completed</span>
-                                                            </div>
-                                                            {shift.patients?.map((patient, pidx) => (
-                                                                <div key={pidx} className="ml-4 mt-2 text-sm">
-                                                                    <p className="text-text-secondary">👤 {patient.patient_name}</p>
-                                                                    <ul className="ml-4 text-xs text-muted-foreground">
-                                                                        {patient.tasks?.slice(0, 3).map((task, tidx) => (
-                                                                            <li key={tidx} className="flex items-center gap-2">
-                                                                                <span className={task.status === 'completed' ? 'text-success' : 'text-warning'}>
-                                                                                    {task.status === 'completed' ? '✓' : '○'}
-                                                                                </span>
-                                                                                {task.description || task.task_type}
-                                                                            </li>
+                                        <Grid item xs={12} md={6} key={nurse.nurse_id}>
+                                            <Card 
+                                                onClick={() => loadNurseDetails(nurse.nurse_id)} 
+                                                sx={{ 
+                                                    cursor: 'pointer', 
+                                                    height: '100%',
+                                                    transition: '0.2s',
+                                                    '&:hover': { borderColor: 'primary.main', boxShadow: 4 }
+                                                }}
+                                                variant="outlined"
+                                            >
+                                                <CardContent>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                        <Box>
+                                                            <Typography variant="h6" sx={{ fontWeight: 700 }}>{nurse.nurse_name}</Typography>
+                                                            <Typography variant="caption" color="text.secondary">Current Shift: <Box component="span" sx={{ color: 'primary.main', fontWeight: 600 }}>{nurse.current_shift}</Box></Typography>
+                                                        </Box>
+                                                        <StatusChip status={nurse.status === 'emergency' ? 'emergency' : nurse.status || 'offline'} />
+                                                    </Box>
+                                                    
+                                                    {nurse.shifts?.length > 0 ? (
+                                                        <Stack spacing={2}>
+                                                            {nurse.shifts.map((shift, idx) => (
+                                                                <Box key={idx} sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 2, border: 1, borderColor: 'divider' }}>
+                                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                                                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{shift.shift} Shift</Typography>
+                                                                        <Typography variant="caption" color="text.secondary">{shift.completed_tasks}/{shift.total_tasks} completed</Typography>
+                                                                    </Box>
+                                                                    <Stack spacing={0.5}>
+                                                                        {shift.patients?.map((patient, pidx) => (
+                                                                            <Box key={pidx} sx={{ ml: 1 }}>
+                                                                                <Typography variant="body2" sx={{ fontWeight: 500 }}>👤 {patient.patient_name}</Typography>
+                                                                                <Box sx={{ ml: 2 }}>
+                                                                                    {patient.tasks?.slice(0, 3).map((task, tidx) => (
+                                                                                        <Typography key={tidx} variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                                            <Box component="span" sx={{ color: task.status === 'completed' ? 'success.main' : 'warning.main', fontWeight: 900 }}>
+                                                                                                {task.status === 'completed' ? '✓' : '○'}
+                                                                                            </Box>
+                                                                                            {task.description || task.task_type}
+                                                                                        </Typography>
+                                                                                    ))}
+                                                                                    {patient.tasks?.length > 3 && (
+                                                                                        <Typography variant="caption" color="text.disabled" sx={{ fontStyle: 'italic', ml: 1 }}>
+                                                                                            ...+{patient.tasks.length - 3} more
+                                                                                        </Typography>
+                                                                                    )}
+                                                                                </Box>
+                                                                            </Box>
                                                                         ))}
-                                                                        {patient.tasks?.length > 3 && (
-                                                                            <li className="text-muted-foreground">...+{patient.tasks.length - 3} more</li>
-                                                                        )}
-                                                                    </ul>
-                                                                </div>
+                                                                    </Stack>
+                                                                </Box>
                                                             ))}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <p className="text-muted-foreground text-sm italic">No tasks assigned yet</p>
-                                            )}
-                                            
-                                            <div className="mt-4 pt-3 border-t border-border flex justify-between items-center text-xs text-muted-foreground">
-                                                <span>Total Handoffs: {nurse.total_handoffs}</span>
-                                                <span className="text-primary opacity-0 group-hover:opacity-100 transition">View details →</span>
-                                            </div>
-                                        </div>
+                                                        </Stack>
+                                                    ) : (
+                                                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>No tasks assigned yet</Typography>
+                                                    )}
+                                                    
+                                                    <Box sx={{ mt: 2, pt: 1.5, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Typography variant="caption" color="text.secondary">Total Handoffs: {nurse.total_handoffs}</Typography>
+                                                        <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>View details →</Typography>
+                                                    </Box>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
                                     ))}
-                                </div>
+                                </Grid>
                             )}
-                        </div>
+                        </Stack>
                     )}
 
                     {/* Medication History View */}
                     {view === 'medication-history' && (
-                        <div className="space-y-6 max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-foreground border-b border-border pb-4">💊 Patient Medication History</h2>
+                        <Stack spacing={3} sx={{ maxWidth: 1200, mx: 'auto' }}>
+                            <PageHeader 
+                                title="Patient Medication History" 
+                                subtitle="Review and track patient treatments"
+                            />
                             
-                            <div className="flex gap-6">
+                            <Grid container spacing={3}>
                                 {/* Patient Selector */}
-                                <div className="w-64 bg-card rounded-xl border border-border p-4 h-fit">
-                                    <h3 className="text-sm font-medium text-muted-foreground uppercase mb-3">Select Patient</h3>
-                                    <div className="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
-                                        {patients.map(p => (
-                                            <button key={p.patient_id} onClick={() => loadMedicationHistory(p.patient_id)}
-                                                className={`w-full text-left px-3 py-2 rounded-lg text-sm transition ${selectedMedicationPatient === p.patient_id ? 'bg-primary text-primary-foreground' : 'bg-muted text-text-secondary hover:bg-border'}`}>
-                                                {p.patient_name}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+                                <Grid item xs={12} md={3}>
+                                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
+                                        <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 900, mb: 1.5, display: 'block' }}>Select Patient</Typography>
+                                        <List sx={{ maxHeight: 500, overflow: 'auto' }}>
+                                            {patients.map(p => (
+                                                <ListItemButton 
+                                                    key={p.patient_id} 
+                                                    selected={selectedMedicationPatient === p.patient_id}
+                                                    onClick={() => loadMedicationHistory(p.patient_id)}
+                                                    sx={{ borderRadius: 2, mb: 0.5 }}
+                                                >
+                                                    <ListItemText primary={p.patient_name} primaryTypographyProps={{ variant: 'body2', fontWeight: selectedMedicationPatient === p.patient_id ? 700 : 500 }} />
+                                                </ListItemButton>
+                                            ))}
+                                        </List>
+                                    </Paper>
+                                </Grid>
 
                                 {/* Medication List */}
-                                <div className="flex-1 bg-card rounded-xl border border-border p-5">
+                                <Grid item xs={12} md={9}>
                                     {selectedMedicationPatient ? (
-                                        medicationHistory.length > 0 ? (
-                                            <div className="space-y-4">
-                                                {medicationHistory.map((med, idx) => (
-                                                    <div key={idx} className="bg-muted p-4 rounded-lg border border-border">
-                                                        <div className="flex justify-between items-start">
-                                                            <div>
-                                                                <h4 className="font-bold text-foreground">{med.medication_name || 'Unnamed Medication'}</h4>
-                                                                <p className="text-sm text-text-secondary">Dose: {med.dose || 'N/A'} • Frequency: {med.frequency || 'N/A'}</p>
-                                                                <p className="text-xs text-muted-foreground mt-1">Time: {med.time || 'N/A'}</p>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <span className={`text-xs px-2 py-1 rounded ${med.is_active ? 'bg-success-soft text-success' : 'bg-muted text-muted-foreground'}`}>
-                                                                    {med.is_active ? 'Active' : 'Past'}
-                                                                </span>
-                                                                <p className="text-xs text-muted-foreground mt-2">{formatDate(med.prescribed_date)}</p>
-                                                            </div>
-                                                        </div>
-                                                        {med.doctor_name && (
-                                                            <p className="text-xs text-muted-foreground mt-2 pt-2 border-t border-border">Prescribed by: {med.doctor_name}</p>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="text-center py-12 text-muted-foreground">
-                                                <span className="text-4xl block mb-3">💊</span>
-                                                <p>No medication history found</p>
-                                            </div>
-                                        )
+                                        <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, minHeight: 400 }}>
+                                            {medicationHistory.length > 0 ? (
+                                                <Stack spacing={2}>
+                                                    {medicationHistory.map((med, idx) => (
+                                                        <Box key={idx} sx={{ p: 2.5, bgcolor: 'action.hover', borderRadius: 2, border: 1, borderColor: 'divider' }}>
+                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                                <Box>
+                                                                    <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{med.medication_name || 'Unnamed Medication'}</Typography>
+                                                                    <Typography variant="body2" color="text.secondary">Dose: <Box component="span" sx={{ fontWeight: 600, color: 'text.primary' }}>{med.dose || 'N/A'}</Box> • Frequency: <Box component="span" sx={{ fontWeight: 600, color: 'text.primary' }}>{med.frequency || 'N/A'}</Box></Typography>
+                                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>Time: {med.time || 'N/A'}</Typography>
+                                                                </Box>
+                                                                <Box sx={{ textAlign: 'right' }}>
+                                                                    <Chip label={med.is_active ? 'Active' : 'Past'} size="small" color={med.is_active ? 'success' : 'default'} variant={med.is_active ? 'filled' : 'outlined'} />
+                                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>{formatDate(med.prescribed_date)}</Typography>
+                                                                </Box>
+                                                            </Box>
+                                                            {med.doctor_name && (
+                                                                <Typography variant="caption" color="text.secondary" sx={{ mt: 2, pt: 1.5, borderTop: 1, borderColor: 'divider', display: 'block' }}>Prescribed by: <Box component="span" sx={{ fontWeight: 600 }}>{med.doctor_name}</Box></Typography>
+                                                            )}
+                                                        </Box>
+                                                    ))}
+                                                </Stack>
+                                            ) : (
+                                                <Box sx={{ py: 10, textAlign: 'center', opacity: 0.5 }}>
+                                                    <Typography variant="h1" sx={{ mb: 2 }}>💊</Typography>
+                                                    <Typography variant="h6">No medication history found</Typography>
+                                                </Box>
+                                            )}
+                                        </Paper>
                                     ) : (
-                                        <div className="text-center py-12 text-muted-foreground">
-                                            <span className="text-4xl block mb-3">👈</span>
-                                            <p>Select a patient to view medication history</p>
-                                        </div>
+                                        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.5, py: 10 }}>
+                                            <Typography variant="h1" sx={{ mb: 2 }}>👈</Typography>
+                                            <Typography variant="h6">Select a patient to view medication history</Typography>
+                                        </Box>
                                     )}
-                                </div>
-                            </div>
-                        </div>
+                                </Grid>
+                            </Grid>
+                        </Stack>
                     )}
 
                     {/* All Nurses View */}
                     {view === 'all-nurses' && (
-                        <div className="space-y-6 max-w-6xl mx-auto">
-                            <h2 className="text-3xl font-bold text-foreground border-b border-border pb-4">👥 All Nurses Overview</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <Stack spacing={3} sx={{ maxWidth: 1200, mx: 'auto' }}>
+                            <PageHeader 
+                                title="Nursing Staff Directory" 
+                                subtitle="Overview of all registered nursing personnel"
+                            />
+                            <Grid container spacing={3}>
                                 {nurseAssignments.map(nurse => (
-                                    <div key={nurse.nurse_id} onClick={() => loadNurseDetails(nurse.nurse_id)}
-                                        className="bg-card rounded-xl border border-border p-5 hover:border-primary transition cursor-pointer group">
-                                        <div className="flex justify-between items-start mb-3">
-                                            <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition">{nurse.nurse_name}</h3>
-                                            <span className={`px-2 py-1 rounded text-xs ${
-                                                nurse.status === 'online' ? 'bg-success-soft text-success' 
-                                                : nurse.status === 'emergency' ? 'bg-error/20 text-error'
-                                                : 'bg-muted text-muted-foreground'
-                                            }`}>
-                                                {nurse.status === 'emergency' ? '🚨 Emergency' : nurse.status || 'offline'}
-                                            </span>
-                                        </div>
-                                        <div className="space-y-2 text-sm text-text-secondary">
-                                            <p>Shift: <span className="text-primary">{nurse.current_shift}</span></p>
-                                            <p>Tasks: {nurse.shifts?.reduce((sum, s) => sum + (s.completed_tasks || 0), 0) || 0} completed</p>
-                                            <p>Handoffs: {nurse.total_handoffs || 0}</p>
-                                        </div>
-                                        <div className="mt-4 pt-3 border-t border-border">
-                                            <span className="text-xs text-muted-foreground">Click to view details →</span>
-                                        </div>
-                                    </div>
+                                    <Grid item xs={12} sm={6} lg={4} key={nurse.nurse_id}>
+                                        <Card 
+                                            onClick={() => loadNurseDetails(nurse.nurse_id)}
+                                            sx={{ 
+                                                cursor: 'pointer', 
+                                                height: '100%',
+                                                transition: '0.2s',
+                                                '&:hover': { borderColor: 'primary.main', boxShadow: 4, transform: 'translateY(-4px)' }
+                                            }}
+                                            variant="outlined"
+                                        >
+                                            <CardContent>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>{nurse.nurse_name}</Typography>
+                                                    <StatusChip status={nurse.status === 'emergency' ? 'emergency' : nurse.status || 'offline'} />
+                                                </Box>
+                                                <Stack spacing={1}>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <Typography variant="body2" color="text.secondary">Current Shift</Typography>
+                                                        <Typography variant="body2" color="primary" sx={{ fontWeight: 600 }}>{nurse.current_shift}</Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <Typography variant="body2" color="text.secondary">Tasks Completed</Typography>
+                                                        <Typography variant="body2" color="text.primary" sx={{ fontWeight: 600 }}>{nurse.shifts?.reduce((sum, s) => sum + (s.completed_tasks || 0), 0) || 0}</Typography>
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <Typography variant="body2" color="text.secondary">Handoffs Filed</Typography>
+                                                        <Typography variant="body2" color="text.primary" sx={{ fontWeight: 600 }}>{nurse.total_handoffs || 0}</Typography>
+                                                    </Box>
+                                                </Stack>
+                                                <Box sx={{ mt: 3, pt: 1.5, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'flex-end' }}>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>VIEW DETAILS →</Typography>
+                                                </Box>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
                                 ))}
-                            </div>
-                        </div>
+                            </Grid>
+                        </Stack>
                     )}
 
                     {/* Nurse Details View */}
                     {view === 'nurse-details' && selectedNurseDetails && (
-                        <div className="space-y-6 max-w-5xl mx-auto">
-                            <button onClick={() => setView('all-nurses')} className="text-muted-foreground hover:text-foreground mb-4">← Back to All Nurses</button>
+                        <Stack spacing={3} sx={{ maxWidth: 1000, mx: 'auto' }}>
+                            <Button 
+                                startIcon={<ArrowBackIcon />} 
+                                onClick={() => setView('all-nurses')} 
+                                sx={{ alignSelf: 'flex-start', color: 'text.secondary' }}
+                            >
+                                Back to All Nurses
+                            </Button>
                             
-                            {/* Nurse Header */}
-                            <div className="bg-card p-6 rounded-xl border border-border">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h2 className="text-3xl font-bold text-foreground">{selectedNurseDetails.nurse_name}</h2>
-                                        <p className="text-muted-foreground">{selectedNurseDetails.email}</p>
-                                        <p className="text-text-secondary mt-2">Department: {selectedNurseDetails.department || 'N/A'}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                                            selectedNurseDetails.current_status === 'online' ? 'bg-success-soft text-success' 
-                                            : selectedNurseDetails.current_status === 'emergency' ? 'bg-error/20 text-error'
-                                            : 'bg-muted text-muted-foreground'
-                                        }`}>
-                                            {selectedNurseDetails.current_status === 'emergency' ? '🚨 Emergency' : selectedNurseDetails.current_status || 'offline'}
-                                        </span>
-                                        <p className="text-muted-foreground text-sm mt-2">Current: {selectedNurseDetails.current_shift} Shift</p>
-                                    </div>
-                                </div>
-                            </div>
+                            <Paper variant="outlined" sx={{ p: 4, borderRadius: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', boxShadow: 3 }}>
+                                <Box>
+                                    <Typography variant="h3" sx={{ fontWeight: 800 }}>{selectedNurseDetails.nurse_name}</Typography>
+                                    <Typography variant="body1" color="text.secondary">{selectedNurseDetails.email}</Typography>
+                                    <Typography variant="body2" sx={{ mt: 2, p: 1, bgcolor: 'action.hover', borderRadius: 1, display: 'inline-block' }}>Department: <Box component="span" sx={{ fontWeight: 700 }}>{selectedNurseDetails.department || 'N/A'}</Box></Typography>
+                                </Box>
+                                <Box sx={{ textAlign: 'right' }}>
+                                    <StatusChip status={selectedNurseDetails.current_status === 'emergency' ? 'emergency' : selectedNurseDetails.current_status || 'offline'} />
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontWeight: 600 }}>Current: {selectedNurseDetails.current_shift} Shift</Typography>
+                                </Box>
+                            </Paper>
 
-                            {/* Stats Cards */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div className="bg-muted p-4 rounded-lg border border-border text-center">
-                                    <span className="text-muted-foreground text-xs uppercase">Completed</span>
-                                    <p className="text-3xl font-bold text-success mt-1">{selectedNurseDetails.total_tasks_completed || 0}</p>
-                                </div>
-                                <div className="bg-muted p-4 rounded-lg border border-border text-center">
-                                    <span className="text-muted-foreground text-xs uppercase">Pending</span>
-                                    <p className="text-3xl font-bold text-warning mt-1">{selectedNurseDetails.pending_tasks || 0}</p>
-                                </div>
-                                <div className="bg-muted p-4 rounded-lg border border-border text-center">
-                                    <span className="text-muted-foreground text-xs uppercase">Reassigned</span>
-                                    <p className="text-3xl font-bold text-primary mt-1">{selectedNurseDetails.reassigned_tasks || 0}</p>
-                                </div>
-                                <div className="bg-muted p-4 rounded-lg border border-border text-center">
-                                    <span className="text-muted-foreground text-xs uppercase">Handoffs</span>
-                                    <p className="text-3xl font-bold text-foreground mt-1">{selectedNurseDetails.total_handoffs || 0}</p>
-                                </div>
-                            </div>
+                            <Grid container spacing={2}>
+                                {[{ label: 'COMPLETED', val: selectedNurseDetails.total_tasks_completed, color: 'success.main' },
+                                  { label: 'PENDING', val: selectedNurseDetails.pending_tasks, color: 'warning.main' },
+                                  { label: 'REASSIGNED', val: selectedNurseDetails.reassigned_tasks, color: 'primary.main' },
+                                  { label: 'HANDOFFS', val: selectedNurseDetails.total_handoffs, color: 'text.primary' }
+                                ].map((stat, i) => (
+                                    <Grid item xs={6} md={3} key={i}>
+                                        <Paper variant="outlined" sx={{ p: 2, textAlign: 'center', bgcolor: 'action.hover' }}>
+                                            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 900 }}>{stat.label}</Typography>
+                                            <Typography variant="h3" sx={{ fontWeight: 800, color: stat.color }}>{stat.val || 0}</Typography>
+                                        </Paper>
+                                    </Grid>
+                                ))}
+                            </Grid>
 
-                            {/* Task Breakdown Tabs */}
-                            <div className="bg-card p-5 rounded-xl border border-border">
-                                <div className="flex gap-2 mb-4 border-b border-border pb-3">
+                            <Paper variant="outlined" sx={{ p: 0, borderRadius: 3, overflow: 'hidden' }}>
+                                <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', gap: 1 }}>
                                     {[
                                         { key: 'completed', label: '✅ Completed', count: selectedNurseDetails.total_tasks_completed || 0 },
                                         { key: 'pending', label: '⏳ Pending', count: selectedNurseDetails.pending_tasks || 0 },
                                         { key: 'reassigned', label: '🔄 Reassigned', count: selectedNurseDetails.reassigned_tasks || 0 }
                                     ].map(tab => (
-                                        <button key={tab.key}
+                                        <Button 
+                                            key={tab.key}
+                                            variant={(nurseTaskTab || 'completed') === tab.key ? 'contained' : 'text'}
                                             onClick={() => setNurseTaskTab?.(tab.key)}
-                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                                                (nurseTaskTab || 'completed') === tab.key
-                                                    ? 'bg-primary text-primary-foreground'
-                                                    : 'bg-muted text-foreground hover:bg-border'
-                                            }`}>
+                                            size="small"
+                                            sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}
+                                        >
                                             {tab.label} ({tab.count})
-                                        </button>
+                                        </Button>
                                     ))}
-                                </div>
+                                </Box>
 
-                                {/* Completed Tasks */}
-                                {(nurseTaskTab || 'completed') === 'completed' && (
-                                    selectedNurseDetails.recent_completed_tasks?.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {selectedNurseDetails.recent_completed_tasks.map((task, idx) => (
-                                                <div key={idx} className="bg-muted p-3 rounded-lg flex justify-between items-center text-sm">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-success">✓</span>
-                                                        <div>
-                                                            <span className="text-foreground">{task.description || task.task_type}</span>
-                                                            {task.patient_name && <span className="text-muted-foreground ml-2">• {task.patient_name}</span>}
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-muted-foreground text-xs">{formatDate(task.completed_at)}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : <p className="text-muted-foreground italic py-4 text-center">No completed tasks</p>
-                                )}
+                                <Box sx={{ p: 2, minHeight: 100 }}>
+                                    {(nurseTaskTab || 'completed') === 'completed' && (
+                                        selectedNurseDetails.recent_completed_tasks?.length > 0 ? (
+                                            <Stack spacing={1}>
+                                                {selectedNurseDetails.recent_completed_tasks.map((task, idx) => (
+                                                    <Box key={idx} sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                            <Typography sx={{ color: 'success.main', fontWeight: 900 }}>✓</Typography>
+                                                            <Box>
+                                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>{task.description || task.task_type}</Typography>
+                                                                {task.patient_name && <Typography variant="caption" color="text.secondary">Patient: {task.patient_name}</Typography>}
+                                                            </Box>
+                                                        </Box>
+                                                        <Typography variant="caption" color="text.secondary">{formatDate(task.completed_at)}</Typography>
+                                                    </Box>
+                                                ))}
+                                            </Stack>
+                                        ) : <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic', textAlign: 'center', py: 2 }}>No completed tasks</Typography>
+                                    )}
 
-                                {/* Pending Tasks */}
-                                {(nurseTaskTab || 'completed') === 'pending' && (
-                                    selectedNurseDetails.recent_pending_tasks?.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {selectedNurseDetails.recent_pending_tasks.map((task, idx) => (
-                                                <div key={idx} className="bg-muted p-3 rounded-lg flex justify-between items-center text-sm">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-warning">○</span>
-                                                        <div>
-                                                            <span className="text-foreground">{task.description || task.task_type}</span>
-                                                            {task.patient_name && <span className="text-muted-foreground ml-2">• {task.patient_name}</span>}
-                                                        </div>
-                                                    </div>
-                                                    <span className={`text-xs px-2 py-0.5 rounded ${task.priority === 'high' ? 'bg-error/20 text-error' : 'bg-warning/20 text-warning'}`}>
-                                                        {task.priority || 'normal'}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : <p className="text-muted-foreground italic py-4 text-center">No pending tasks</p>
-                                )}
+                                    {(nurseTaskTab || 'completed') === 'pending' && (
+                                        selectedNurseDetails.recent_pending_tasks?.length > 0 ? (
+                                            <Stack spacing={1}>
+                                                {selectedNurseDetails.recent_pending_tasks.map((task, idx) => (
+                                                    <Box key={idx} sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                            <Typography sx={{ color: 'warning.main', fontWeight: 900 }}>○</Typography>
+                                                            <Box>
+                                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>{task.description || task.task_type}</Typography>
+                                                                {task.patient_name && <Typography variant="caption" color="text.secondary">Patient: {task.patient_name}</Typography>}
+                                                            </Box>
+                                                        </Box>
+                                                        <Chip label={task.priority || 'normal'} size="small" color={task.priority === 'high' ? 'error' : 'warning'} variant="soft" />
+                                                    </Box>
+                                                ))}
+                                            </Stack>
+                                        ) : <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic', textAlign: 'center', py: 2 }}>No pending tasks</Typography>
+                                    )}
 
-                                {/* Reassigned Tasks */}
-                                {(nurseTaskTab || 'completed') === 'reassigned' && (
-                                    selectedNurseDetails.recent_reassigned_tasks?.length > 0 ? (
-                                        <div className="space-y-2">
-                                            {selectedNurseDetails.recent_reassigned_tasks.map((task, idx) => (
-                                                <div key={idx} className="bg-muted p-3 rounded-lg flex justify-between items-center text-sm">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-primary">🔄</span>
-                                                        <div>
-                                                            <span className="text-foreground">{task.description || task.task_type}</span>
-                                                            {task.patient_name && <span className="text-muted-foreground ml-2">• {task.patient_name}</span>}
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-muted-foreground text-xs">{task.status}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : <p className="text-muted-foreground italic py-4 text-center">No reassigned tasks</p>
-                                )}
-                            </div>
+                                    {(nurseTaskTab || 'completed') === 'reassigned' && (
+                                        selectedNurseDetails.recent_reassigned_tasks?.length > 0 ? (
+                                            <Stack spacing={1}>
+                                                {selectedNurseDetails.recent_reassigned_tasks.map((task, idx) => (
+                                                    <Box key={idx} sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                            <Typography sx={{ color: 'primary.main' }}>🔄</Typography>
+                                                            <Box>
+                                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>{task.description || task.task_type}</Typography>
+                                                                {task.patient_name && <Typography variant="caption" color="text.secondary">Patient: {task.patient_name}</Typography>}
+                                                            </Box>
+                                                        </Box>
+                                                        <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>{task.status}</Typography>
+                                                    </Box>
+                                                ))}
+                                            </Stack>
+                                        ) : <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic', textAlign: 'center', py: 2 }}>No reassigned tasks</Typography>
+                                    )}
+                                </Box>
+                            </Paper>
 
-                            {/* Shifts Worked */}
-                            <div className="bg-card p-5 rounded-xl border border-border">
-                                <h3 className="text-lg font-bold text-foreground mb-4 border-b border-border pb-2">Recent Shifts Worked</h3>
+                            <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
+                                <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Recent Shifts Worked</Typography>
                                 {selectedNurseDetails.shifts_worked?.length > 0 ? (
-                                    <div className="space-y-3">
+                                    <Stack spacing={1.5}>
                                         {selectedNurseDetails.shifts_worked.slice(0, 10).map((shift, idx) => (
-                                            <div key={idx} className="bg-muted p-3 rounded-lg flex justify-between items-center">
-                                                <div>
-                                                    <span className="font-medium text-foreground">{shift.date}</span>
-                                                    <span className="ml-2 text-sm text-primary">{shift.shift} Shift</span>
-                                                </div>
-                                                <div className="text-sm text-muted-foreground">
+                                            <Box key={idx} sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 2, border: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{shift.date}</Typography>
+                                                    <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>{shift.shift} Shift</Typography>
+                                                </Box>
+                                                <Typography variant="body2" color="text.secondary">
                                                     {shift.tasks_completed} tasks • {shift.patients?.length || 0} patients
-                                                </div>
-                                            </div>
+                                                </Typography>
+                                            </Box>
                                         ))}
-                                    </div>
+                                    </Stack>
                                 ) : (
-                                    <p className="text-muted-foreground italic">No shift history available</p>
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>No shift history available</Typography>
                                 )}
-                            </div>
-                        </div>
+                            </Paper>
+                        </Stack>
                     )}
 
                     {view === 'inventory' && (
@@ -1729,140 +2256,236 @@ const DoctorDashboard = () => {
                     )}
 
 
-                </div>
+
 
                 {/* Persistent Chatbot */}
-                <div className="absolute bottom-0 left-0 right-0 bg-muted border-t border-border p-4 z-40 shadow-lg">
-                    <div className="max-w-4xl mx-auto">
+                <Box 
+                    sx={{ 
+                        position: 'fixed', 
+                        bottom: 0, 
+                        left: 0, 
+                        right: 0, 
+                        bgcolor: 'background.paper', 
+                        borderTop: 1, 
+                        borderColor: 'divider', 
+                        p: 2, 
+                        zIndex: 1100,
+                        boxShadow: '0 -4px 20px rgba(0,0,0,0.1)'
+                    }}
+                >
+                    <Box sx={{ maxWidth: 800, mx: 'auto' }}>
                         {chatMessages.length > 0 && (
-                            <div className="mb-4 relative">
-                                <button onClick={() => setChatMessages([])} className="absolute top-2 right-2 z-10 p-1 bg-border hover:bg-error text-text-secondary hover:text-foreground rounded-full transition text-xs w-6 h-6 flex items-center justify-center" title="Close chat">✕</button>
-                                <div className="space-y-3 p-4 bg-surface rounded-lg border border-border h-48 overflow-y-auto custom-scrollbar shadow-inner">
-                                {chatMessages.map((msg, i) => (
-                                    <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`max-w-[85%] rounded-lg px-4 py-2 text-sm leading-relaxed ${msg.type === 'user' ? 'bg-primary text-primary-foreground' : 'bg-card text-foreground border border-border'}`}>
-                                            {msg.text}
-                                        </div>
-                                    </div>
-                                ))}
-                                <div ref={chatEndRef} />
-                            </div>
-                            </div>
+                            <Paper 
+                                variant="outlined" 
+                                sx={{ 
+                                    mb: 2, 
+                                    p: 2, 
+                                    height: 200, 
+                                    overflowY: 'auto', 
+                                    position: 'relative',
+                                    borderRadius: 3,
+                                    bgcolor: 'action.hover'
+                                }}
+                            >
+                                <IconButton 
+                                    size="small" 
+                                    onClick={() => setChatMessages([])} 
+                                    sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}
+                                >
+                                    <CloseIcon fontSize="small" />
+                                </IconButton>
+                                <Stack spacing={1.5}>
+                                    {chatMessages.map((msg, i) => (
+                                        <Box key={i} sx={{ display: 'flex', justifyContent: msg.type === 'user' ? 'flex-end' : 'flex-start' }}>
+                                            <Paper 
+                                                sx={{ 
+                                                    p: 1.5, 
+                                                    px: 2, 
+                                                    maxWidth: '80%', 
+                                                    borderRadius: msg.type === 'user' ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                                                    bgcolor: msg.type === 'user' ? 'primary.main' : 'background.paper',
+                                                    color: msg.type === 'user' ? 'white' : 'text.primary',
+                                                    boxShadow: 1
+                                                }}
+                                            >
+                                                <Typography variant="body2">{msg.text}</Typography>
+                                            </Paper>
+                                        </Box>
+                                    ))}
+                                    <div ref={chatEndRef} />
+                                </Stack>
+                            </Paper>
                         )}
-                        <form onSubmit={handleChatSubmit} className="relative">
-                            <input type="text" value={chatQuestion} onChange={(e) => setChatQuestion(e.target.value)} placeholder="Ask AI..." className="w-full bg-input text-foreground rounded-xl pl-5 pr-12 py-4 shadow-lg border border-border focus:border-primary focus:outline-none focus:ring-1 focus:ring-ring transition-all placeholder-muted-foreground" />
-                            <button type="submit" disabled={chatLoading} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-muted-foreground hover:text-primary transition rounded-md"><span className="text-xl">➤</span></button>
+                        <form onSubmit={handleChatSubmit}>
+                            <TextField
+                                fullWidth
+                                variant="outlined"
+                                placeholder="Ask AI anything about the hospital..."
+                                value={chatQuestion}
+                                onChange={(e) => setChatQuestion(e.target.value)}
+                                disabled={chatLoading}
+                                InputProps={{
+                                    sx: { borderRadius: 4, bgcolor: 'background.paper' },
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton type="submit" color="primary" disabled={chatLoading}>
+                                                {chatLoading ? <CircularProgress size={24} /> : <SendIcon />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
                         </form>
-                    </div>
-                </div>
-            </main>
+                    </Box>
+                </Box>
 
             {/* Notification Toast */}
-            {notification && (
-                <div className={`fixed top-4 right-4 z-[100] px-6 py-3 rounded shadow-lg text-primary-foreground font-medium animate-fade-in-down ${notification.type === 'error' ? 'bg-error' : 'bg-primary'}`}>{notification.message}</div>
-            )}
+            <Snackbar 
+                open={!!notification} 
+                autoHideDuration={6000} 
+                onClose={() => setNotification(null)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                sx={{ zIndex: 9999 }}
+            >
+                {notification && (
+                    <Alert 
+                        onClose={() => setNotification(null)} 
+                        severity={notification.type === 'error' ? 'error' : 'success'} 
+                        variant="filled" 
+                        sx={{ width: '100%', borderRadius: 2, fontWeight: 600 }}
+                    >
+                        {notification.message}
+                    </Alert>
+                )}
+            </Snackbar>
 
-            {/* Show Add Nurse Modal (reused) */}
-            {showAddNurse && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div className="bg-surface p-8 rounded-xl w-96 border border-border shadow-2xl">
-                        <h2 className="text-xl font-bold mb-6 text-foreground">Add New Nurse</h2>
-                        <form onSubmit={handleAddNurse} className="space-y-4">
-                            <input placeholder="Full Name" required className="w-full bg-muted text-foreground border border-border rounded p-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring" onChange={e => setNurseForm({ ...nurseForm, full_name: e.target.value })} />
-                            <input placeholder="Email" required className="w-full bg-muted text-foreground border border-border rounded p-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring" onChange={e => setNurseForm({ ...nurseForm, email: e.target.value })} />
-                            <input placeholder="Password" type="password" required autoComplete="new-password" className="w-full bg-muted text-foreground border border-border rounded p-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring" onChange={e => setNurseForm({ ...nurseForm, password: e.target.value })} />
-                            <input placeholder="Employee ID" required className="w-full bg-muted text-foreground border border-border rounded p-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring" onChange={e => setNurseForm({ ...nurseForm, employee_id: e.target.value })} />
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button type="button" onClick={() => setShowAddNurse(false)} className="px-4 py-2 bg-card text-foreground rounded hover:bg-muted transition">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-primary rounded text-primary-foreground hover:bg-primary-hover transition">Add Nurse</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+            {/* Add Nurse Dialog */}
+            <Dialog open={showAddNurse} onClose={() => setShowAddNurse(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <DialogTitle sx={{ textAlign: 'center', pt: 4 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'primary.main' }}>Add New Nurse</Typography>
+                    <Typography variant="body2" color="text.secondary">Register a new nurse to the hospital system</Typography>
+                </DialogTitle>
+                <DialogContent>
+                    <Box component="form" sx={{ pt: 2 }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
+                                <TextField fullWidth label="Full Name" value={nurseForm.full_name} onChange={e => setNurseForm({ ...nurseForm, full_name: e.target.value })} required margin="normal" />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField fullWidth label="Employee ID" value={nurseForm.employee_id} onChange={e => setNurseForm({ ...nurseForm, employee_id: e.target.value })} required margin="normal" />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="Email Address" type="email" value={nurseForm.email} onChange={e => setNurseForm({ ...nurseForm, email: e.target.value })} required margin="normal" />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField fullWidth label="Password" type="password" value={nurseForm.password} onChange={e => setNurseForm({ ...nurseForm, password: e.target.value })} required margin="normal" />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField fullWidth label="Confirm Password" type="password" value={nurseForm.confirm_password} onChange={e => setNurseForm({ ...nurseForm, confirm_password: e.target.value })} required margin="normal" />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField fullWidth label="Department" value={nurseForm.department} onChange={e => setNurseForm({ ...nurseForm, department: e.target.value })} margin="normal" />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField fullWidth label="Phone Number" value={nurseForm.phone} onChange={e => setNurseForm({ ...nurseForm, phone: e.target.value })} margin="normal" />
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, justifyContent: 'center', gap: 2 }}>
+                    <Button onClick={() => setShowAddNurse(false)} variant="outlined" color="inherit" sx={{ px: 4 }}>Cancel</Button>
+                    <Button onClick={handleAddNurse} variant="contained" color="primary" sx={{ px: 4, fontWeight: 700 }}>Add Nurse</Button>
+                </DialogActions>
+            </Dialog>
 
-            {/* Create Care Plan Modal */}
-            {showCreatePlan && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                    <div className="bg-surface p-6 rounded-xl w-full max-w-2xl border border-border max-h-[85vh] overflow-y-auto custom-scrollbar shadow-2xl">
-                        <div className="flex justify-between items-center mb-6 pb-4 border-b border-border">
-                            <h2 className="text-xl font-bold text-foreground">Create Care Plan</h2>
-                            <button onClick={() => setShowCreatePlan(false)} className="text-muted-foreground hover:text-foreground text-2xl">&times;</button>
-                        </div>
-                        <form onSubmit={submitCarePlan} className="space-y-6">
-                            <div>
-                                <label className="block text-text-secondary mb-2 font-medium">Select Patient</label>
-                                <select className="w-full bg-muted text-foreground border border-border p-3 rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring"
-                                    onChange={e => setPlanForm({ ...planForm, patient_id: e.target.value })} required>
-                                    <option value="">Select Patient...</option>
-                                    {patients.map(p => <option key={p.patient_id} value={p.patient_id}>{p.patient_name} ({p.patient_id})</option>)}
-                                </select>
-                            </div>
-
-                            {/* Medications */}
-                            <div className="bg-card p-4 rounded-lg border border-border">
-                                <label className="block text-foreground mb-3 font-medium">💊 Medications (with timing)</label>
-                                {planForm.medications.map((m, i) => (
-                                    <div key={i} className="flex gap-2 mb-2">
-                                        <input placeholder="Name" className="flex-1 bg-muted text-foreground border border-border p-2 rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring"
-                                            value={m.name} onChange={e => {
-                                                const newMeds = [...planForm.medications];
-                                                newMeds[i].name = e.target.value;
-                                                setPlanForm({ ...planForm, medications: newMeds });
-                                            }} />
-                                        <input placeholder="13:00" className="w-24 bg-muted text-foreground border border-border p-2 rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring"
-                                            value={m.time} onChange={e => {
-                                                const newMeds = [...planForm.medications];
-                                                newMeds[i].time = e.target.value;
-                                                setPlanForm({ ...planForm, medications: newMeds });
-                                            }} />
-                                        <input placeholder="Freq (once)" className="w-24 bg-muted text-foreground border border-border p-2 rounded focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring"
-                                            value={m.frequency} onChange={e => {
-                                                const newMeds = [...planForm.medications];
-                                                newMeds[i].frequency = e.target.value;
-                                                setPlanForm({ ...planForm, medications: newMeds });
-                                            }} />
-                                    </div>
+            {/* Create Care Plan Dialog */}
+            <Dialog open={showCreatePlan} onClose={() => setShowCreatePlan(false)} maxWidth="md" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <DialogTitle sx={{ borderBottom: 1, borderColor: 'divider', px: 4, py: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="h5" sx={{ fontWeight: 800 }}>Create Care Plan</Typography>
+                        <IconButton onClick={() => setShowCreatePlan(false)}><CloseIcon /></IconButton>
+                    </Box>
+                </DialogTitle>
+                <DialogContent sx={{ p: 4 }}>
+                    <Stack spacing={3} sx={{ mt: 1 }}>
+                        <FormControl fullWidth>
+                            <InputLabel>Select Patient</InputLabel>
+                            <Select
+                                value={planForm.patient_id}
+                                label="Select Patient"
+                                onChange={e => setPlanForm({ ...planForm, patient_id: e.target.value })}
+                                required
+                            >
+                                <MenuItem value=""><em>None</em></MenuItem>
+                                {patients.map(p => (
+                                    <MenuItem key={p.patient_id} value={p.patient_id}>
+                                        {p.patient_name} ({p.patient_id})
+                                    </MenuItem>
                                 ))}
-                                <button type="button" onClick={() => setPlanForm({ ...planForm, medications: [...planForm.medications, { name: '', dose: '', time: '', frequency: '' }] })} className="text-sm text-primary hover:underline mt-2">+ Add Another Medication</button>
-                            </div>
+                            </Select>
+                        </FormControl>
 
-                            {/* Meals */}
-                            <div className="bg-card p-4 rounded-lg border border-border">
-                                <label className="block text-foreground mb-3 font-medium">🍽️ Meal Plan (with timing)</label>
-                                <div className="space-y-3">
-                                    <div className="flex gap-2 items-center">
-                                        <label className="w-20 text-muted-foreground text-sm">Breakfast</label>
-                                        <input placeholder="Meal info" className="flex-1 bg-muted text-foreground border border-border p-2 rounded"
-                                            onChange={e => setPlanForm({ ...planForm, meals: { ...planForm.meals, morning: e.target.value } })} />
-                                        <input type="time" className="w-32 bg-muted text-foreground border border-border p-2 rounded"
-                                            value={planForm.meals.morning_time} onChange={e => setPlanForm({ ...planForm, meals: { ...planForm.meals, morning_time: e.target.value } })} />
-                                    </div>
-                                    <div className="flex gap-2 items-center">
-                                        <label className="w-20 text-muted-foreground text-sm">Lunch</label>
-                                        <input placeholder="Meal info" className="flex-1 bg-muted text-foreground border border-border p-2 rounded"
-                                            onChange={e => setPlanForm({ ...planForm, meals: { ...planForm.meals, afternoon: e.target.value } })} />
-                                        <input type="time" className="w-32 bg-muted text-foreground border border-border p-2 rounded"
-                                            value={planForm.meals.afternoon_time} onChange={e => setPlanForm({ ...planForm, meals: { ...planForm.meals, afternoon_time: e.target.value } })} />
-                                    </div>
-                                    <div className="flex gap-2 items-center">
-                                        <label className="w-20 text-muted-foreground text-sm">Dinner</label>
-                                        <input placeholder="Meal info" className="flex-1 bg-muted text-foreground border border-border p-2 rounded"
-                                            onChange={e => setPlanForm({ ...planForm, meals: { ...planForm.meals, night: e.target.value } })} />
-                                        <input type="time" className="w-32 bg-muted text-foreground border border-border p-2 rounded"
-                                            value={planForm.meals.night_time} onChange={e => setPlanForm({ ...planForm, meals: { ...planForm.meals, night_time: e.target.value } })} />
-                                    </div>
-                                </div>
-                            </div>
+                        {/* Medications */}
+                        <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <span>💊</span> Medications
+                            </Typography>
+                            {planForm.medications.map((m, i) => (
+                                <Stack key={i} direction="row" spacing={2} sx={{ mb: 2 }}>
+                                    <TextField fullWidth placeholder="Name" size="small" value={m.name} onChange={e => {
+                                        const newMeds = [...planForm.medications];
+                                        newMeds[i].name = e.target.value;
+                                        setPlanForm({ ...planForm, medications: newMeds });
+                                    }} />
+                                    <TextField placeholder="Time (13:00)" size="small" sx={{ width: 140 }} value={m.time} onChange={e => {
+                                        const newMeds = [...planForm.medications];
+                                        newMeds[i].time = e.target.value;
+                                        setPlanForm({ ...planForm, medications: newMeds });
+                                    }} />
+                                    <TextField placeholder="Freq" size="small" sx={{ width: 120 }} value={m.frequency} onChange={e => {
+                                        const newMeds = [...planForm.medications];
+                                        newMeds[i].frequency = e.target.value;
+                                        setPlanForm({ ...planForm, medications: newMeds });
+                                    }} />
+                                    <IconButton size="small" color="error" onClick={() => {
+                                        const newMeds = planForm.medications.filter((_, idx) => idx !== i);
+                                        setPlanForm({ ...planForm, medications: newMeds });
+                                    }} disabled={planForm.medications.length <= 1}>
+                                        <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                </Stack>
+                            ))}
+                            <Button size="small" startIcon={<AddIcon />} onClick={() => setPlanForm({ ...planForm, medications: [...planForm.medications, { name: '', dose: '', time: '', frequency: '' }] })}>
+                                Add Another Medication
+                            </Button>
+                        </Paper>
 
-                            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
-                                <button type="button" onClick={() => setShowCreatePlan(false)} className="px-5 py-2 bg-card text-foreground rounded hover:bg-muted transition">Cancel</button>
-                                <button type="submit" className="px-5 py-2 bg-primary rounded text-primary-foreground hover:bg-primary-hover transition">Create Care Plan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                        {/* Meals */}
+                        <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <span>🍽️</span> Meal Plan
+                            </Typography>
+                            <Stack spacing={2}>
+                                {[
+                                    { label: 'Breakfast', key: 'morning', timeKey: 'morning_time' },
+                                    { label: 'Lunch', key: 'afternoon', timeKey: 'afternoon_time' },
+                                    { label: 'Dinner', key: 'night', timeKey: 'night_time' }
+                                ].map((meal) => (
+                                    <Stack key={meal.key} direction="row" spacing={2} alignItems="center">
+                                        <Typography variant="body2" sx={{ width: 80, fontWeight: 600 }}>{meal.label}</Typography>
+                                        <TextField fullWidth placeholder="Meal info" size="small" onChange={e => setPlanForm({ ...planForm, meals: { ...planForm.meals, [meal.key]: e.target.value } })} />
+                                        <TextField type="time" size="small" sx={{ width: 150 }} value={planForm.meals[meal.timeKey]} onChange={e => setPlanForm({ ...planForm, meals: { ...planForm.meals, [meal.timeKey]: e.target.value } })} />
+                                    </Stack>
+                                ))}
+                            </Stack>
+                        </Paper>
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, borderTop: 1, borderColor: 'divider' }}>
+                    <Button onClick={() => setShowCreatePlan(false)} color="inherit">Cancel</Button>
+                    <Button onClick={submitCarePlan} variant="contained" sx={{ fontWeight: 700 }}>Create Care Plan</Button>
+                </DialogActions>
+            </Dialog>
 
             {/* View Handoff Modal */}
             {selectedHandoff && (
@@ -1872,144 +2495,83 @@ const DoctorDashboard = () => {
                 />
             )}
 
-            {/* Scheduled Medication Modal */}
-            {showScheduledMed && (
-                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4">
-                    <div className="bg-surface rounded-xl max-w-lg w-full p-6 shadow-2xl border border-border max-h-[90vh] overflow-y-auto animate-fade-in">
-                        <div className="flex justify-between items-center mb-6 border-b border-border pb-4">
-                            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                                <span>💊</span> Schedule Medication Tasks
-                            </h2>
-                            <button onClick={() => setShowScheduledMed(false)} className="text-muted-foreground hover:text-foreground text-2xl">&times;</button>
-                        </div>
+            {/* Scheduled Medication Dialog */}
+            <Dialog open={showScheduledMed} onClose={() => setShowScheduledMed(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+                <DialogTitle sx={{ borderBottom: 1, borderColor: 'divider', px: 4, py: 3 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="h5" sx={{ fontWeight: 800 }}>Schedule Medication Tasks</Typography>
+                        <IconButton onClick={() => setShowScheduledMed(false)}><CloseIcon /></IconButton>
+                    </Box>
+                </DialogTitle>
+                <DialogContent sx={{ p: 4 }}>
+                    <Stack spacing={3} sx={{ mt: 1 }}>
+                        <FormControl fullWidth>
+                            <InputLabel>Select Patient</InputLabel>
+                            <Select
+                                value={scheduledMedForm.patient_id}
+                                label="Select Patient"
+                                onChange={e => setScheduledMedForm({ ...scheduledMedForm, patient_id: e.target.value })}
+                                required
+                            >
+                                <MenuItem value=""><em>None</em></MenuItem>
+                                {patients.map(p => (
+                                    <MenuItem key={p.patient_id} value={p.patient_id}>{p.patient_name} ({p.patient_id})</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
 
-                        <form onSubmit={submitScheduledMedication} className="space-y-5">
-                            {/* Patient Selection */}
-                            <div>
-                                <label className="block text-muted-foreground text-sm mb-2">Patient *</label>
-                                <select 
-                                    value={scheduledMedForm.patient_id}
-                                    onChange={e => setScheduledMedForm({ ...scheduledMedForm, patient_id: e.target.value })}
-                                    className="w-full bg-card text-foreground border border-border p-3 rounded focus:border-primary focus:outline-none"
-                                    required
-                                >
-                                    <option value="">Select Patient</option>
-                                    {patients.map(p => (
-                                        <option key={p.patient_id} value={p.patient_id}>{p.patient_name} ({p.patient_id})</option>
-                                    ))}
-                                </select>
-                            </div>
+                        <TextField fullWidth label="Medication Name" placeholder="e.g. Paracetamol 500mg" value={scheduledMedForm.medication_name} onChange={e => setScheduledMedForm({ ...scheduledMedForm, medication_name: e.target.value })} required />
 
-                            {/* Medication Name */}
-                            <div>
-                                <label className="block text-muted-foreground text-sm mb-2">Medication Name *</label>
-                                <input 
-                                    type="text"
-                                    value={scheduledMedForm.medication_name}
-                                    onChange={e => setScheduledMedForm({ ...scheduledMedForm, medication_name: e.target.value })}
-                                    className="w-full bg-card text-foreground border border-border p-3 rounded focus:border-primary focus:outline-none"
-                                    placeholder="e.g., Paracetamol 500mg"
-                                    required
-                                />
-                            </div>
-
-                            {/* Shifts Selection */}
-                            <div>
-                                <label className="block text-muted-foreground text-sm mb-3">Shifts (when to administer) *</label>
-                                <div className="flex gap-4">
-                                    {['day', 'afternoon', 'night'].map(shift => (
-                                        <label key={shift} className="flex items-center gap-2 cursor-pointer">
-                                            <input 
-                                                type="checkbox"
-                                                checked={scheduledMedForm.shifts.includes(shift)}
-                                                onChange={e => {
-                                                    const newShifts = e.target.checked 
-                                                        ? [...scheduledMedForm.shifts, shift]
-                                                        : scheduledMedForm.shifts.filter(s => s !== shift);
-                                                    setScheduledMedForm({ ...scheduledMedForm, shifts: newShifts });
-                                                }}
-                                                className="w-5 h-5 accent-primary"
-                                            />
-                                            <span className="text-foreground capitalize">
-                                                {shift === 'day' ? '☀️ Day (9am)' : shift === 'afternoon' ? '🌅 Afternoon (2pm)' : '🌙 Night (9pm)'}
-                                            </span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Date Range */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-muted-foreground text-sm mb-2">Start Date *</label>
-                                    <input 
-                                        type="date"
-                                        value={scheduledMedForm.start_date}
-                                        onChange={e => setScheduledMedForm({ ...scheduledMedForm, start_date: e.target.value })}
-                                        className="w-full bg-muted text-foreground border border-border p-3 rounded"
-                                        required
+                        <Box>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>Shifts (when to administer)</Typography>
+                            <Stack direction="row" spacing={2.5}>
+                                {[
+                                    { key: 'day', label: '☀️ Day', desc: '9am' },
+                                    { key: 'afternoon', label: '🌅 Afternoon', desc: '2pm' },
+                                    { key: 'night', label: '🌙 Night', desc: '9pm' }
+                                ].map(s => (
+                                    <FormControlLabel
+                                        key={s.key}
+                                        control={<Checkbox checked={scheduledMedForm.shifts.includes(s.key)} onChange={e => {
+                                            const newShifts = e.target.checked ? [...scheduledMedForm.shifts, s.key] : scheduledMedForm.shifts.filter(sh => sh !== s.key);
+                                            setScheduledMedForm({ ...scheduledMedForm, shifts: newShifts });
+                                        }} />}
+                                        label={
+                                            <Box>
+                                                <Typography variant="body2" sx={{ fontWeight: 600 }}>{s.label}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{s.desc}</Typography>
+                                            </Box>
+                                        }
                                     />
-                                </div>
-                                <div>
-                                    <label className="block text-muted-foreground text-sm mb-2">End Date *</label>
-                                    <input 
-                                        type="date"
-                                        value={scheduledMedForm.end_date}
-                                        onChange={e => setScheduledMedForm({ ...scheduledMedForm, end_date: e.target.value })}
-                                        className="w-full bg-muted text-foreground border border-border p-3 rounded"
-                                        required
-                                    />
-                                </div>
-                            </div>
+                                ))}
+                            </Stack>
+                        </Box>
 
-                            {/* Duration Preview */}
-                            {scheduledMedForm.start_date && scheduledMedForm.end_date && scheduledMedForm.shifts.length > 0 && (
-                                <div className="bg-primary/10 border border-primary/30 rounded p-3 text-sm">
-                                    <span className="text-primary font-medium">📋 Preview: </span>
-                                    <span className="text-text-secondary">
-                                        {(() => {
-                                            const days = Math.ceil((new Date(scheduledMedForm.end_date) - new Date(scheduledMedForm.start_date)) / (1000 * 60 * 60 * 24)) + 1;
-                                            const totalTasks = days * scheduledMedForm.shifts.length;
-                                            return `${totalTasks} tasks will be created (${days} days × ${scheduledMedForm.shifts.length} shift${scheduledMedForm.shifts.length > 1 ? 's' : ''})`;
-                                        })()}
-                                    </span>
-                                </div>
-                            )}
+                        <Stack direction="row" spacing={2}>
+                            <TextField fullWidth label="Start Date" type="date" InputLabelProps={{ shrink: true }} value={scheduledMedForm.start_date} onChange={e => setScheduledMedForm({ ...scheduledMedForm, start_date: e.target.value })} required />
+                            <TextField fullWidth label="End Date" type="date" InputLabelProps={{ shrink: true }} value={scheduledMedForm.end_date} onChange={e => setScheduledMedForm({ ...scheduledMedForm, end_date: e.target.value })} required />
+                        </Stack>
 
-                            {/* Notes */}
-                            <div>
-                                <label className="block text-muted-foreground text-sm mb-2">Notes (optional)</label>
-                                <textarea 
-                                    value={scheduledMedForm.notes}
-                                    onChange={e => setScheduledMedForm({ ...scheduledMedForm, notes: e.target.value })}
-                                    className="w-full bg-muted text-foreground border border-border p-3 rounded resize-none"
-                                    rows={2}
-                                    placeholder="e.g., Take with food"
-                                />
-                            </div>
+                        {scheduledMedForm.start_date && scheduledMedForm.end_date && scheduledMedForm.shifts.length > 0 && (
+                            <Alert severity="info" variant="outlined" sx={{ borderRadius: 2 }}>
+                                {(() => {
+                                    const days = Math.ceil((new Date(scheduledMedForm.end_date) - new Date(scheduledMedForm.start_date)) / (1000 * 60 * 60 * 24)) + 1;
+                                    const totalTasks = days * scheduledMedForm.shifts.length;
+                                    return `${totalTasks} tasks will be created (${days} days × ${scheduledMedForm.shifts.length} shifts)`;
+                                })()}
+                            </Alert>
+                        )}
 
-                            {/* Actions */}
-                            <div className="flex justify-end gap-3 pt-4 border-t border-border">
-                                <button 
-                                    type="button" 
-                                    onClick={() => setShowScheduledMed(false)} 
-                                    className="px-5 py-2 bg-card text-foreground rounded hover:bg-muted transition"
-                                >
-                                    Cancel
-                                </button>
-                                <button 
-                                    type="submit" 
-                                    disabled={loading}
-                                    className="px-5 py-2 bg-primary rounded text-primary-foreground hover:bg-primary-hover transition disabled:opacity-50"
-                                >
-                                    {loading ? 'Creating...' : 'Create Medication Tasks'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
+                        <TextField fullWidth label="Notes (optional)" multiline rows={2} value={scheduledMedForm.notes} onChange={e => setScheduledMedForm({ ...scheduledMedForm, notes: e.target.value })} />
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, borderTop: 1, borderColor: 'divider' }}>
+                    <Button onClick={() => setShowScheduledMed(false)} color="inherit">Cancel</Button>
+                    <Button onClick={submitScheduledMedication} variant="contained" disabled={loading} sx={{ fontWeight: 700 }}>
+                        {loading ? 'Creating...' : 'Create Medication Tasks'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
             {/* Profile Modal */}
             <ProfileModal 
                 isOpen={showProfile} 
@@ -2020,17 +2582,21 @@ const DoctorDashboard = () => {
 
             {/* Schedule Manager Modal */}
             {showScheduleManager && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+                <Box sx={{ position: 'fixed', inset: 0, bgcolor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1300, p: 2 }}>
                     <DoctorScheduleManager
                         onClose={() => setShowScheduleManager(false)}
                         onSuccess={() => {
                             showNotify('Schedule updated successfully', 'success');
                         }}
                     />
-                </div>
+                </Box>
             )}
-        </div>
+
+                </Box>
+            </Box>
+        </Box>
     );
 };
 
 export default DoctorDashboard;
+

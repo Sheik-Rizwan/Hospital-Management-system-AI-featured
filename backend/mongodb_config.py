@@ -729,7 +729,7 @@ class MongoDatabase:
                 {'_id': 0}
             ).sort('timestamp', -1).limit(5))
             
-            # Enrich with patient names
+            # Enrich with patient and nurse names
             for handoff in recent_handoffs:
                 if 'patient_id' in handoff:
                     patient = self.get_patient(handoff['patient_id'])
@@ -737,6 +737,10 @@ class MongoDatabase:
                         handoff['patient_name'] = patient.get('patient_name', 'Unknown')
                     else:
                         handoff['patient_name'] = handoff.get('structured_report', {}).get('patient_name', 'Unknown')
+                if 'nurse_id' in handoff:
+                    nurse = self.get_user_by_id(handoff['nurse_id'])
+                    if nurse:
+                        handoff['nurse_name'] = nurse.get('full_name', handoff.get('nurse_name', 'Unknown'))
             
             return {
                 'total_patients': total_patients,
@@ -934,12 +938,17 @@ class MongoDatabase:
                 {'assigned_nurse_id': nurse_id, 'status': {'$ne': 'completed'}}
             ).sort('scheduled_time', 1))
 
-            # Ensure task_id exists and _id is string
+            # Ensure task_id exists and _id is string, enrich names
             for task in tasks:
                  if '_id' in task:
                      task['_id'] = str(task['_id'])
                  if 'task_id' not in task or not task['task_id']:
                      task['task_id'] = task.get('_id')
+                 # Enrich patient_name live so edits propagate
+                 if task.get('patient_id'):
+                     patient = self.get_patient(task['patient_id'])
+                     if patient:
+                         task['patient_name'] = patient.get('patient_name', task.get('patient_name', 'Unknown'))
 
             return tasks
         except Exception as e:
@@ -1098,6 +1107,12 @@ class MongoDatabase:
             
             medications = []
             for plan in care_plans:
+                # Live-enrich doctor_name so edits propagate
+                doctor_name = plan.get('doctor_name', '')
+                if plan.get('doctor_id'):
+                    doc = self.doctors.find_one({'user_id': plan['doctor_id']}, {'full_name': 1})
+                    if doc:
+                        doctor_name = doc.get('full_name', doctor_name)
                 plan_meds = plan.get('medications', [])
                 for med in plan_meds:
                     medications.append({
@@ -1108,7 +1123,7 @@ class MongoDatabase:
                         'prescribed_date': plan.get('created_at'),
                         'plan_id': plan.get('plan_id'),
                         'doctor_id': plan.get('doctor_id'),
-                        'doctor_name': plan.get('doctor_name', ''),
+                        'doctor_name': doctor_name,
                         'start_date': plan.get('start_date'),
                         'end_date': plan.get('end_date'),
                         'is_active': plan.get('is_active', False)

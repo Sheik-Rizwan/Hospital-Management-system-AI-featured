@@ -1,21 +1,23 @@
-/**
- * SocketChatRoom.jsx — Real-time chat room powered by Socket.IO.
- *
- * - Loads message history from REST API on mount.
- * - Joins the socket.io room (chat_id) so messages arrive instantly.
- * - Sends messages via socket event (also persisted by the server).
- * - Shows a live typing indicator.
- * - Falls back gracefully if socket is disconnected.
- *
- * Props:
- *   chat       {Object}  - chat object { chat_id, other_participant, ... }
- *   onBack     {Function}- called when user clicks ← Back
- *   authRole   {string}  - 'doctor' | 'vendor' | '' (used for correct JWT header)
- */
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { API_BASE, getAuthHeaders, formatDate } from '../utils/api';
 import { useSocket } from '../hooks/useSocket';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Avatar from '@mui/material/Avatar';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import MicIcon from '@mui/icons-material/Mic';
+import SendIcon from '@mui/icons-material/Send';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Tooltip from '@mui/material/Tooltip';
 
 const SocketChatRoom = ({ chat, onBack, authRole = '' }) => {
     // Prefer role-specific user to avoid cross-role contamination in same browser
@@ -52,6 +54,7 @@ const SocketChatRoom = ({ chat, onBack, authRole = '' }) => {
                 setMessages(data.messages || []);
             }
         } catch (e) {
+            console.error('Error loading history:', e);
         } finally {
             setLoading(false);
         }
@@ -80,7 +83,6 @@ const SocketChatRoom = ({ chat, onBack, authRole = '' }) => {
             }
         },
         joined_chat: () => {
-            // Successfully joined — load fresh history
             loadHistory();
         }
     });
@@ -100,7 +102,7 @@ const SocketChatRoom = ({ chat, onBack, authRole = '' }) => {
     }, [chat?.chat_id]); // eslint-disable-line
 
     // Auto-scroll on new messages
-    useEffect(() => scrollToBottom(), [messages]);
+    useEffect(() => scrollToBottom(), [messages, typingLabel]);
 
     // ── send message ──────────────────────────────────────────
     const sendMessage = useCallback(async () => {
@@ -110,20 +112,6 @@ const SocketChatRoom = ({ chat, onBack, authRole = '' }) => {
         setSending(true);
         setNewMessage('');
 
-        // Optimistic UI — add immediately
-        const optimistic = {
-            message_id: `opt_${Date.now()}`,
-            chat_id: chat.chat_id,
-            sender_id: user.user_id,
-            sender_name: user.full_name || 'You',
-            content,
-            type: 'text',
-            timestamp: new Date().toISOString(),
-            optimistic: true
-        };
-        setMessages(prev => [...prev, optimistic]);
-
-        // Send via socket (server also saves to DB and broadcasts)
         socket.emit('chat_message', {
             chat_id: chat.chat_id,
             content,
@@ -164,7 +152,7 @@ const SocketChatRoom = ({ chat, onBack, authRole = '' }) => {
             return;
         }
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) { alert('Speech recognition not supported in this browser.'); return; }
+        if (!SpeechRecognition) { return; }
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
         recognition.interimResults = false;
@@ -207,11 +195,11 @@ const SocketChatRoom = ({ chat, onBack, authRole = '' }) => {
                 });
             }
         } catch (e) {
+            console.error('File upload error:', e);
         }
         e.target.value = '';
     };
 
-    // ── helpers for rendering ─────────────────────────────────
     const isMe = (msg) => msg.sender_id === user.user_id;
 
     const renderContent = (msg) => {
@@ -221,129 +209,137 @@ const SocketChatRoom = ({ chat, onBack, authRole = '' }) => {
             const url = msg.file_url?.startsWith('/')
                 ? `${API_BASE.replace('/api', '')}${msg.file_url}`
                 : msg.file_url;
-            if (isImage) return <img src={url} alt={msg.file_name} className="max-w-[240px] rounded-lg mt-1" />;
+            if (isImage) return <Box component="img" src={url} alt={msg.file_name} sx={{ maxWidth: '100%', borderRadius: 2, mt: 1, display: 'block' }} />;
             return (
-                <a href={url} target="_blank" rel="noreferrer"
-                    className="flex items-center gap-2 text-blue-300 hover:underline">
-                    📎 <span className="truncate max-w-[200px]">{msg.file_name || 'Download file'}</span>
-                </a>
+                <Button 
+                    href={url} 
+                    target="_blank" 
+                    startIcon={<AttachFileIcon />} 
+                    sx={{ textTransform: 'none', color: isMe(msg) ? 'white' : 'primary.main', bgcolor: 'action.hover', mt: 1 }}
+                >
+                    {msg.file_name || 'Download file'}
+                </Button>
             );
         }
-        return <p className="whitespace-pre-wrap break-words">{msg.content}</p>;
+        return <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{msg.content}</Typography>;
     };
 
     const other = chat?.other_participant || {};
 
-    // ── render ────────────────────────────────────────────────
     return (
-        <div className="flex flex-col h-full bg-background min-h-0">
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', borderRadius: 3, overflow: 'hidden' }}>
             {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card shrink-0">
-                <button onClick={onBack}
-                    className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-white transition text-lg">
-                    ←
-                </button>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#10A37F] to-[#3B82F6] flex items-center justify-center text-white font-bold text-lg shrink-0">
+            <Paper square elevation={0} sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <IconButton onClick={onBack} size="small"><ArrowBackIcon /></IconButton>
+                <Avatar sx={{ width: 44, height: 44, bgcolor: 'primary.main', fontWeight: 800 }}>
                     {(other.name || '?')[0].toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                    <p className="font-bold text-foreground truncate">{other.name || 'Chat'}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{other.role || ''}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Live chat" />
-                    <span className="text-xs text-muted-foreground">Live</span>
-                </div>
-            </div>
+                </Avatar>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="subtitle1" fontWeight={700} noWrap>{other.name || 'Chat'}</Typography>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'success.main' }} />
+                        <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'capitalize' }}>{other.role || 'Member'}</Typography>
+                    </Stack>
+                </Box>
+                <IconButton size="small"><MoreVertIcon /></IconButton>
+            </Paper>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 min-h-0">
+            {/* Messages Area */}
+            <Box sx={{ flex: 1, overflowY: 'auto', p: 3, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                 {loading ? (
-                    <div className="flex items-center justify-center h-32 text-muted-foreground">
-                        <span className="text-sm">Loading messages…</span>
-                    </div>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress size={30} /></Box>
                 ) : messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-                        <span className="text-3xl mb-2">💬</span>
-                        <p className="text-sm">No messages yet. Say hello!</p>
-                    </div>
+                    <Box sx={{ textAlign: 'center', py: 8, opacity: 0.4 }}>
+                        <Typography variant="h2">💬</Typography>
+                        <Typography variant="body2">Start a conversation with {other.name || 'this member'}</Typography>
+                    </Box>
                 ) : (
-                    messages.map(msg => (
-                        <div key={msg.message_id}
-                            className={`flex ${isMe(msg) ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl text-sm ${
-                                isMe(msg)
-                                    ? 'bg-primary text-white rounded-br-sm'
-                                    : 'bg-card text-foreground border border-border rounded-bl-sm'
-                            } ${msg.optimistic ? 'opacity-70' : ''}`}>
-                                {!isMe(msg) && (
-                                    <p className="text-xs font-bold mb-1 opacity-80">{msg.sender_name}</p>
-                                )}
-                                {renderContent(msg)}
-                                <p className={`text-[10px] mt-1 ${isMe(msg) ? 'text-white/60' : 'text-muted-foreground'} text-right`}>
-                                    {msg.timestamp
-                                        ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                        : ''}
-                                </p>
-                            </div>
-                        </div>
-                    ))
+                    messages.map((msg) => {
+                        const mine = isMe(msg);
+                        return (
+                            <Box key={msg.message_id} sx={{ display: 'flex', justifyContent: mine ? 'flex-end' : 'flex-start' }}>
+                                <Box sx={{ maxWidth: '75%', minWidth: '80px' }}>
+                                    {!mine && (
+                                        <Typography variant="caption" sx={{ ml: 1, fontWeight: 700, opacity: 0.6, fontSize: '0.65rem' }}>
+                                            {msg.sender_name}
+                                        </Typography>
+                                    )}
+                                    <Paper 
+                                        elevation={0}
+                                        sx={{ 
+                                            p: 1.5, 
+                                            borderRadius: 3, 
+                                            borderTopLeftRadius: mine ? 3 : 0,
+                                            borderTopRightRadius: mine ? 0 : 3,
+                                            bgcolor: mine ? 'primary.main' : 'action.hover',
+                                            color: mine ? 'white' : 'text.primary',
+                                            border: mine ? 'none' : '1px solid',
+                                            borderColor: 'divider'
+                                        }}
+                                    >
+                                        {renderContent(msg)}
+                                        <Typography variant="caption" sx={{ display: 'block', textAlign: 'right', mt: 0.5, opacity: 0.6, fontSize: '0.6rem' }}>
+                                            {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                                        </Typography>
+                                    </Paper>
+                                </Box>
+                            </Box>
+                        );
+                    })
                 )}
                 {typingLabel && (
-                    <div className="flex justify-start">
-                        <div className="bg-card border border-border px-4 py-2 rounded-2xl text-sm text-muted-foreground italic">
-                            {typingLabel}
-                        </div>
-                    </div>
+                    <Typography variant="caption" sx={{ fontStyle: 'italic', color: 'text.secondary', ml: 1 }}>
+                        {typingLabel}
+                    </Typography>
                 )}
                 <div ref={messagesEndRef} />
-            </div>
+            </Box>
 
-            {/* Input bar */}
-            <div className="shrink-0 border-t border-border bg-card px-3 py-2">
-                <div className="flex items-center gap-2">
-                    {/* File upload button */}
-                    <button onClick={() => fileInputRef.current?.click()}
-                        className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-white transition shrink-0"
-                        title="Attach file">
-                        📎
-                    </button>
-                    <input ref={fileInputRef} type="file"
-                        accept="image/*,.pdf,.doc,.docx"
-                        className="hidden"
-                        onChange={handleFileUpload} />
+            {/* Input Footer */}
+            <Paper square elevation={0} sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Tooltip title="Attach File">
+                        <IconButton onClick={() => fileInputRef.current?.click()} size="small" sx={{ bgcolor: 'action.hover' }}>
+                            <AttachFileIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <input ref={fileInputRef} type="file" className="hidden" style={{ display: 'none' }} onChange={handleFileUpload} />
 
-                    {/* Text input */}
-                    <input
-                        type="text"
+                    <TextField
+                        fullWidth
+                        size="small"
+                        placeholder="Type a clinical message..."
                         value={newMessage}
                         onChange={handleTyping}
                         onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                        placeholder="Type a message…"
-                        className="flex-1 bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none min-w-0"
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4, bgcolor: 'action.hover' } }}
                     />
 
-                    {/* Mic button */}
-                    <button onClick={toggleVoice}
-                        className={`p-2 rounded-lg transition shrink-0 ${
-                            isRecording
-                                ? 'bg-red-500 text-white animate-pulse'
-                                : 'hover:bg-muted text-muted-foreground hover:text-white'
-                        }`}
-                        title={isRecording ? 'Stop recording' : 'Voice input'}>
-                        🎤
-                    </button>
+                    <Tooltip title={isRecording ? "Stop Recording" : "Voice Input"}>
+                        <IconButton 
+                            onClick={toggleVoice} 
+                            size="small"
+                            sx={{ 
+                                bgcolor: isRecording ? 'error.main' : 'action.hover', 
+                                color: isRecording ? 'white' : 'inherit',
+                                '&:hover': { bgcolor: isRecording ? 'error.dark' : 'action.selected' }
+                            }}
+                        >
+                            <MicIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
 
-                    {/* Send button */}
-                    <button
-                        onClick={sendMessage}
+                    <Button 
+                        variant="contained" 
+                        onClick={sendMessage} 
                         disabled={!newMessage.trim() || sending}
-                        className="px-4 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-sm font-medium transition disabled:opacity-40 shrink-0">
-                        Send
-                    </button>
-                </div>
-            </div>
-        </div>
+                        sx={{ borderRadius: 3, px: 3, minWidth: 'unset' }}
+                    >
+                        <SendIcon />
+                    </Button>
+                </Stack>
+            </Paper>
+        </Box>
     );
 };
 

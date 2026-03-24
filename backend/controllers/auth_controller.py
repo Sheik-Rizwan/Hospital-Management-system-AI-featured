@@ -1,11 +1,14 @@
 # auth_controller.py - Authentication business logic
 
 import uuid
+import logging
 from datetime import datetime
 from flask import request, jsonify
 from flask_jwt_extended import (
     create_access_token, jwt_required, get_jwt_identity, get_jwt
 )
+
+logger = logging.getLogger(__name__)
 
 from mongodb_config import MongoDatabase
 from models.user_models import User, Doctor, Nurse, Patient, SuperAdmin
@@ -241,12 +244,12 @@ def doctor_signup():
 
         doctor_data = {
             'user_id': user_id,
-            'email': data['email'],
+            'email': data['email'].strip(),
             'password': data['password'],
-            'full_name': data['full_name'],
-            'specialization': data['specialization'],
-            'license_number': data.get('license_number', ''),
-            'phone': data.get('phone', ''),
+            'full_name': data['full_name'].strip(),
+            'specialization': data['specialization'].strip(),
+            'license_number': data.get('license_number', '').strip(),
+            'phone': data.get('phone', '').strip(),
             'is_approved': True,
         }
 
@@ -404,7 +407,7 @@ def get_user_profile():
         }
 
         collection = collection_map.get(role)
-        if not collection:
+        if collection is None:
             return jsonify({'success': False, 'error': 'Invalid role'}), 400
 
         user = collection.find_one({'user_id': user_id}, {'_id': 0, 'password': 0})
@@ -432,7 +435,11 @@ def update_user_profile():
             'full_name', 'phone', 'email', 'patient_name', 'company_name',
             'contact_person', 'address', 'specialization'
         ]
-        update_data = {field: data[field] for field in allowed_fields if field in data}
+        update_data = {}
+        for field in allowed_fields:
+            if field in data:
+                val = data[field]
+                update_data[field] = val.strip() if isinstance(val, str) else val
 
         collection_map = {
             'doctor': db.doctors,
@@ -442,7 +449,7 @@ def update_user_profile():
             'vendor': db.vendors
         }
         collection = collection_map.get(role)
-        if not collection:
+        if collection is None:
             return jsonify({'success': False, 'error': 'Invalid role'}), 400
 
         # Handle password change
@@ -461,6 +468,52 @@ def update_user_profile():
         result = collection.update_one({'user_id': user_id}, {'$set': update_data})
 
         if result.modified_count > 0:
+            # ── Propagate name changes to denormalized copies ──
+            try:
+                if role == 'patient' and 'patient_name' in update_data:
+                    new_name = update_data['patient_name']
+                    # Update patient_name in appointments
+                    db.db.appointments.update_many(
+                        {'patient_id': user_id},
+                        {'$set': {'patient_name': new_name}}
+                    )
+                    # Update patient_name in tasks
+                    db.db.tasks.update_many(
+                        {'patient_id': user_id},
+                        {'$set': {'patient_name': new_name}}
+                    )
+                    # Update patient_name in meals
+                    db.healthcare_db['patient_meals'].update_many(
+                        {'patient_id': user_id},
+                        {'$set': {'patient_name': new_name}}
+                    )
+                    # Update in wa_users (WhatsApp)
+                    db.db.wa_users.update_many(
+                        {'patient_id': user_id},
+                        {'$set': {'name': new_name}}
+                    )
+                elif role == 'nurse' and 'full_name' in update_data:
+                    new_name = update_data['full_name']
+                    # Update nurse_name in handoffs
+                    db.handoffs.update_many(
+                        {'nurse_id': user_id},
+                        {'$set': {'nurse_name': new_name}}
+                    )
+                    # Update assigned_nurse_name in tasks
+                    db.db.tasks.update_many(
+                        {'assigned_nurse_id': user_id},
+                        {'$set': {'assigned_nurse_name': new_name}}
+                    )
+                elif role == 'doctor' and 'full_name' in update_data:
+                    new_name = update_data['full_name']
+                    # Update doctor_name in care plans
+                    db.healthcare_db['doctor_care_plans'].update_many(
+                        {'doctor_id': user_id},
+                        {'$set': {'doctor_name': new_name}}
+                    )
+            except Exception as prop_err:
+                logger.warning(f"Name propagation partial failure: {prop_err}")
+
             updated_user = collection.find_one({'user_id': user_id}, {'_id': 0, 'password': 0})
             for key in ['created_at', 'updated_at']:
                 if key in updated_user and updated_user[key]:

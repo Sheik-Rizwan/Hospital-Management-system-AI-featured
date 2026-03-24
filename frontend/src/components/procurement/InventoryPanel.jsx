@@ -1,16 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE, getAuthHeaders, formatDate } from '../../utils/api';
 
-/**
- * Inventory Panel with category subsections.
- * Doctor/Nurse/Admin can add items, consume (take), and request restocks.
- * Categories: General Supplies, Medicines, Medical Equipment, Lab Supplies.
- */
+// MUI Components
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import IconButton from '@mui/material/IconButton';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import InputAdornment from '@mui/material/InputAdornment';
+
+// Icons
+import AddIcon from '@mui/icons-material/Add';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import HistoryIcon from '@mui/icons-material/History';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import MedicationIcon from '@mui/icons-material/Medication';
+import ScienceIcon from '@mui/icons-material/Science';
+import ConstructionIcon from '@mui/icons-material/Construction';
+import PageHeader from '../ui/PageHeader';
+
 const CATEGORIES = [
-    { key: 'general_supplies', label: '🧴 General Supplies', icon: '🧴' },
-    { key: 'medicines', label: '💊 Medicines', icon: '💊' },
-    { key: 'medical_equipment', label: '🩺 Medical Equipment', icon: '🩺' },
-    { key: 'lab_supplies', label: '🧪 Lab Supplies', icon: '🧪' }
+    { key: 'general_supplies', label: 'General Supplies', icon: <LocalHospitalIcon /> },
+    { key: 'medicines', label: 'Medicines', icon: <MedicationIcon /> },
+    { key: 'medical_equipment', label: 'Medical Equipment', icon: <ConstructionIcon /> },
+    { key: 'lab_supplies', label: 'Lab Supplies', icon: <ScienceIcon /> }
 ];
 
 const InventoryPanel = ({ showNotify, refreshTrigger }) => {
@@ -22,7 +58,7 @@ const InventoryPanel = ({ showNotify, refreshTrigger }) => {
 
     // Consume modal
     const [showConsume, setShowConsume] = useState(null);
-    const [consumeQty, setConsumeQty] = useState(1);
+    const [consumeQty, setConsumeQty] = useState('');
     const [consumeNotes, setConsumeNotes] = useState('');
 
     // Restock modal
@@ -32,11 +68,10 @@ const InventoryPanel = ({ showNotify, refreshTrigger }) => {
     const [restockNotes, setRestockNotes] = useState('');
 
     // Add item form
-    const [newItem, setNewItem] = useState({ name: '', category: 'general_supplies', quantity: 0, unit: 'pcs', reorder_level: 10 });
+    const [newItem, setNewItem] = useState({ name: '', category: 'general_supplies', quantity: 0, unit: 'pcs', reorder_level: '' });
 
     useEffect(() => { loadInventory(); }, []);
 
-    // Re-load inventory when refreshTrigger changes (real-time update from socket)
     useEffect(() => {
         if (refreshTrigger > 0) loadInventory();
     }, [refreshTrigger]);
@@ -71,7 +106,7 @@ const InventoryPanel = ({ showNotify, refreshTrigger }) => {
             const data = await res.json();
             if (data.success) {
                 showNotify?.(`"${newItem.name}" added to inventory!`, 'success');
-                setNewItem({ name: '', category: activeCategory, quantity: 0, unit: 'pcs', reorder_level: 10 });
+                setNewItem({ name: '', category: activeCategory, quantity: 0, unit: 'pcs', reorder_level: '' });
                 setView('inventory');
                 loadInventory();
             } else {
@@ -83,22 +118,24 @@ const InventoryPanel = ({ showNotify, refreshTrigger }) => {
     const handleConsume = async (e) => {
         e.preventDefault();
         if (!showConsume) return;
+        const qty = parseInt(consumeQty);
+        if (!qty || qty <= 0) { showNotify?.('Please enter a valid quantity', 'error'); return; }
+        if (qty > showConsume.quantity) { showNotify?.(`Only ${showConsume.quantity} available`, 'error'); return; }
         try {
             const res = await fetch(`${API_BASE}/procurement/inventory/consume`, {
                 method: 'POST',
                 headers: getAuthHeaders(),
                 body: JSON.stringify({
                     item_id: showConsume.item_id,
-                    quantity: consumeQty,
+                    quantity: qty,
                     reason: consumeNotes
                 })
             });
             const data = await res.json();
             if (data.success) {
-                showNotify?.(`Consumed ${consumeQty}x ${showConsume.name}`, 'success');
-                if (data.low_stock_warning) showNotify?.(`⚠️ Low stock warning for ${showConsume.name}!`, 'warning');
+                showNotify?.(`Consumed ${qty}x ${showConsume.name}`, 'success');
                 setShowConsume(null);
-                setConsumeQty(1);
+                setConsumeQty('');
                 setConsumeNotes('');
                 loadInventory();
             } else {
@@ -127,272 +164,215 @@ const InventoryPanel = ({ showNotify, refreshTrigger }) => {
             if (data.success) {
                 showNotify?.('Restock request submitted!', 'success');
                 setShowRestock(null);
-                setRestockQty(10);
-                setRestockNotes('');
-            } else {
-                showNotify?.(data.error || 'Failed to submit request', 'error');
             }
         } catch (e) { showNotify?.('Error submitting restock request', 'error'); }
     };
 
-    const getStockColor = (item) => {
-        if (item.quantity <= 0) return 'text-[#EF4444]';
-        if (item.quantity <= (item.reorder_level || 10)) return 'text-[#F59E0B]';
-        return 'text-primary';
+    const getStockChip = (item) => {
+        if (item.quantity <= 0) return <Chip label="OUT OF STOCK" color="error" size="small" variant="soft" />;
+        if (item.quantity <= (item.reorder_level || 10)) return <Chip label="LOW STOCK" color="warning" size="small" variant="soft" />;
+        return <Chip label="IN STOCK" color="success" size="small" variant="soft" />;
     };
 
-    // Filter inventory by active category
     const filteredItems = inventory.filter(item => item.category === activeCategory);
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex justify-between items-center border-b border-border pb-4">
-                <h2 className="text-3xl font-bold text-foreground">📦 Inventory</h2>
-                <div className="flex gap-2">
-                    <button onClick={() => { setView('add'); setNewItem(prev => ({ ...prev, category: activeCategory })); }}
-                        className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg text-sm transition font-medium">
-                        ➕ Add Item
-                    </button>
-                    <button onClick={loadInventory} className="px-3 py-2 bg-card text-muted-foreground hover:text-foreground rounded-lg text-sm transition border border-transparent hover:border-border">
-                        🔄
-                    </button>
-                </div>
-            </div>
+        <Stack spacing={4} sx={{ maxWidth: 1200, mx: 'auto' }}>
+            <PageHeader 
+                title="Clinical Inventory & Supplies" 
+                subtitle="Track, consume and coordinate essential medical resources"
+                actionLabel="Add Resource"
+                onAction={() => setView('add')}
+                actionIcon={<AddIcon />}
+            />
 
-            {/* Top Tabs: Items / History */}
-            <div className="flex gap-2">
-                <button onClick={() => setView('inventory')}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${view === 'inventory' ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted border border-transparent hover:border-border'}`}>
-                    📦 Items
-                </button>
-                <button onClick={() => { setView('history'); loadTransactions(); }}
-                    className={`px-4 py-2 rounded-lg font-medium transition ${view === 'history' ? 'bg-primary text-white' : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted border border-transparent hover:border-border'}`}>
-                    📋 Transaction History
-                </button>
-            </div>
+            {/* Navigation Tabs */}
+            <Stack direction="row" spacing={1}>
+                <Button
+                    variant={view === 'inventory' ? 'contained' : 'outlined'}
+                    onClick={() => setView('inventory')}
+                    startIcon={<Inventory2Icon />}
+                    sx={{ borderRadius: 2 }}
+                >
+                    Available Resources
+                </Button>
+                <Button
+                    variant={view === 'history' ? 'contained' : 'outlined'}
+                    onClick={() => { setView('history'); loadTransactions(); }}
+                    startIcon={<HistoryIcon />}
+                    sx={{ borderRadius: 2 }}
+                >
+                    Log History
+                </Button>
+            </Stack>
 
-            {/* ========== ADD ITEM FORM ========== */}
+            {/* ADD ITEM View */}
             {view === 'add' && (
-                <div className="bg-card p-6 rounded-xl border border-border">
-                    <h3 className="text-xl font-bold text-foreground mb-4">Add New Inventory Item</h3>
-                    <form onSubmit={handleAddItem} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Item Name *</label>
-                                <input type="text" value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })}
-                                    placeholder="e.g., Surgical Gloves" required
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none" />
-                            </div>
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Category *</label>
-                                <select value={newItem.category} onChange={e => setNewItem({ ...newItem, category: e.target.value })}
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none">
-                                    {CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Initial Quantity</label>
-                                <input type="number" min="0" value={newItem.quantity} onChange={e => setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 0 })}
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none" />
-                            </div>
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Unit</label>
-                                <select value={newItem.unit} onChange={e => setNewItem({ ...newItem, unit: e.target.value })}
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none">
-                                    <option value="pcs">Pieces</option>
-                                    <option value="box">Boxes</option>
-                                    <option value="kg">Kilograms</option>
-                                    <option value="litre">Litres</option>
-                                    <option value="pack">Packs</option>
-                                    <option value="bottle">Bottles</option>
-                                    <option value="roll">Rolls</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Reorder Level</label>
-                                <input type="number" min="1" value={newItem.reorder_level} onChange={e => setNewItem({ ...newItem, reorder_level: parseInt(e.target.value) || 10 })}
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none" />
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 pt-2">
-                            <button type="button" onClick={() => setView('inventory')} className="px-4 py-2 bg-[#565869] text-white rounded-lg hover:bg-[#6B6D80] transition">Cancel</button>
-                            <button type="submit" className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition font-medium">Add Item</button>
-                        </div>
-                    </form>
-                </div>
+                <Paper variant="outlined" sx={{ p: 4, borderRadius: 3 }}>
+                    <Typography variant="h6" fontWeight={800} gutterBottom>Register New Clinical Unit</Typography>
+                    <Grid container spacing={3} component="form" onSubmit={handleAddItem} sx={{ mt: 1 }}>
+                        <Grid item xs={12} md={6}>
+                            <TextField fullWidth label="Unit Name" placeholder="e.g., Surgical Gloves (Size M)" required value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })} />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <FormControl fullWidth>
+                                <InputLabel>Category</InputLabel>
+                                <Select label="Category" value={newItem.category} onChange={e => setNewItem({ ...newItem, category: e.target.value })}>
+                                    {CATEGORIES.map(c => <MenuItem key={c.key} value={c.key}>{c.label}</MenuItem>)}
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <TextField fullWidth type="number" label="Initial Stock" value={newItem.quantity} onChange={e => setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 0 })} />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <FormControl fullWidth>
+                                <InputLabel>Measurement Unit</InputLabel>
+                                <Select label="Measurement Unit" value={newItem.unit} onChange={e => setNewItem({ ...newItem, unit: e.target.value })}>
+                                    <MenuItem value="pcs">Pieces</MenuItem>
+                                    <MenuItem value="box">Boxes</MenuItem>
+                                    <MenuItem value="pack">Packs</MenuItem>
+                                    <MenuItem value="bottle">Bottles</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <TextField fullWidth type="number" label="Reorder Threshold" value={newItem.reorder_level} onChange={e => setNewItem({ ...newItem, reorder_level: e.target.value })} />
+                        </Grid>
+                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+                            <Button variant="outlined" onClick={() => setView('inventory')}>Cancel</Button>
+                            <Button variant="contained" type="submit">Complete Registration</Button>
+                        </Grid>
+                    </Grid>
+                </Paper>
             )}
 
-            {/* ========== INVENTORY VIEW ========== */}
+            {/* INVENTORY View */}
             {view === 'inventory' && (
-                <>
-                    {/* Category Tabs */}
-                    <div className="flex gap-2 flex-wrap">
+                <Stack spacing={3}>
+                    <Box sx={{ display: 'flex', gap: 1.5, overflowX: 'auto', pb: 1 }}>
                         {CATEGORIES.map(cat => {
                             const count = inventory.filter(i => i.category === cat.key).length;
                             return (
-                                <button key={cat.key} onClick={() => setActiveCategory(cat.key)}
-                                    className={`px-4 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
-                                        activeCategory === cat.key
-                                            ? 'bg-primary text-white shadow-lg'
-                                            : 'bg-card text-muted-foreground hover:text-foreground hover:bg-muted border border-transparent hover:border-border'
-                                    }`}>
-                                    {cat.icon} {cat.label.split(' ').slice(1).join(' ')}
-                                    {count > 0 && <span className="ml-1 bg-black/20 px-2 py-0.5 rounded-full text-xs">{count}</span>}
-                                </button>
+                                <Button
+                                    key={cat.key}
+                                    variant={activeCategory === cat.key ? 'contained' : 'outlined'}
+                                    onClick={() => setActiveCategory(cat.key)}
+                                    startIcon={cat.icon}
+                                    sx={{ borderRadius: 3, whiteSpace: 'nowrap', px: 3 }}
+                                >
+                                    {cat.label} {count > 0 && <Chip label={count} size="small" sx={{ ml: 1, height: 20, bgcolor: activeCategory === cat.key ? 'white' : 'action.selected', color: activeCategory === cat.key ? 'primary.main' : 'text.primary' }} />}
+                                </Button>
                             );
                         })}
-                    </div>
+                    </Box>
 
-                    {/* Items Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {loading && (
-                            <div className="col-span-full text-center py-12 text-muted-foreground">Loading...</div>
-                        )}
-                        {!loading && filteredItems.length === 0 && (
-                            <div className="col-span-full text-center py-12 text-muted-foreground">
-                                <span className="text-4xl block mb-3">{CATEGORIES.find(c => c.key === activeCategory)?.icon || '📦'}</span>
-                                <p>No items in this category</p>
-                                <button onClick={() => { setView('add'); setNewItem(prev => ({ ...prev, category: activeCategory })); }}
-                                    className="mt-3 px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary-hover transition">
-                                    ➕ Add First Item
-                                </button>
-                            </div>
-                        )}
+                    <Grid container spacing={2.5}>
                         {filteredItems.map(item => (
-                            <div key={item.item_id} className="bg-card p-4 rounded-xl border border-border hover:border-[#3B82F6] transition">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div>
-                                        <h3 className="font-bold text-foreground">{item.name}</h3>
-                                        <p className="text-xs text-muted-foreground">{item.unit || 'pcs'}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className={`text-2xl font-bold ${getStockColor(item)}`}>{item.quantity}</span>
-                                        {item.quantity <= 0 && <p className="text-xs text-[#EF4444]">Out of stock</p>}
-                                        {item.quantity > 0 && item.quantity <= (item.reorder_level || 10) && <p className="text-xs text-[#F59E0B]">⚠️ Low</p>}
-                                    </div>
-                                </div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => { setShowConsume(item); setConsumeQty(1); setConsumeNotes(''); }}
-                                        disabled={item.quantity <= 0}
-                                        className="flex-1 px-3 py-2 bg-primary text-white rounded-lg text-sm hover:bg-[#2563EB] disabled:opacity-40 transition font-medium">
-                                        ➖ Take
-                                    </button>
-                                    <button onClick={() => { setShowRestock(item); setRestockQty(10); setRestockNotes(''); }}
-                                        className="flex-1 px-3 py-2 bg-[#F59E0B] text-black rounded-lg text-sm hover:bg-[#D97706] transition font-medium">
-                                        📤 Restock
-                                    </button>
-                                </div>
-                            </div>
+                            <Grid item xs={12} sm={6} lg={4} key={item.item_id}>
+                                <Card variant="outlined" sx={{ '&:hover': { borderColor: 'primary.main', bgcolor: 'action.hover' }, transition: '0.2s' }}>
+                                    <CardContent>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                            <Box sx={{ minWidth: 0 }}>
+                                                <Typography variant="subtitle1" fontWeight={700} noWrap>{item.name}</Typography>
+                                                <Typography variant="caption" color="text.secondary">{item.unit || 'units'}</Typography>
+                                            </Box>
+                                            <Box sx={{ textAlign: 'right' }}>
+                                                <Typography variant="h5" fontWeight={800} color={item.quantity <= 0 ? 'error.main' : item.quantity <= (item.reorder_level || 10) ? 'warning.main' : 'primary.main'}>
+                                                    {item.quantity}
+                                                </Typography>
+                                                {getStockChip(item)}
+                                            </Box>
+                                        </Box>
+                                        <Stack direction="row" spacing={1.5}>
+                                            <Button fullWidth size="small" variant="contained" disabled={item.quantity <= 0} onClick={() => setShowConsume(item)}>Take</Button>
+                                            <Button fullWidth size="small" variant="outlined" color="warning" onClick={() => setShowRestock(item)}>Restock</Button>
+                                        </Stack>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
                         ))}
-                    </div>
-                </>
+                    </Grid>
+                </Stack>
             )}
 
-            {/* ========== TRANSACTION HISTORY ========== */}
+            {/* HISTORY View */}
             {view === 'history' && (
-                <div className="bg-card rounded-lg overflow-hidden border border-border">
-                    <table className="w-full text-left">
-                        <thead className="bg-sidebar text-muted-foreground text-sm uppercase">
-                            <tr>
-                                <th className="p-4 border-b border-border">Date</th>
-                                <th className="p-4 border-b border-border">Item</th>
-                                <th className="p-4 border-b border-border">Type</th>
-                                <th className="p-4 border-b border-border">Qty</th>
-                                <th className="p-4 border-b border-border">Remaining</th>
-                                <th className="p-4 border-b border-border">Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#565869]">
-                            {transactions.length === 0 ? (
-                                <tr><td colSpan="6" className="p-8 text-center text-muted-foreground">No transactions yet.</td></tr>
-                            ) : (
-                                transactions.map((tx, i) => (
-                                    <tr key={tx.transaction_id || i} className="hover:bg-muted transition">
-                                        <td className="p-4 text-muted-foreground text-sm">{tx.timestamp ? formatDate(tx.timestamp) : '-'}</td>
-                                        <td className="p-4 font-medium text-foreground">{tx.item_name}</td>
-                                        <td className="p-4">
-                                            <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
-                                                tx.type === 'consume' ? 'bg-blue-900/30 text-blue-400' : 'bg-green-900/30 text-success'
-                                            }`}>{tx.type}</span>
-                                        </td>
-                                        <td className="p-4 text-foreground">-{tx.quantity}</td>
-                                        <td className="p-4 text-muted-foreground">{tx.new_qty ?? '-'}</td>
-                                        <td className="p-4 text-text-secondary text-sm">{tx.reason || '-'}</td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 3 }}>
+                    <Table>
+                        <TableHead sx={{ bgcolor: 'action.hover' }}>
+                            <TableRow>
+                                <TableCell sx={{ fontWeight: 800 }}>Timestamp</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Clinical Unit</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Operation</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Qty Change</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Remaining</TableCell>
+                                <TableCell sx={{ fontWeight: 800 }}>Details</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {transactions.map((tx, i) => (
+                                <TableRow key={tx.transaction_id || i} hover>
+                                    <TableCell>{tx.timestamp ? formatDate(tx.timestamp) : '-'}</TableCell>
+                                    <TableCell sx={{ fontWeight: 700 }}>{tx.item_name}</TableCell>
+                                    <TableCell>
+                                        <Chip label={tx.type.toUpperCase()} size="small" color={tx.type === 'consume' ? 'primary' : 'success'} variant="soft" />
+                                    </TableCell>
+                                    <TableCell sx={{ fontWeight: 700, color: tx.type === 'consume' ? 'error.main' : 'success.main' }}>
+                                        {tx.type === 'consume' ? '-' : '+'}{tx.quantity}
+                                    </TableCell>
+                                    <TableCell>{tx.new_qty ?? '-'}</TableCell>
+                                    <TableCell sx={{ fontStyle: 'italic', fontSize: '0.8rem' }}>{tx.reason || '—'}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
             )}
 
-            {/* ========== CONSUME MODAL ========== */}
-            {showConsume && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div className="bg-sidebar p-6 rounded-xl w-full max-w-md border border-border shadow-2xl">
-                        <h3 className="text-xl font-bold mb-2 text-foreground">Take: {showConsume.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-4">Available: <span className={getStockColor(showConsume)}>{showConsume.quantity}</span> {showConsume.unit || 'units'}</p>
-                        <form onSubmit={handleConsume} className="space-y-4">
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">How many?</label>
-                                <input type="number" min="1" max={showConsume.quantity} value={consumeQty}
-                                    onChange={e => setConsumeQty(parseInt(e.target.value) || 1)}
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none" />
-                            </div>
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Reason (optional)</label>
-                                <input type="text" value={consumeNotes} onChange={e => setConsumeNotes(e.target.value)}
-                                    placeholder="e.g., For patient in Room 302"
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none" />
-                            </div>
-                            <div className="flex justify-end gap-3">
-                                <button type="button" onClick={() => setShowConsume(null)} className="px-4 py-2 bg-card text-foreground rounded-lg hover:bg-[#565869] transition">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-primary rounded-lg text-white hover:bg-[#2563EB] transition font-medium">Confirm Take</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+            {/* Consume Modal */}
+            <Dialog open={!!showConsume} onClose={() => setShowConsume(null)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ fontWeight: 800 }}>Request Consumption</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ mb: 3 }}>You are taking <strong>{showConsume?.name}</strong> from clinical stores.</Typography>
+                    <Stack spacing={3}>
+                        <TextField fullWidth label="Quantity" type="number" placeholder="Enter units required" value={consumeQty} onChange={e => setConsumeQty(e.target.value)} />
+                        <TextField fullWidth label="Purpose/Reason" placeholder="e.g., Surgery Suite 1-A" value={consumeNotes} onChange={e => setConsumeNotes(e.target.value)} />
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5 }}>
+                    <Button onClick={() => setShowConsume(null)}>Cancel</Button>
+                    <Button variant="contained" onClick={handleConsume}>Confirm Draw</Button>
+                </DialogActions>
+            </Dialog>
 
-            {/* ========== RESTOCK MODAL ========== */}
-            {showRestock && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-                    <div className="bg-sidebar p-6 rounded-xl w-full max-w-md border border-border shadow-2xl">
-                        <h3 className="text-xl font-bold mb-2 text-foreground">Request Restock: {showRestock.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-4">Current stock: {showRestock.quantity} {showRestock.unit || 'units'}</p>
-                        <form onSubmit={handleRestock} className="space-y-4">
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Quantity Needed</label>
-                                <input type="number" min="1" value={restockQty} onChange={e => setRestockQty(parseInt(e.target.value) || 1)}
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none" />
-                            </div>
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Priority</label>
-                                <select value={restockPriority} onChange={e => setRestockPriority(e.target.value)}
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none">
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="text-sm text-muted-foreground block mb-1">Notes</label>
-                                <input type="text" value={restockNotes} onChange={e => setRestockNotes(e.target.value)}
-                                    placeholder="Reason for restock..."
-                                    className="w-full bg-card text-white border border-border p-3 rounded-lg focus:border-primary focus:outline-none" />
-                            </div>
-                            <div className="flex justify-end gap-3">
-                                <button type="button" onClick={() => setShowRestock(null)} className="px-4 py-2 bg-card text-foreground rounded-lg hover:bg-[#565869] transition">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-[#F59E0B] rounded-lg text-black font-medium hover:bg-[#D97706] transition">Submit Request</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </div>
+            {/* Restock Modal */}
+            <Dialog open={!!showRestock} onClose={() => setShowRestock(null)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ fontWeight: 800 }}>Procurement Request</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ mb: 3 }}>Request restock for <strong>{showRestock?.name}</strong> from central supply.</Typography>
+                    <Stack spacing={3}>
+                        <TextField fullWidth label="Needed Quantity" type="number" value={restockQty} onChange={e => setRestockQty(parseInt(e.target.value) || 1)} />
+                        <FormControl fullWidth>
+                            <InputLabel>Urgency</InputLabel>
+                            <Select label="Urgency" value={restockPriority} onChange={e => setRestockPriority(e.target.value)}>
+                                <MenuItem value="low">Standard (Low)</MenuItem>
+                                <MenuItem value="medium">Required (Medium)</MenuItem>
+                                <MenuItem value="high">Urgent (High)</MenuItem>
+                                <MenuItem value="urgent">CRITICAL (Emergency)</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <TextField fullWidth label="Justification" placeholder="Why is this restock needed?" value={restockNotes} onChange={e => setRestockNotes(e.target.value)} />
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 2.5 }}>
+                    <Button onClick={() => setShowRestock(null)}>Cancel</Button>
+                    <Button variant="contained" color="warning" onClick={handleRestock}>Submit Request</Button>
+                </DialogActions>
+            </Dialog>
+        </Stack>
     );
 };
 
 export default InventoryPanel;
+

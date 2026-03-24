@@ -1,5 +1,6 @@
 # procurement_routes.py - Procurement API Routes (Admin/Staff)
 
+import logging
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 
@@ -11,6 +12,7 @@ from services.socket_service import (notify_new_rfq, notify_purchase_order_creat
                                       notify_inventory_updated, notify_procurement_updated)
 
 procurement_bp = Blueprint('procurement', __name__)
+logger = logging.getLogger(__name__)
 
 
 # ============ INVENTORY MANAGEMENT ============
@@ -526,7 +528,7 @@ def reject_vendor(vendor_id):
         
         result = db.vendors.update_one(
             {'user_id': vendor_id},
-            {'$set': {'is_approved': False, 'is_active': False, 'updated_at': datetime.now()}}
+            {'$set': {'is_approved': False, 'is_active': False, 'is_deleted': True, 'updated_at': datetime.now()}}
         )
         
         if result.matched_count == 0:
@@ -608,6 +610,14 @@ def select_quotation(request_id):
         purchase_request = db.purchase_requests.find_one({'request_id': request_id})
         if not purchase_request:
             return jsonify({'success': False, 'error': 'Request not found'}), 404
+        
+        # Guard: prevent duplicate PO creation for the same request/quotation
+        if purchase_request.get('status') == 'ordered':
+            return jsonify({'success': False, 'error': 'A Purchase Order already exists for this request'}), 409
+        
+        existing_po = db.purchase_orders.find_one({'quotation_id': quotation_id})
+        if existing_po:
+            return jsonify({'success': False, 'error': 'A Purchase Order already exists for this quotation'}), 409
         
         # Budget check - use admin-selected budget, or auto-find by department
         budget_id = data.get('budget_id') or purchase_request.get('budget_id')
@@ -702,6 +712,26 @@ def select_quotation(request_id):
             })
         except Exception:
             pass
+        
+        # Email: Send PO notification to vendor
+        try:
+            vendor = db.vendors.find_one({'user_id': quotation['vendor_id']})
+            if vendor and vendor.get('email'):
+                from services.email_service import EmailService
+                email_sent = EmailService.send_po_notification(
+                    vendor_email=vendor['email'],
+                    vendor_name=vendor.get('company_name', ''),
+                    po_data=po,
+                    items=po.get('items', [])
+                )
+                if email_sent:
+                    logger.info(f"PO email sent to vendor {vendor.get('email')} for PO {po.get('po_id')}")
+                else:
+                    logger.warning(f"PO email FAILED for vendor {vendor.get('email')} — check Gmail config in .env")
+            else:
+                logger.warning(f"PO email skipped: vendor not found or no email for vendor_id={quotation.get('vendor_id')}")
+        except Exception as e:
+            logger.error(f"PO email error: {e}")  # Log error but don't block PO creation
         
         return jsonify({
             'success': True,

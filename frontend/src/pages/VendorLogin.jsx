@@ -1,6 +1,24 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { API_BASE, setRoleAuth } from '../utils/api';
+import ThemeToggle from '../components/ThemeToggle';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Link from '@mui/material/Link';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Avatar from '@mui/material/Avatar';
+
+// Icons
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const VendorLogin = () => {
     const [email, setEmail] = useState('');
@@ -35,58 +53,105 @@ const VendorLogin = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-card text-foreground">
-            <div className="w-full max-w-md p-8 bg-sidebar rounded-xl border border-border shadow-2xl">
-                <div className="text-center mb-8">
-                    <span className="text-4xl mb-2 block">🚚</span>
-                    <h1 className="text-2xl font-bold">Vendor Portal</h1>
-                    <p className="text-muted-foreground text-sm mt-1">Hospital Procurement System</p>
-                </div>
+        <Box 
+            sx={{ 
+                minHeight: '100vh', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)',
+                p: 3,
+                position: 'relative'
+            }}
+        >
+            {/* Header Icons */}
+            <Box sx={{ position: 'absolute', top: 24, right: 24, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <ThemeToggle />
+                <Box component="img" src="/logo.png" sx={{ height: 32, opacity: 0.9 }} />
+            </Box>
 
-                {error && (
-                    <div className="bg-red-900/20 border border-red-500/50 text-red-200 p-3 rounded mb-4 text-sm text-center">
-                        {error}
-                    </div>
-                )}
+            <Container maxWidth="xs">
+                <Paper 
+                    elevation={12} 
+                    sx={{ 
+                        p: { xs: 4, md: 5 }, 
+                        borderRadius: 5,
+                        bgcolor: 'background.paper',
+                        textAlign: 'center',
+                        borderBottom: 8,
+                        borderColor: 'success.main'
+                    }}
+                >
+                    <Avatar sx={{ m: '0 auto 24px', bgcolor: 'success.main', width: 60, height: 60 }}>
+                        <LocalShippingIcon fontSize="large" />
+                    </Avatar>
 
-                <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                        <label className="block text-sm text-muted-foreground mb-1">Email Address</label>
-                        <input
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-card border border-border rounded p-3 text-white focus:border-primary focus:outline-none transition"
-                            placeholder="vendor@company.com"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm text-muted-foreground mb-1">Password</label>
-                        <input
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-card border border-border rounded p-3 text-white focus:border-primary focus:outline-none transition"
-                            placeholder="••••••••"
-                        />
-                    </div>
+                    <Typography variant="h5" fontWeight={900} gutterBottom>
+                        Vendor Portal
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                        Procurement & Inventory Management System
+                    </Typography>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-primary hover:bg-primary-hover text-white font-medium py-3 rounded transition disabled:opacity-50 mt-2"
+                    {error && <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>{error}</Alert>}
+
+                    <Box component="form" onSubmit={handleLogin} noValidate>
+                        <Stack spacing={2.5}>
+                            <TextField 
+                                fullWidth 
+                                label="Contact Email" 
+                                type="email" 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)} 
+                                required 
+                                autoComplete="email"
+                            />
+                            <TextField 
+                                fullWidth 
+                                label="Password" 
+                                type="password" 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required 
+                                autoComplete="current-password"
+                            />
+
+                            <Button 
+                                type="submit" 
+                                fullWidth 
+                                variant="contained" 
+                                size="large"
+                                disabled={loading}
+                                color="success"
+                                sx={{ py: 1.5, borderRadius: 2, fontWeight: 700, fontSize: '1rem', textTransform: 'none', mt: 1 }}
+                            >
+                                {loading ? <CircularProgress size={24} color="inherit" /> : 'Dashboard Access'}
+                            </Button>
+                        </Stack>
+
+                        <Box sx={{ mt: 4 }}>
+                            <Typography variant="body2" color="text.secondary">
+                                New vendor?{' '}
+                                <Link component={RouterLink} to="/vendor-signup" fontWeight={700} underline="hover" color="success">
+                                    Register Account
+                                </Link>
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Paper>
+
+                <Box sx={{ mt: 4, textAlign: 'center' }}>
+                    <Button 
+                        startIcon={<ArrowBackIcon />} 
+                        component={RouterLink} 
+                        to="/" 
+                        sx={{ color: 'white', opacity: 0.8, '&:hover': { opacity: 1 } }}
                     >
-                        {loading ? 'Authenticating...' : 'Login to Dashboard'}
-                    </button>
-                </form>
-
-                <div className="mt-6 text-center text-sm text-muted-foreground">
-                    <p>Contact hospital administration for access.</p>
-                </div>
-            </div>
-        </div>
+                        Return to Hub
+                    </Button>
+                </Box>
+            </Container>
+        </Box>
     );
 };
 

@@ -1,18 +1,30 @@
-/**
- * VendorRequests.jsx — Doctor's page for managing incoming vendor connection requests.
- *
- * Tabs: All | Pending | Accepted | Rejected
- * - Pending  : Accept + Reject buttons (with optional reject-reason modal)
- * - Accepted : "Open Chat" button → opens SocketChatRoom inline
- * - Rejected : read-only status view
- *
- * This page is rendered inside DoctorDashboard at view === 'vendor-requests'.
- */
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { API_BASE, getAuthHeaders, formatDate } from '../utils/api';
 import SocketChatRoom from '../components/SocketChatRoom';
 import { useSocket } from '../hooks/useSocket';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Stack from '@mui/material/Stack';
+import Chip from '@mui/material/Chip';
+import Grid from '@mui/material/Grid';
+import Avatar from '@mui/material/Avatar';
+import Divider from '@mui/material/Divider';
+import PageHeader from '../components/ui/PageHeader';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 const VendorRequests = ({ showNotify }) => {
     const [requests, setRequests]     = useState([]);
@@ -23,7 +35,6 @@ const VendorRequests = ({ showNotify }) => {
     const [rejectReason, setRejectReason] = useState('');
     const [processing, setProcessing] = useState(''); // request_id being processed
 
-    // Prefer doctor role-specific user to avoid cross-role contamination
     // Prefer doctor role-specific user to avoid cross-role contamination
     const user = JSON.parse(
         sessionStorage.getItem('doctor_user') ||
@@ -41,9 +52,9 @@ const VendorRequests = ({ showNotify }) => {
             const data = await res.json();
             if (data.success) {
                 setRequests(data.requests || []);
-            } else {
             }
         } catch (e) {
+            console.error('Error loading requests:', e);
         } finally {
             setLoading(false);
         }
@@ -108,7 +119,6 @@ const VendorRequests = ({ showNotify }) => {
 
     // ── open chat for an already-accepted request ──────────────
     const openChatForRequest = async (req) => {
-        // Fetch the existing chat for this request
         try {
             const res = await fetch(`${API_BASE}/chat/conversations`, {
                 headers: getAuthHeaders(user.role || 'doctor')
@@ -125,7 +135,6 @@ const VendorRequests = ({ showNotify }) => {
             }
         } catch (e) { /* fall through */ }
 
-        // If not found yet, create/get via direct chat
         try {
             const res = await fetch(`${API_BASE}/chat/direct`, {
                 method: 'POST',
@@ -144,192 +153,192 @@ const VendorRequests = ({ showNotify }) => {
     // ── filter ─────────────────────────────────────────────────
     const filtered = (() => {
         if (activeTab === 'all') return requests;
-        if (activeTab === 'pending') return requests.filter(r => r.status === 'pending');
-        if (activeTab === 'accepted') return requests.filter(r => r.status === 'accepted');
-        if (activeTab === 'rejected') return requests.filter(r => r.status === 'rejected');
-        return requests;
+        return requests.filter(r => r.status === activeTab);
     })();
 
-    const pendingCount = requests.filter(r => r.status === 'pending').length;
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'pending': return 'warning';
+            case 'accepted': return 'success';
+            case 'rejected': return 'error';
+            default: return 'default';
+        }
+    };
 
-    // ── if a chat is open, show the chat room full-width ───────
     if (activeChat) {
         return (
-            <div className="h-full flex flex-col">
+            <Box sx={{ height: 'calc(100vh - 160px)', display: 'flex', flexDirection: 'column' }}>
                 <SocketChatRoom
                     chat={activeChat}
                     authRole="doctor"
                     onBack={() => setActiveChat(null)}
                 />
-            </div>
+            </Box>
         );
     }
 
-    // ── main requests list ─────────────────────────────────────
     return (
-        <div className="space-y-6">
-            {/* Page header */}
-            <div className="flex justify-between items-center border-b border-border pb-4">
-                <div>
-                    <h2 className="text-3xl font-bold text-foreground">Vendor Requests</h2>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Manage incoming connection requests from medical vendors
-                    </p>
-                </div>
-                <button
-                    onClick={loadRequests}
-                    className="px-4 py-2 bg-card border border-border rounded-lg text-sm text-muted-foreground hover:text-white hover:border-primary transition">
-                    🔄 Refresh
-                </button>
-            </div>
+        <Stack spacing={4} sx={{ maxWidth: 1200, mx: 'auto' }}>
+            {/* Header */}
+            <PageHeader 
+                title="Vendor Requests" 
+                subtitle="Manage incoming connection requests from medical vendors"
+                actionLabel="Refresh List"
+                onAction={loadRequests}
+                actionIcon={<RefreshIcon />}
+            />
 
-            {/* Tab bar */}
-            <div className="flex gap-2 flex-wrap">
+            {/* Filter Tabs */}
+            <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 1 }}>
                 {[
-                    { key: 'pending',  label: '⏳ Pending',  count: requests.filter(r => r.status === 'pending').length },
-                    { key: 'accepted', label: '✅ Accepted', count: requests.filter(r => r.status === 'accepted').length },
-                    { key: 'rejected', label: '❌ Rejected', count: requests.filter(r => r.status === 'rejected').length },
-                    { key: 'all',      label: '📋 All',      count: requests.length },
-                ].map(tab => (
-                    <button key={tab.key}
-                        onClick={() => setActiveTab(tab.key)}
-                        className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
-                            activeTab === tab.key
-                                ? 'bg-primary text-white'
-                                : 'bg-card text-muted-foreground hover:text-white border border-border'
-                        }`}>
-                        {tab.label}
-                        {tab.count > 0 && (
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                                activeTab === tab.key ? 'bg-white/20 text-white' : 'bg-amber-500 text-black'
-                            }`}>
-                                {tab.count}
-                            </span>
-                        )}
-                    </button>
-                ))}
-            </div>
+                    { key: 'pending', label: 'Pending', icon: '⏳' },
+                    { key: 'accepted', label: 'Accepted', icon: '✅' },
+                    { key: 'rejected', label: 'Rejected', icon: '❌' },
+                    { key: 'all', label: 'All Requests', icon: '📋' }
+                ].map((tab) => {
+                    const count = tab.key === 'all' ? requests.length : requests.filter(r => r.status === tab.key).length;
+                    return (
+                        <Button
+                            key={tab.key}
+                            variant={activeTab === tab.key ? 'contained' : 'outlined'}
+                            onClick={() => setActiveTab(tab.key)}
+                            startIcon={<span>{tab.icon}</span>}
+                            sx={{ borderRadius: 2, px: 2, py: 1, whiteSpace: 'nowrap' }}
+                        >
+                            {tab.label} {count > 0 && (
+                                <Chip 
+                                    label={count} 
+                                    size="small" 
+                                    sx={{ 
+                                        ml: 1, 
+                                        height: 20, 
+                                        bgcolor: activeTab === tab.key ? 'white/20' : 'action.selected',
+                                        color: activeTab === tab.key ? 'white' : 'text.primary',
+                                        fontWeight: 700 
+                                    }} 
+                                />
+                            )}
+                        </Button>
+                    );
+                })}
+            </Stack>
 
-            {/* Request cards */}
+            {/* Content List */}
             {loading ? (
-                <div className="flex items-center justify-center py-16 text-muted-foreground">
-                    <span className="text-sm animate-pulse">Loading requests…</span>
-                </div>
+                <Box sx={{ py: 12, textAlign: 'center', opacity: 0.5 }}>
+                    <Typography variant="body2">Loading requests...</Typography>
+                </Box>
             ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                    <span className="text-5xl mb-3">
+                <Card variant="outlined" sx={{ py: 12, textAlign: 'center', bgcolor: 'action.hover', borderStyle: 'dashed' }}>
+                    <Typography variant="h2" sx={{ opacity: 0.2, mb: 2 }}>
                         {activeTab === 'pending' ? '📭' : activeTab === 'accepted' ? '🤝' : '📋'}
-                    </span>
-                    <p className="font-medium">No {activeTab === 'all' ? '' : activeTab} requests</p>
-                    <p className="text-sm mt-1">
-                        {activeTab === 'pending'
-                            ? 'All clear — no pending vendor requests right now.'
-                            : activeTab === 'accepted'
-                                ? 'Accept a pending request to start chatting with a vendor.'
-                                : 'Nothing to see here.'}
-                    </p>
-                </div>
+                    </Typography>
+                    <Typography variant="h6" color="text.secondary">No {activeTab === 'all' ? '' : activeTab} requests</Typography>
+                    <Typography variant="body2" color="text.disabled">Everythings clear!</Typography>
+                </Card>
             ) : (
-                <div className="space-y-3">
+                <Grid container spacing={2}>
                     {filtered.map(req => (
-                        <div key={req.request_id}
-                            className="bg-card border border-border rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/50 transition">
-                            {/* Vendor info */}
-                            <div className="flex items-start gap-4 min-w-0">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#EF4444] flex items-center justify-center text-white font-bold text-lg shrink-0">
-                                    {(req.vendor_name || '?')[0].toUpperCase()}
-                                </div>
-                                <div className="min-w-0">
-                                    <p className="font-bold text-foreground">{req.vendor_name}</p>
-                                    {req.message && (
-                                        <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
-                                            "{req.message}"
-                                        </p>
-                                    )}
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                        {req.created_at ? formatDate(req.created_at) : 'Unknown date'}
-                                    </p>
-                                </div>
-                            </div>
+                        <Grid item xs={12} key={req.request_id}>
+                            <Card variant="outlined" sx={{ '&:hover': { borderColor: 'primary.main', bgcolor: 'action.hover' }, transition: '0.2s' }}>
+                                <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 280 }}>
+                                            <Avatar sx={{ width: 48, height: 48, bgcolor: 'primary.main', fontWeight: 800 }}>
+                                                {(req.vendor_name || '?')[0].toUpperCase()}
+                                            </Avatar>
+                                            <Box>
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{req.vendor_name}</Typography>
+                                                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', display: 'block', mb: 0.5 }}>
+                                                    {req.message ? `"${req.message}"` : 'No message provided'}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.disabled">{formatDate(req.created_at)}</Typography>
+                                            </Box>
+                                        </Box>
 
-                            {/* Status + Actions */}
-                            <div className="flex items-center gap-3 shrink-0">
-                                {/* Status badge */}
-                                <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${
-                                    req.status === 'pending'
-                                        ? 'text-amber-400 border-amber-400/40 bg-amber-400/10'
-                                        : req.status === 'accepted'
-                                            ? 'text-green-400 border-green-400/40 bg-green-400/10'
-                                            : 'text-red-400 border-red-400/40 bg-red-400/10'
-                                }`}>
-                                    {req.status}
-                                </span>
+                                        <Stack direction="row" spacing={2} alignItems="center">
+                                            <Chip 
+                                                label={req.status.toUpperCase()} 
+                                                size="small" 
+                                                color={getStatusColor(req.status)} 
+                                                variant="soft" 
+                                                sx={{ fontWeight: 800, fontSize: '0.65rem' }} 
+                                            />
+                                            
+                                            {req.status === 'pending' && (
+                                                <Stack direction="row" spacing={1}>
+                                                    <Button 
+                                                        size="small" 
+                                                        variant="contained" 
+                                                        startIcon={<CheckIcon />}
+                                                        disabled={!!processing}
+                                                        onClick={() => respondToRequest(req.request_id, 'accept')}
+                                                    >
+                                                        Accept
+                                                    </Button>
+                                                    <Button 
+                                                        size="small" 
+                                                        variant="outlined" 
+                                                        color="error"
+                                                        startIcon={<CloseIcon />}
+                                                        disabled={!!processing}
+                                                        onClick={() => { setRejectModal(req.request_id); setRejectReason(''); }}
+                                                    >
+                                                        Reject
+                                                    </Button>
+                                                </Stack>
+                                            )}
 
-                                {/* Pending actions */}
-                                {req.status === 'pending' && (
-                                    <>
-                                        <button
-                                            onClick={() => respondToRequest(req.request_id, 'accept')}
-                                            disabled={processing === req.request_id}
-                                            className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg text-sm font-medium transition disabled:opacity-50">
-                                            {processing === req.request_id ? '…' : '✓ Accept'}
-                                        </button>
-                                        <button
-                                            onClick={() => { setRejectModal(req.request_id); setRejectReason(''); }}
-                                            disabled={processing === req.request_id}
-                                            className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-sm font-medium transition disabled:opacity-50">
-                                            ✕ Reject
-                                        </button>
-                                    </>
-                                )}
-
-                                {/* Accepted: open chat */}
-                                {req.status === 'accepted' && (
-                                    <button
-                                        onClick={() => openChatForRequest(req)}
-                                        className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg text-sm font-medium transition flex items-center gap-2">
-                                        💬 Open Chat
-                                    </button>
-                                )}
-                            </div>
-                        </div>
+                                            {req.status === 'accepted' && (
+                                                <Button 
+                                                    size="small" 
+                                                    variant="contained" 
+                                                    startIcon={<ChatBubbleOutlineIcon />}
+                                                    onClick={() => openChatForRequest(req)}
+                                                >
+                                                    Open Chat
+                                                </Button>
+                                            )}
+                                        </Stack>
+                                    </Box>
+                                </CardContent>
+                            </Card>
+                        </Grid>
                     ))}
-                </div>
+                </Grid>
             )}
 
-            {/* Reject modal */}
-            {rejectModal && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm"
-                    onClick={(e) => e.target === e.currentTarget && setRejectModal(null)}>
-                    <div className="bg-popover border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
-                        <h3 className="text-lg font-bold text-foreground mb-1">Reject Request</h3>
-                        <p className="text-sm text-muted-foreground mb-4">
-                            Optionally explain why you're declining this vendor's request.
-                        </p>
-                        <textarea
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            placeholder="Reason (optional)…"
-                            rows={3}
-                            className="w-full bg-input border border-border rounded-lg p-3 text-sm text-foreground focus:border-primary focus:outline-none resize-none"
-                        />
-                        <div className="flex justify-end gap-3 mt-4">
-                            <button
-                                onClick={() => setRejectModal(null)}
-                                className="px-4 py-2 bg-card border border-border rounded-lg text-sm text-muted-foreground hover:text-white transition">
-                                Cancel
-                            </button>
-                            <button
-                                onClick={() => respondToRequest(rejectModal, 'reject', rejectReason)}
-                                disabled={!!processing}
-                                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition disabled:opacity-50">
-                                {processing ? '…' : 'Reject'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
+            {/* Reject Modal */}
+            <Dialog open={Boolean(rejectModal)} onClose={() => setRejectModal(null)} fullWidth maxWidth="xs">
+                <DialogTitle sx={{ fontWeight: 700 }}>Reject Request</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+                        Optionally provide a reason for declining this vendor connection request.
+                    </Typography>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Reason (Optional)"
+                        fullWidth
+                        multiline
+                        rows={3}
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setRejectModal(null)} color="inherit">Cancel</Button>
+                    <Button 
+                        onClick={() => respondToRequest(rejectModal, 'reject', rejectReason)}
+                        color="error" 
+                        variant="contained"
+                        disabled={!!processing}
+                    >
+                        {processing ? 'Declining...' : 'Reject Request'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Stack>
     );
 };
 

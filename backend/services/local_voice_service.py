@@ -4,15 +4,28 @@
 import os
 import time
 import uuid
-import torch
-import soundfile as sf
 from datetime import datetime
 from logger_config import logger
+
+try:
+    import torch
+except ImportError:
+    torch = None
+    logger.warning("torch not installed. Local voice features will be disabled.")
+
+try:
+    import soundfile as sf
+except ImportError:
+    sf = None
+    logger.warning("soundfile not installed. Local TTS features will be disabled.")
 
 try:
     from faster_whisper import WhisperModel
     from transformers import VitsModel, AutoTokenizer
 except ImportError:
+    WhisperModel = None
+    VitsModel = None
+    AutoTokenizer = None
     logger.warning("faster-whisper or transformers not installed. Local voice will fail.")
 
 # Map Sarvam Language codes to Facebook MMS ISO codes
@@ -35,15 +48,28 @@ class LocalVoiceService:
         
         # Dictionary to cache TTS models/tokenizers in memory: { 'hin': (model, tokenizer) }
         self.tts_models = {}
+
+        self.stt_available = bool(torch is not None and WhisperModel is not None)
+        self.tts_available = bool(
+            torch is not None and sf is not None and
+            VitsModel is not None and AutoTokenizer is not None
+        )
         
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = "cuda" if (torch is not None and torch.cuda.is_available()) else "cpu"
         logger.info(f"LocalVoiceService initialized. Compute device: {self.device}")
+        if not self.stt_available:
+            logger.warning("Local STT unavailable (torch/faster-whisper missing)")
+        if not self.tts_available:
+            logger.warning("Local TTS unavailable (torch/transformers/soundfile missing)")
 
     # ═══════════════════════════════════════════
     #  STT: Whisper Tiny
     # ═══════════════════════════════════════════
     
     def _get_stt_model(self):
+        if not self.stt_available:
+            logger.warning("Local STT requested but dependencies are missing")
+            return None
         if self.stt_model is None:
             logger.info("loading faster-whisper 'tiny' model into memory...")
             # compute_type="int8" reduces memory usage with slight accuracy drop on CPU
@@ -57,6 +83,8 @@ class LocalVoiceService:
         """
         try:
             model = self._get_stt_model()
+            if model is None:
+                return None
             logger.info(f"🎤 Local STT: processing {audio_file_path}")
             
             # Whisper handles multi-lingual detection automatically, but we can hint the language
@@ -89,6 +117,10 @@ class LocalVoiceService:
 
     def _get_tts_model(self, mms_code: str):
         """Lazy load the TTS model for a specific language."""
+        if not self.tts_available:
+            logger.warning("Local TTS requested but dependencies are missing")
+            return None, None
+
         if mms_code not in self.tts_models:
             repo_id = f"facebook/mms-tts-{mms_code}"
             logger.info(f"loading TTS model {repo_id} into memory...")
@@ -108,6 +140,10 @@ class LocalVoiceService:
         Returns the path to the generated .wav file.
         """
         try:
+            if not self.tts_available:
+                logger.warning("Skipping local TTS; required dependencies are unavailable")
+                return None
+
             mms_code = MMS_LANG_MAP.get(language_code, 'eng')
             
             model, tokenizer = self._get_tts_model(mms_code)
@@ -133,11 +169,11 @@ class LocalVoiceService:
             
             audio_path = os.path.join(
                 temp_dir,
-                f"local_tts_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}.wav"
+                f"local_tts_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}.ogg"
             )
             
-            # Write to .wav using soundfile
-            sf.write(audio_path, audio_data, sample_rate)
+            # Write as Ogg Opus (required by WhatsApp voice messages)
+            sf.write(audio_path, audio_data, sample_rate, format='OGG', subtype='OPUS')
             
             logger.info(f"✅ Local TTS saved: {audio_path}")
             return audio_path

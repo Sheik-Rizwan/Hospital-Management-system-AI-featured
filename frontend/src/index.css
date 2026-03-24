@@ -2,10 +2,6 @@
    MedCore AI — Design System
    ======================================== */
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* ========================================
    CSS Custom Properties — Design Tokens
    ======================================== */
@@ -220,29 +216,32 @@ html.theme-transitioning *::after {
    Utility Classes
    ======================================== */
 
-@layer utilities {
-  .text-gradient-primary {
-    background: linear-gradient(
-      135deg,
-      var(--color-primary),
-      var(--color-secondary)
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+.text-gradient-primary {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  .glass {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-  .glass-light {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-  }
+.glass-light {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* SimpleBar overrides */
+.simplebar-scrollbar::before {
+  background: rgba(0, 0, 0, 0.15);
 }

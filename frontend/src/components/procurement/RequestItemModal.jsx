@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE, getAuthHeaders } from '../../utils/api';
 
+// MUI Components
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+
+// Icons
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+
 const RequestItemModal = ({ onClose, onSuccess }) => {
     const [inventory, setInventory] = useState([]);
     const [selectedItem, setSelectedItem] = useState('');
@@ -23,6 +42,7 @@ const RequestItemModal = ({ onClose, onSuccess }) => {
                 setInventory(data.items || []);
             }
         } catch (err) {
+            console.error('Failed to fetch inventory:', err);
         }
     };
 
@@ -61,67 +81,70 @@ const RequestItemModal = ({ onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-            <div className="bg-sidebar rounded-xl max-w-md w-full p-6 shadow-2xl border border-border">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                        <span>📦</span> Request Item
-                    </h2>
-                    <button onClick={onClose} className="text-muted-foreground hover:text-white text-2xl">&times;</button>
-                </div>
+        <Dialog open={true} onClose={onClose} maxWidth="xs" fullWidth>
+            <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 700 }}>
+                <Inventory2Icon color="primary" />
+                Request Item
+            </DialogTitle>
+            
+            <DialogContent dividers>
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
+                )}
 
-                {error && <div className="bg-red-900/20 text-red-200 p-3 rounded mb-4 text-sm text-center border border-red-500/30">{error}</div>}
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-muted-foreground text-sm mb-2">Select Item</label>
-                        <select 
-                            value={selectedItem} 
+                <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+                    <FormControl fullWidth required>
+                        <InputLabel>Select Item</InputLabel>
+                        <Select
+                            value={selectedItem}
                             onChange={e => setSelectedItem(e.target.value)}
-                            className="w-full bg-card text-white border border-border p-3 rounded focus:border-primary focus:outline-none"
-                            required
+                            label="Select Item"
                         >
-                            <option value="">-- Choose Item --</option>
+                            <MenuItem value="" disabled>-- Choose Item --</MenuItem>
                             {inventory.map(item => (
-                                <option key={item.item_id} value={item.item_id}>
+                                <MenuItem key={item.item_id} value={item.item_id}>
                                     {item.name} ({item.quantity} {item.unit} available)
-                                </option>
+                                </MenuItem>
                             ))}
-                        </select>
-                    </div>
+                        </Select>
+                    </FormControl>
 
-                    <div>
-                        <label className="block text-muted-foreground text-sm mb-2">Quantity Needed</label>
-                        <input 
-                            type="number" 
-                            min="1"
-                            value={quantity}
-                            onChange={e => setQuantity(e.target.value)}
-                            className="w-full bg-card text-white border border-border p-3 rounded focus:border-primary focus:outline-none"
-                            required
-                        />
-                    </div>
+                    <TextField
+                        fullWidth
+                        type="number"
+                        label="Quantity Needed"
+                        required
+                        inputProps={{ min: 1 }}
+                        value={quantity}
+                        onChange={e => setQuantity(e.target.value)}
+                    />
 
-                    <div>
-                        <label className="block text-muted-foreground text-sm mb-2">Reason (Optional)</label>
-                        <textarea 
-                            value={reason}
-                            onChange={e => setReason(e.target.value)}
-                            className="w-full bg-card text-white border border-border p-3 rounded resize-none focus:border-primary focus:outline-none"
-                            rows={3}
-                            placeholder="e.g., Running low for daily shifts"
-                        />
-                    </div>
+                    <TextField
+                        fullWidth
+                        multiline
+                        rows={3}
+                        label="Reason (Optional)"
+                        placeholder="e.g., Running low for daily shifts"
+                        value={reason}
+                        onChange={e => setReason(e.target.value)}
+                    />
+                </Box>
+            </DialogContent>
 
-                    <div className="flex justify-end gap-3 pt-4 border-t border-border">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-card text-foreground rounded hover:bg-[#565869] transition">Cancel</button>
-                        <button type="submit" disabled={loading} className="px-4 py-2 bg-primary rounded text-white hover:bg-primary-hover transition disabled:opacity-50">
-                            {loading ? 'Submitting...' : 'Submit Request'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            <DialogActions sx={{ p: 2.5 }}>
+                <Button onClick={onClose} disabled={loading} color="inherit">
+                    Cancel
+                </Button>
+                <Button 
+                    variant="contained" 
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+                >
+                    {loading ? 'Submitting...' : 'Submit Request'}
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 };
 

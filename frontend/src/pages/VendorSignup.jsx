@@ -1,6 +1,30 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { API_BASE } from '../utils/api';
+import ThemeToggle from '../components/ThemeToggle';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Link from '@mui/material/Link';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Avatar from '@mui/material/Avatar';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
+// Icons
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const VendorSignup = () => {
     const navigate = useNavigate();
@@ -15,13 +39,21 @@ const VendorSignup = () => {
         address: '',
         gst_number: ''
     });
+    const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState({ type: '', msg: '' });
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if(formData.password !== formData.confirm_password) return alert("Passwords don't match");
+        setStatus({ type: '', msg: '' });
 
+        if(formData.password !== formData.confirm_password) {
+            setStatus({ type: 'error', msg: "Passwords do not match" });
+            return;
+        }
+
+        setLoading(true);
         try {
             const res = await fetch(`${API_BASE}/auth/vendor/signup`, {
                 method: 'POST',
@@ -30,143 +62,135 @@ const VendorSignup = () => {
             });
             const data = await res.json();
             if (data.success) {
-                alert('Signup successful! Please wait for admin approval before logging in.');
-                navigate('/vendor-login');
+                setStatus({ type: 'success', msg: 'Registration successful! Awaiting administrative approval. Redirecting...' });
+                setTimeout(() => navigate('/vendor-login'), 3000);
             } else {
-                alert(data.error);
+                setStatus({ type: 'error', msg: data.error || 'Registration failed' });
             }
         } catch (error) {
-            alert('An error occurred during signup.');
+            setStatus({ type: 'error', msg: 'Network error. Please try again.' });
         }
+        setLoading(false);
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-card relative overflow-hidden">
-            {/* Background Effects */}
-            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-success-soft rounded-full blur-[120px] pointer-events-none"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <Box 
+            sx={{ 
+                minHeight: '100vh', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)',
+                p: 3,
+                position: 'relative'
+            }}
+        >
+            {/* Header Icons */}
+            <Box sx={{ position: 'absolute', top: 24, right: 24, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <ThemeToggle />
+                <Box component="img" src="/logo.png" sx={{ height: 32, opacity: 0.9 }} />
+            </Box>
 
-            <div className="bg-surface/80 backdrop-blur-xl p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-2xl border border-white/10 relative z-10 animate-fade-in-up">
-                <div className="text-center mb-10">
-                    <span className="text-4xl mb-4 block">🚚</span>
-                    <h2 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent mb-2">Vendor Registration</h2>
-                    <p className="text-muted-foreground">Join our supply chain network</p>
-                </div>
-                
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-text-secondary ml-1">Company Name</label>
-                            <input 
-                                name="company_name" 
-                                placeholder="e.g. MedSupply Co." 
-                                onChange={handleChange} 
-                                required 
-                                className="w-full px-4 py-3 bg-input border border-border rounded-xl focus:border-green-500 focus:ring-1 focus:ring-green-500 text-foreground placeholder:text-muted-foreground outline-none transition-all" 
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-text-secondary ml-1">Category</label>
-                            <select 
-                                name="category" 
-                                onChange={handleChange} 
-                                required 
-                                className="w-full px-4 py-3 bg-input border border-border rounded-xl focus:border-green-500 focus:ring-1 focus:ring-green-500 text-foreground outline-none transition-all"
-                            >
-                                <option value="general">General Supplies</option>
-                                <option value="medicines">Medicines</option>
-                                <option value="equipment">Medical Equipment</option>
-                                <option value="lab">Lab Supplies</option>
-                            </select>
-                        </div>
-                    </div>
+            <Container maxWidth="sm">
+                <Paper 
+                    elevation={12} 
+                    sx={{ 
+                        p: { xs: 4, md: 6 }, 
+                        borderRadius: 5,
+                        bgcolor: 'background.paper',
+                        textAlign: 'center',
+                        borderBottom: 8,
+                        borderColor: 'success.main'
+                    }}
+                >
+                    <Avatar sx={{ m: '0 auto 24px', bgcolor: 'success.main', width: 64, height: 64 }}>
+                        <LocalShippingIcon fontSize="large" />
+                    </Avatar>
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-text-secondary ml-1">Email Address</label>
-                        <input 
-                            name="email" 
-                            type="email" 
-                            placeholder="contact@company.com" 
-                            onChange={handleChange} 
-                            required 
-                            className="w-full px-4 py-3 bg-input border border-border rounded-xl focus:border-green-500 focus:ring-1 focus:ring-green-500 text-foreground placeholder:text-muted-foreground outline-none transition-all" 
-                        />
-                    </div>
+                    <Typography variant="h4" fontWeight={900} gutterBottom sx={{ letterSpacing: -1 }}>
+                        Vendor registration
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                        Join the clinical supply chain and expand your business impact.
+                    </Typography>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-text-secondary ml-1">Password</label>
-                            <input 
-                                name="password" 
-                                type="password" 
-                                placeholder="••••••••" 
-                                onChange={handleChange} 
-                                required 
-                                className="w-full px-4 py-3 bg-input border border-border rounded-xl focus:border-green-500 focus:ring-1 focus:ring-green-500 text-foreground placeholder:text-muted-foreground outline-none transition-all" 
-                                autoComplete="new-password"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-text-secondary ml-1">Confirm Password</label>
-                            <input 
-                                name="confirm_password" 
-                                type="password" 
-                                placeholder="••••••••" 
-                                onChange={handleChange} 
-                                required 
-                                className="w-full px-4 py-3 bg-input border border-border rounded-xl focus:border-green-500 focus:ring-1 focus:ring-green-500 text-foreground placeholder:text-muted-foreground outline-none transition-all" 
-                                autoComplete="new-password"
-                            />
-                        </div>
-                    </div>
+                    <Alert severity="info" icon={<InfoOutlinedIcon />} sx={{ mb: 4, textAlign: 'left' }}>
+                        All vendor applications are subject to a standard 24-48 hour verification period before activation.
+                    </Alert>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-text-secondary ml-1">Contact Person</label>
-                            <input 
-                                name="contact_person" 
-                                placeholder="Representative Name" 
-                                onChange={handleChange} 
-                                className="w-full px-4 py-3 bg-input border border-border rounded-xl focus:border-green-500 focus:ring-1 focus:ring-green-500 text-foreground placeholder:text-muted-foreground outline-none transition-all" 
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-text-secondary ml-1">Phone Number</label>
-                            <input 
-                                name="phone" 
-                                placeholder="+1 (555) 000-0000" 
-                                onChange={handleChange} 
-                                className="w-full px-4 py-3 bg-input border border-border rounded-xl focus:border-green-500 focus:ring-1 focus:ring-green-500 text-foreground placeholder:text-muted-foreground outline-none transition-all" 
-                            />
-                        </div>
-                    </div>
+                    {status.msg && <Alert severity={status.type} sx={{ mb: 3, textAlign: 'left' }}>{status.msg}</Alert>}
 
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-text-secondary ml-1">GST/Tax ID</label>
-                        <input 
-                            name="gst_number" 
-                            placeholder="Tax Identification Number" 
-                            onChange={handleChange} 
-                            className="w-full px-4 py-3 bg-input border border-border rounded-xl focus:border-green-500 focus:ring-1 focus:ring-green-500 text-foreground placeholder:text-muted-foreground outline-none transition-all" 
-                        />
-                    </div>
+                    <Box component="form" onSubmit={handleSubmit} noValidate>
+                        <Grid container spacing={2.5}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Company Name" name="company_name" onChange={handleChange} required />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth required>
+                                    <InputLabel>Category</InputLabel>
+                                    <Select name="category" value={formData.category} label="Category" onChange={handleChange}>
+                                        <MenuItem value="general">General Supplies</MenuItem>
+                                        <MenuItem value="medicines">Medicines</MenuItem>
+                                        <MenuItem value="equipment">Medical Equipment</MenuItem>
+                                        <MenuItem value="lab">Lab Supplies</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="Contact Email" name="email" type="email" onChange={handleChange} required />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Password" name="password" type="password" onChange={handleChange} required autoComplete="new-password" />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Confirm Password" name="confirm_password" type="password" onChange={handleChange} required autoComplete="new-password" />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Contact Person" name="contact_person" onChange={handleChange} />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Phone Number" name="phone" onChange={handleChange} />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="GST/Tax ID" name="gst_number" onChange={handleChange} placeholder="TRN or License Number" />
+                            </Grid>
+                        </Grid>
 
-                    <button 
-                        type="submit" 
-                        className="w-full py-4 mt-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-green-900/20 transform hover:-translate-y-0.5 transition-all active:scale-95 text-lg"
+                        <Button 
+                            type="submit" 
+                            fullWidth 
+                            variant="contained" 
+                            size="large"
+                            disabled={loading}
+                            color="success"
+                            sx={{ mt: 5, py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: '1rem', textTransform: 'none' }}
+                        >
+                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Register Supply Channel'}
+                        </Button>
+
+                        <Box sx={{ mt: 4 }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Already registered?{' '}
+                                <Link component={RouterLink} to="/vendor-login" fontWeight={700} underline="hover" color="success">
+                                    Login here
+                                </Link>
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Paper>
+
+                <Box sx={{ mt: 4, textAlign: 'center' }}>
+                    <Button 
+                        startIcon={<ArrowBackIcon />} 
+                        component={RouterLink} 
+                        to="/" 
+                        sx={{ color: 'white', opacity: 0.8, '&:hover': { opacity: 1 } }}
                     >
-                        Register Vendor
-                    </button>
-                </form>
-                
-                <p className="mt-8 text-center text-muted-foreground">
-                    Already have an account? <Link to="/vendor-login" className="text-success hover:text-green-300 font-medium hover:underline transition-colors">Login here</Link>
-                </p>
-                <p className="mt-2 text-center text-muted-foreground text-sm">
-                    Back to <Link to="/" className="text-muted-foreground hover:text-white transition-colors">Main Login</Link>
-                </p>
-            </div>
-        </div>
+                        Back to Portal Select
+                    </Button>
+                </Box>
+            </Container>
+        </Box>
     );
 };
 

@@ -1,88 +1,157 @@
 import React from 'react';
 
+// MUI Components
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+
+// Icons
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import PersonIcon from '@mui/icons-material/Person';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+
 const TaskCard = ({ task, onComplete, onReject }) => {
-    // Priority colors (Glow effects for dark mode)
-    const priorityStyles = {
-        high: 'border-l-red-500 bg-gradient-to-r from-red-500/10 to-transparent hover:from-red-500/20',
-        medium: 'border-l-yellow-500 bg-gradient-to-r from-yellow-500/10 to-transparent hover:from-yellow-500/20',
-        low: 'border-l-green-500 bg-gradient-to-r from-green-500/10 to-transparent hover:from-green-500/20',
-        normal: 'border-l-blue-500 bg-gradient-to-r from-blue-500/10 to-transparent hover:from-blue-500/20'
+    // Priority colors
+    const getPriorityColor = (priority) => {
+        switch (priority?.toLowerCase()) {
+            case 'high': return 'error.main';
+            case 'medium': return 'warning.main';
+            case 'low': return 'success.main';
+            default: return 'primary.main';
+        }
     };
 
-    const cardStyle = priorityStyles[task.priority] || priorityStyles.normal;
+    const priorityColor = getPriorityColor(task.priority);
+    const isOverdue = new Date(task.scheduled_time) < new Date();
 
     return (
-        <div className={`p-4 mb-3 rounded-xl border-l-[6px] shadow-lg backdrop-blur-sm border border-white/5 transition-all duration-300 hover:translate-x-1 ${cardStyle} group`}>
-            <div className="flex justify-between items-center">
-                {/* Left Content */}
-                <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className="font-bold text-foreground text-lg group-hover:text-white transition-colors">
-                            {task.description}
-                        </span>
-                        <div className="flex gap-2">
-                            <span className="text-[10px] uppercase font-bold tracking-wider text-text-secondary bg-border/50 px-2 py-1 rounded border border-border">
-                                {task.task_type}
-                            </span>
-                            {task.reassigned && (
-                                <span className="text-[10px] uppercase font-bold tracking-wider text-orange-300 bg-orange-900/40 px-2 py-1 rounded border border-orange-700/50 animate-pulse">
-                                    Reassigned
-                                </span>
-                            )}
-                            {task.rejected && (
-                                <span className="text-[10px] uppercase font-bold tracking-wider text-red-300 bg-red-900/40 px-2 py-1 rounded border border-red-700/50">
-                                    Rejected
-                                </span>
-                            )}
-                        </div>
-                    </div>
+        <Card sx={{ 
+            mb: 2, 
+            borderRadius: 3, 
+            borderLeft: 6, 
+            borderColor: priorityColor,
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': { transform: 'translateX(8px)', boxShadow: 6 },
+            bgcolor: 'background.paper',
+            position: 'relative',
+            overflow: 'visible'
+        }}>
+            <CardContent sx={{ p: '16px !important' }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    {/* Left Content */}
+                    <Box sx={{ flex: 1 }}>
+                        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
+                            <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2 }}>
+                                {task.description}
+                            </Typography>
+                            <Stack direction="row" spacing={1}>
+                                <Chip 
+                                    label={task.task_type} 
+                                    size="small" 
+                                    sx={{ 
+                                        height: 20, 
+                                        fontSize: '10px', 
+                                        fontWeight: 800, 
+                                        textTransform: 'uppercase',
+                                        bgcolor: 'action.hover',
+                                        color: 'text.secondary'
+                                    }} 
+                                />
+                                {task.reassigned && (
+                                    <Chip 
+                                        label="Reassigned" 
+                                        size="small" 
+                                        color="warning"
+                                        sx={{ 
+                                            height: 20, 
+                                            fontSize: '10px', 
+                                            fontWeight: 800, 
+                                            textTransform: 'uppercase',
+                                            animation: 'pulse 2s infinite'
+                                        }} 
+                                    />
+                                )}
+                                {task.rejected && (
+                                    <Chip 
+                                        label="Rejected" 
+                                        size="small" 
+                                        color="error"
+                                        sx={{ 
+                                            height: 20, 
+                                            fontSize: '10px', 
+                                            fontWeight: 800, 
+                                            textTransform: 'uppercase'
+                                        }} 
+                                    />
+                                )}
+                            </Stack>
+                        </Stack>
 
-                    <div className="flex items-center gap-5 text-sm">
-                        <div className="flex items-center gap-1.5 text-muted-foreground group-hover:text-text-secondary transition-colors">
-                            <span className="text-lg">👤</span>
-                            <span className="font-medium">{task.patient_name || task.patient_id}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-muted-foreground group-hover:text-text-secondary transition-colors">
-                            <span className="text-lg">⏰</span>
-                            <span className={`font-mono font-medium ${
-                                new Date(task.scheduled_time) < new Date() ? 'text-error' : 'text-primary'
-                            }`}>
-                                {new Date(task.scheduled_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                        <Stack direction="row" spacing={3} alignItems="center">
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary' }}>
+                                <PersonIcon sx={{ fontSize: 16 }} />
+                                <Typography variant="caption" fontWeight={600}>
+                                    {task.patient_name || task.patient_id}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <AccessTimeIcon sx={{ fontSize: 16, color: isOverdue ? 'error.main' : 'primary.main' }} />
+                                <Typography 
+                                    variant="caption" 
+                                    fontWeight={800} 
+                                    sx={{ 
+                                        fontFamily: 'monospace',
+                                        color: isOverdue ? 'error.main' : 'primary.main'
+                                    }}
+                                >
+                                    {new Date(task.scheduled_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Box>
 
-                {/* Right Actions */}
-                <div className="flex items-center gap-2 ml-4">
-                    {/* Reject Button */}
-                    {onReject && task.status !== 'rejected' && task.status !== 'completed' && (
-                        <button
-                            onClick={() => onReject(task)}
-                            className="w-10 h-10 flex items-center justify-center rounded-full bg-error-soft text-error border border-red-500/50 hover:bg-red-500 hover:text-white hover:scale-110 active:scale-95 transition-all duration-300"
-                            title="Reject Task"
-                        >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    )}
-                    {/* Complete Button */}
-                    {task.status !== 'completed' && task.status !== 'rejected' && (
-                        <button
-                            onClick={() => onComplete(task.task_id || task._id)}
-                            className="w-12 h-12 flex items-center justify-center rounded-full bg-primary/20 text-primary border border-primary/50 shadow-[0_0_15px_rgba(20,184,166,0.2)] hover:bg-primary hover:text-white hover:shadow-[0_0_25px_rgba(20,184,166,0.6)] hover:scale-110 active:scale-95 transition-all duration-300"
-                            title="Mark Completed"
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        </button>
-                    )}
-                </div>
-            </div>
-        </div>
+                    {/* Right Actions */}
+                    <Stack direction="row" spacing={1} sx={{ ml: 2 }}>
+                        {onReject && task.status !== 'rejected' && task.status !== 'completed' && (
+                            <Tooltip title="Reject Task">
+                                <IconButton 
+                                    onClick={() => onReject(task)}
+                                    sx={{ 
+                                        color: 'error.main',
+                                        bgcolor: 'error.lighter',
+                                        '&:hover': { bgcolor: 'error.main', color: 'white' }
+                                    }}
+                                >
+                                    <CancelIcon />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                        {task.status !== 'completed' && task.status !== 'rejected' && (
+                            <Tooltip title="Mark Completed">
+                                <IconButton 
+                                    onClick={() => onComplete(task.task_id || task._id)}
+                                    sx={{ 
+                                        color: 'primary.main',
+                                        bgcolor: 'primary.lighter',
+                                        '&:hover': { bgcolor: 'primary.main', color: 'white' },
+                                        width: 48,
+                                        height: 48
+                                    }}
+                                >
+                                    <CheckCircleIcon sx={{ fontSize: 32 }} />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                    </Stack>
+                </Stack>
+            </CardContent>
+        </Card>
     );
 };
 

@@ -150,6 +150,19 @@ export const formatDate = (dateString) => {
     }
 };
 
+// Format 24h time string (e.g. '09:00', '22:30') to AM/PM (e.g. '9:00 AM', '10:30 PM')
+export const formatTimeAmPm = (time24) => {
+    if (!time24) return '';
+    try {
+        const [h, m] = time24.split(':').map(Number);
+        const period = h >= 12 ? 'PM' : 'AM';
+        const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+        return m > 0 ? `${h12}:${String(m).padStart(2, '0')} ${period}` : `${h12}:00 ${period}`;
+    } catch {
+        return time24;
+    }
+};
+
 // Check connection status to the backend
 export const checkConnectionStatus = async () => {
     try {

@@ -118,6 +118,14 @@ def get_all_handoffs_admin():
                             h['patient_name'] = patient.get('patient_name', 'Unknown')
                     except:
                         h['patient_name'] = 'Error Fetching Name'
+                # Enrich nurse name (live lookup so edits propagate)
+                if 'nurse_id' in h:
+                    try:
+                        nurse = db.get_user_by_id(h['nurse_id'])
+                        if nurse:
+                            h['nurse_name'] = nurse.get('full_name', h.get('nurse_name', 'Unknown'))
+                    except:
+                        pass
                 
                 safe_handoffs.append(h)
             except Exception as item_error:

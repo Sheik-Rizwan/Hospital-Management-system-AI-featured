@@ -1,174 +1,248 @@
 import React from 'react';
 import { formatDate } from '../utils/api';
 
+// MUI Components
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+
+// Icons — using only guaranteed-stable MUI icon names
+import CloseIcon from '@mui/icons-material/Close';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import OpacityIcon from '@mui/icons-material/Opacity';           // Blood pressure
+import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat'; // Temperature
+import WavesIcon from '@mui/icons-material/Waves';               // SpO2 / oxygen
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'; // Respiratory / heart monitor
+
+/**
+ * Safely resolve a vital reading to a plain string.
+ * Handles: number, string, undefined, null, or object {value?, systolic?, diastolic?, unit?}
+ */
+const resolveVital = (raw) => {
+    if (raw === null || raw === undefined) return '--';
+    if (typeof raw === 'number') return String(raw);
+    if (typeof raw === 'string') return raw || '--';
+    if (typeof raw === 'object') {
+        // Blood pressure nested object
+        if (raw.systolic !== undefined && raw.diastolic !== undefined) {
+            return `${raw.systolic}/${raw.diastolic}`;
+        }
+        // Generic {value, unit} shape
+        if (raw.value !== undefined) {
+            return String(raw.value);
+        }
+        // Last resort: convert to string without throwing
+        try { return JSON.stringify(raw); } catch { return '--'; }
+    }
+    return '--';
+};
+
 const PatientsVitalsModal = ({ isOpen, onClose, patients }) => {
-    if (!isOpen) return null;
-
-    const getVitalStyle = (k, val) => {
-        const lowerK = k.toLowerCase();
-        // Check for abnormalities (simplified logic for visual highlighting)
-        let isAbnormal = false;
-        if (lowerK.includes('heart') && (val < 60 || val > 100)) isAbnormal = true;
-        if (lowerK.includes('temp') && (val < 97 || val > 99)) isAbnormal = true;
-        if (lowerK.includes('oxygen') && val < 95) isAbnormal = true;
-
-        const baseStyle = "p-3 rounded-lg border flex flex-col items-center justify-center text-center transition-all hover:scale-105";
-        
-        if (lowerK.includes('heart') || lowerK.includes('pulse') || lowerK.includes('hr')) 
-            return { className: `${baseStyle} ${isAbnormal ? 'bg-error-soft border-red-500 animate-pulse' : 'bg-red-500/10 border-red-500/20'} text-error`, icon: '❤️' };
-        if (lowerK.includes('pressure') || lowerK.includes('bp')) 
-            return { className: `${baseStyle} bg-purple-500/10 border-purple-500/20 text-purple-400`, icon: '🩸' };
-        if (lowerK.includes('temp')) 
-            return { className: `${baseStyle} ${isAbnormal ? 'bg-orange-500/20 border-orange-500' : 'bg-orange-500/10 border-orange-500/20'} text-orange-400`, icon: '🌡️' };
-        if (lowerK.includes('oxygen') || lowerK.includes('spo2')) 
-            return { className: `${baseStyle} ${isAbnormal ? 'bg-blue-500/20 border-blue-500' : 'bg-blue-500/10 border-blue-500/20'} text-blue-400`, icon: '🌬️' };
-        if (lowerK.includes('respiratory') || lowerK.includes('resp')) 
-            return { className: `${baseStyle} bg-primary/10 border-teal-500/20 text-primary`, icon: '🫁' };
-        
-        return { className: `${baseStyle} bg-border/50 border-border text-text-secondary`, icon: '📊' };
-    };
-
     return (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-            <div className="bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col animate-fade-in-up">
-                
-                {/* Header */}
-                <div className="px-8 py-6 border-b border-border flex justify-between items-center bg-card/50 rounded-t-2xl">
-                    <div>
-                        <h2 className="text-3xl font-bold text-white flex items-center gap-3">
-                            <span className="text-4xl">💓</span> Live Vitals Monitor
-                        </h2>
-                        <p className="text-muted-foreground mt-1">Real-time overview of all patient vitals from latest handoffs</p>
-                    </div>
-                    <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-card hover:bg-border text-muted-foreground hover:text-white transition-all">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
+        <Dialog
+            open={isOpen}
+            onClose={onClose}
+            maxWidth="lg"
+            fullWidth
+            PaperProps={{
+                sx: {
+                    borderRadius: 3,
+                    bgcolor: 'background.paper',
+                    maxHeight: '90vh'
+                }
+            }}
+        >
+            <DialogTitle sx={{
+                borderBottom: 1,
+                borderColor: 'divider',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                py: 2.5,
+                px: 3
+            }}>
+                <Box>
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <MonitorHeartIcon color="primary" sx={{ fontSize: 32 }} />
+                        <Typography variant="h5" fontWeight={800}>Live Vitals Monitor</Typography>
+                    </Stack>
+                    <Typography variant="body2" color="text.secondary">
+                        Real-time overview of all patient vitals from latest handoffs
+                    </Typography>
+                </Box>
+                <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
+            </DialogTitle>
 
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-surface/50">
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {patients.length === 0 ? (
-                            <div className="col-span-full py-20 text-center text-muted-foreground">
-                                <span className="text-6xl block mb-4 opacity-50">📉</span>
-                                <p className="text-xl">No vitals data available.</p>
-                            </div>
-                        ) : (
-                            patients.map(p => {
-                                const v = p.vitals || p.latest_vitals || {}; // Handle inconsistent naming if any
+            <DialogContent sx={{ p: 4, bgcolor: 'action.hover' }}>
+                <Grid container spacing={3}>
+                    {!patients || patients.length === 0 ? (
+                        <Grid size={12}>
+                            <Box sx={{ py: 10, textAlign: 'center', color: 'text.secondary' }}>
+                                <Typography variant="h1" sx={{ mb: 2, opacity: 0.2 }}>📉</Typography>
+                                <Typography variant="h6">No vitals data available.</Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    Vitals are populated from nurse handoff records. Record a handoff with vital signs to see data here.
+                                </Typography>
+                            </Box>
+                        </Grid>
+                    ) : (
+                        patients
+                            .filter(p => p != null)  // guard against null entries
+                            .map((p, index) => {
+                                // Support both 'vitals' and 'latest_vitals' shapes from API
+                                const v = (p.vitals && typeof p.vitals === 'object') ? p.vitals
+                                    : (p.latest_vitals && typeof p.latest_vitals === 'object') ? p.latest_vitals
+                                    : {};
+
+                                const patientName = typeof p.patient_name === 'string' ? p.patient_name : 'Unknown Patient';
+                                const patientId   = p.patient_id ? String(p.patient_id) : `patient-${index}`;
+                                const roomNo      = p.room_number ? String(p.room_number) : 'N/A';
+
                                 return (
-                                <div key={p.patient_id} className="bg-card/60 backdrop-blur-md border border-white/5 rounded-2xl p-6 hover:border-teal-500/30 transition-all hover:shadow-lg group">
-                                    <div className="flex justify-between items-start mb-4 pb-4 border-b border-white/5">
-                                        <div>
-                                            <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">{p.patient_name}</h3>
-                                            <p className="text-xs font-mono text-muted-foreground mt-1">ID: {p.patient_id} • Rm: {p.room_number || 'N/A'}</p>
-                                        </div>
-                                        {p.last_updated && (
-                                            <span className="text-[10px] bg-surface px-2 py-1 rounded text-muted-foreground border border-border">
-                                                {formatDate(p.last_updated)}
-                                            </span>
-                                        )}
-                                    </div>
+                                    <Grid size={{ xs: 12, md: 6, lg: 4 }} key={patientId}>
+                                        <Card sx={{
+                                            borderRadius: 3,
+                                            height: '100%',
+                                            transition: 'all 0.3s',
+                                            '&:hover': { transform: 'translateY(-4px)', boxShadow: 6 }
+                                        }}>
+                                            <CardContent>
+                                                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 3 }}>
+                                                    <Box>
+                                                        <Typography variant="h6" fontWeight={800} color="primary" noWrap>
+                                                            {patientName}
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary" fontFamily="monospace">
+                                                            ID: {patientId} • Room: {roomNo}
+                                                        </Typography>
+                                                    </Box>
+                                                    {p.last_updated && (
+                                                        <Chip
+                                                            size="small"
+                                                            label={formatDate(p.last_updated)}
+                                                            variant="outlined"
+                                                            sx={{ fontSize: '10px' }}
+                                                        />
+                                                    )}
+                                                </Stack>
 
-                                    {Object.keys(v).length > 0 ? (
-                                        <div className="grid grid-cols-3 gap-3">
-                                            {/* Heart Rate */}
-                                            <VitalCard 
-                                                icon="❤️" label="Heart Rate" 
-                                                value={v.heart_rate?.value || v.hr} 
-                                                unit="bpm" 
-                                                status={v.heart_rate?.status}
-                                                color="text-error" bg="bg-red-500/10" border="border-red-500/20"
-                                            />
-                                            
-                                            {/* Blood Pressure */}
-                                            <VitalCard 
-                                                icon="🩸" label="Blood Pressure" 
-                                                value={(v.blood_pressure?.systolic && v.blood_pressure?.diastolic ? `${v.blood_pressure.systolic}/${v.blood_pressure.diastolic}` : null) || v.bp || v.blood_pressure} 
-                                                unit="mmHg" 
-                                                status={v.blood_pressure?.status}
-                                                color="text-purple-400" bg="bg-purple-500/10" border="border-purple-500/20"
-                                            />
+                                                {Object.keys(v).length > 0 ? (
+                                                    <Grid container spacing={1.5}>
+                                                        <Grid size={4}>
+                                                            <VitalCardSmall
+                                                                icon={<FavoriteIcon sx={{ fontSize: 20 }} />}
+                                                                label="HR"
+                                                                value={resolveVital(v.heart_rate ?? v.hr)}
+                                                                unit="bpm"
+                                                                status={v.heart_rate?.status}
+                                                                color="error"
+                                                            />
+                                                        </Grid>
+                                                        <Grid size={4}>
+                                                            <VitalCardSmall
+                                                                icon={<OpacityIcon sx={{ fontSize: 20 }} />}
+                                                                label="BP"
+                                                                value={resolveVital(v.blood_pressure ?? v.bp)}
+                                                                unit="mmHg"
+                                                                status={v.blood_pressure?.status}
+                                                                color="secondary"
+                                                            />
+                                                        </Grid>
+                                                        <Grid size={4}>
+                                                            <VitalCardSmall
+                                                                icon={<DeviceThermostatIcon sx={{ fontSize: 20 }} />}
+                                                                label="Temp"
+                                                                value={resolveVital(v.temperature_celsius ?? v.temperature ?? v.temp)}
+                                                                unit="°C"
+                                                                color="warning"
+                                                            />
+                                                        </Grid>
+                                                        <Grid size={4}>
+                                                            <VitalCardSmall
+                                                                icon={<WavesIcon sx={{ fontSize: 20 }} />}
+                                                                label="SpO2"
+                                                                value={resolveVital(v.oxygen_saturation ?? v.spo2)}
+                                                                unit="%"
+                                                                status={v.oxygen_saturation?.status}
+                                                                color="info"
+                                                            />
+                                                        </Grid>
+                                                        <Grid size={4}>
+                                                            <VitalCardSmall
+                                                                icon={<MonitorHeartIcon sx={{ fontSize: 20 }} />}
+                                                                label="Resp"
+                                                                value={resolveVital(v.respiratory_rate ?? v.resp_rate)}
+                                                                unit="/min"
+                                                                status={v.respiratory_rate?.status}
+                                                                color="success"
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
+                                                ) : (
+                                                    <Box sx={{
+                                                        py: 4,
+                                                        textAlign: 'center',
+                                                        bgcolor: 'action.selected',
+                                                        borderRadius: 2,
+                                                        border: '1px dashed',
+                                                        borderColor: 'divider'
+                                                    }}>
+                                                        <Typography variant="body2" color="text.secondary">No recorded vitals</Typography>
+                                                    </Box>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
+                                );
+                            })
+                    )}
+                </Grid>
+            </DialogContent>
 
-                                            {/* Temperature */}
-                                            <VitalCard 
-                                                icon="🌡️" label="Temp" 
-                                                value={v.temperature_celsius || v.temp || v.temperature} 
-                                                unit="°C" // Note: Old data shows "39.2°C", so unit might double up if not careful. VitalCard logic below separates it.
-                                                status={null}
-                                                color="text-orange-400" bg="bg-orange-500/10" border="border-orange-500/20"
-                                            />
-
-                                            {/* SPO2 */}
-                                            <VitalCard 
-                                                icon="🌬️" label="SPO2" 
-                                                value={v.oxygen_saturation || v.oxygen_saturation?.value || v.spo2?.value || v.spo2} 
-                                                unit="%" 
-                                                status={v.oxygen_saturation?.status || v.spo2?.status}
-                                                color="text-blue-400" bg="bg-blue-500/10" border="border-blue-500/20"
-                                            />
-
-                                            {/* Resp Rate */}
-                                            <VitalCard 
-                                                icon="🫁" label="Resp. Rate" 
-                                                value={v.respiratory_rate || v.respiratory_rate?.value || v.resp_rate} 
-                                                unit="/min" 
-                                                status={v.respiratory_rate?.status}
-                                                color="text-primary" bg="bg-primary/10" border="border-teal-500/20"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="py-8 text-center bg-black/20 rounded-xl border border-dashed border-border">
-                                            <p className="text-muted-foreground text-sm">No recorded vitals</p>
-                                        </div>
-                                    )}
-                                </div>
-                            )})
-                        )}
-                    </div>
-                </div>
-
-                {/* Helper Component defined inside matching scope */}
-
-                
-                {/* Footer */}
-                <div className="px-8 py-4 border-t border-border bg-card/50 rounded-b-2xl text-center">
-                    <p className="text-xs text-muted-foreground">
-                        Updates automatically from latest nurse handoff reports. 
-                        <span className="ml-2 text-teal-500/50 font-bold">● System Online</span>
-                    </p>
-                </div>
-            </div>
-        </div>
+            <Box sx={{ px: 3, py: 2, borderTop: 1, borderColor: 'divider', textAlign: 'center', bgcolor: 'background.paper' }}>
+                <Typography variant="caption" color="text.secondary">
+                    Updates automatically from latest nurse handoff reports.
+                    <Typography component="span" variant="caption" sx={{ ml: 1, color: 'success.main', fontWeight: 800 }}>
+                        ● System Online
+                    </Typography>
+                </Typography>
+            </Box>
+        </Dialog>
     );
 };
 
-const VitalCard = ({ icon, label, value, unit, status, color, bg, border }) => {
-    let displayValue = value;
-    let displayUnit = unit;
+const VitalCardSmall = ({ icon, label, value, unit, status, color }) => {
+    const isCritical = status ? ['critical', 'low', 'elevated'].includes(String(status).toLowerCase()) : false;
 
-    // Handle object value (from structured report)
-    if (typeof value === 'object' && value !== null) {
-        displayValue = value.value || value.val;
-        if (value.unit) displayUnit = value.unit;
-    }
-
-    if (!displayValue && displayValue !== 0) return (
-        <div className={`p-3 rounded-lg border flex flex-col items-center justify-center text-center transition-all opacity-50 bg-card/50 border-border`}>
-             <span className="text-2xl mb-1 grayscale opacity-30">{icon}</span>
-             <span className="font-bold text-lg leading-tight text-text-secondary">--</span>
-             <span className="text-[10px] uppercase font-bold text-text-secondary mt-1">{label}</span>
-        </div>
-    );
-
-    const isCritical = status?.toLowerCase() === 'critical' || status?.toLowerCase() === 'low' || status?.toLowerCase() === 'elevated';
-    
     return (
-        <div className={`p-3 rounded-lg border flex flex-col items-center justify-center text-center transition-all hover:scale-105 ${bg} ${border} ${color} ${isCritical ? 'animate-pulse ring-1 ring-red-500' : ''}`}>
-            <span className="text-2xl mb-1 opacity-80">{icon}</span>
-            <span className="font-bold text-lg leading-tight">{displayValue} <span className="text-[10px] opacity-70">{displayUnit}</span></span>
-            <span className="text-[10px] uppercase font-bold opacity-60 mt-1 truncate w-full">{label}</span>
-        </div>
+        <Paper variant="outlined" sx={{
+            p: 1.5,
+            textAlign: 'center',
+            borderRadius: 2,
+            transition: 'all 0.2s',
+            bgcolor: isCritical ? `${color}.lighter` : 'background.paper',
+            borderColor: isCritical ? `${color}.main` : 'divider',
+            '&:hover': { transform: 'scale(1.05)' }
+        }}>
+            <Box sx={{ color: `${color}.main`, mb: 0.5 }}>{icon}</Box>
+            <Typography variant="body2" fontWeight={800} sx={{ lineHeight: 1 }}>
+                {/* value is always a safe string from resolveVital() */}
+                {value}{' '}
+                <Typography component="span" variant="caption" sx={{ fontSize: '8px', opacity: 0.7 }}>{unit}</Typography>
+            </Typography>
+            <Typography variant="caption" sx={{ fontSize: '9px', fontWeight: 700, opacity: 0.6, textTransform: 'uppercase' }}>
+                {label}
+            </Typography>
+        </Paper>
     );
 };
 

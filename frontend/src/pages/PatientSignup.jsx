@@ -1,6 +1,31 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { API_BASE } from '../utils/api'; // Ensure this path matches your file structure
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { API_BASE } from '../utils/api';
+import ThemeToggle from '../components/ThemeToggle';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Link from '@mui/material/Link';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Avatar from '@mui/material/Avatar';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
+// Icons
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const PatientSignup = () => {
     const navigate = useNavigate();
@@ -18,6 +43,8 @@ const PatientSignup = () => {
         diagnosis: '',
         terms: false
     });
+    const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState({ type: '', msg: '' });
 
     const handleChange = (e) => {
         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -26,17 +53,19 @@ const PatientSignup = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setStatus({ type: '', msg: '' });
 
         if (formData.password !== formData.confirm_password) {
-            alert("Passwords do not match!");
+            setStatus({ type: 'error', msg: "Passwords do not match!" });
             return;
         }
 
         if (!formData.terms) {
-            alert("You must agree to the Terms of Service.");
+            setStatus({ type: 'warning', msg: "You must agree to the Terms of Service." });
             return;
         }
 
+        setLoading(true);
         try {
             const res = await fetch(`${API_BASE}/auth/patient/signup`, {
                 method: 'POST',
@@ -47,223 +76,154 @@ const PatientSignup = () => {
             const data = await res.json();
 
             if (data.success) {
-                alert(data.message || 'Patient account created successfully!');
-                navigate('/'); // Redirect to login
+                setStatus({ type: 'success', msg: data.message || 'Account created successfully! Redirecting...' });
+                setTimeout(() => navigate('/'), 2000);
             } else {
-                alert(data.error || 'Signup failed. Please try again.');
+                setStatus({ type: 'error', msg: data.error || 'Signup failed' });
             }
         } catch (error) {
-            alert('Network error. Please try again.');
+            setStatus({ type: 'error', msg: 'Network error. Please try again.' });
         }
+        setLoading(false);
     };
 
     return (
-        <div className="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen flex items-center justify-center p-4">
-            <div className="max-w-2xl w-full">
-                {/* Logo and Header */}
-                <div className="text-center mb-8">
-                    <div className="inline-block p-4 bg-green-600 rounded-full mb-4">
-                        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
-                    </div>
-                    <h1 className="text-3xl font-bold text-foreground">Patient Registration</h1>
-                    <p className="text-text-secondary mt-2">Create your patient account</p>
-                </div>
+        <Box 
+            sx={{ 
+                minHeight: '100vh', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #065f46 0%, #10b981 100%)',
+                p: 3,
+                position: 'relative'
+            }}
+        >
+            {/* Header Icons */}
+            <Box sx={{ position: 'absolute', top: 24, right: 24, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <ThemeToggle />
+                <Box component="img" src="/logo.png" sx={{ height: 32, opacity: 0.9 }} />
+            </Box>
 
-                {/* Signup Form */}
-                <div className="bg-surface rounded-lg shadow-xl p-8 text-foreground">
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Patient ID *</label>
-                                <input 
-                                    type="text" 
-                                    name="patient_id" 
-                                    required 
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                    placeholder="e.g., P001" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Full Name *</label>
-                                <input 
-                                    type="text" 
-                                    name="patient_name" 
-                                    required 
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                    placeholder="Enter your full name" 
-                                />
-                            </div>
-                        </div>
+            <Container maxWidth="md">
+                <Paper 
+                    elevation={12} 
+                    sx={{ 
+                        p: { xs: 4, md: 6 }, 
+                        borderRadius: 6,
+                        bgcolor: 'background.paper',
+                        textAlign: 'center',
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}
+                >
+                    <Box sx={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 8, bgcolor: '#10b981' }} />
+                    
+                    <Avatar sx={{ m: '0 auto 24px', bgcolor: '#10b981', width: 64, height: 64 }}>
+                        <FavoriteIcon fontSize="large" />
+                    </Avatar>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Date of Birth *</label>
-                                <input 
-                                    type="date" 
-                                    name="date_of_birth" 
-                                    required 
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Gender *</label>
-                                <select 
-                                    name="gender" 
-                                    required 
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                >
-                                    <option value="">Select Gender...</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                        </div>
+                    <Typography variant="h4" fontWeight={900} gutterBottom sx={{ letterSpacing: -1 }}>
+                        Patient Registration
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                        Create your medical identity to access your health transformation journey.
+                    </Typography>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Password *</label>
-                                <input 
-                                    type="password" 
-                                    name="password" 
-                                    required 
-                                    minLength="6"
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                    placeholder="••••••••" 
-                                    autoComplete="new-password"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Confirm Password *</label>
-                                <input 
-                                    type="password" 
-                                    name="confirm_password" 
-                                    required 
-                                    minLength="6"
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                    placeholder="••••••••" 
-                                    autoComplete="new-password"
-                                />
-                            </div>
-                        </div>
+                    {status.msg && <Alert severity={status.type} sx={{ mb: 4, textAlign: 'left' }}>{status.msg}</Alert>}
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Email (Optional)</label>
-                                <input 
-                                    type="email" 
-                                    name="email" 
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                    placeholder="patient@email.com" 
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Phone (Optional)</label>
-                                <input 
-                                    type="tel" 
-                                    name="phone" 
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                    placeholder="+1 (555) 000-0000" 
-                                />
-                            </div>
-                        </div>
+                    <Box component="form" onSubmit={handleSubmit} noValidate>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Patient ID" name="patient_id" value={formData.patient_id} onChange={handleChange} required placeholder="e.g. P001" />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Full Name" name="patient_name" value={formData.patient_name} onChange={handleChange} required />
+                            </Grid>
+                            
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Date of Birth" name="date_of_birth" type="date" value={formData.date_of_birth} onChange={handleChange} required InputLabelProps={{ shrink: true }} />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <FormControl fullWidth required>
+                                    <InputLabel>Gender</InputLabel>
+                                    <Select name="gender" value={formData.gender} label="Gender" onChange={handleChange}>
+                                        <MenuItem value="Male">Male</MenuItem>
+                                        <MenuItem value="Female">Female</MenuItem>
+                                        <MenuItem value="Other">Other</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Admission Date *</label>
-                                <input 
-                                    type="date" 
-                                    name="admission_date" 
-                                    required 
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground" 
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Password" name="password" type="password" value={formData.password} onChange={handleChange} required autoComplete="new-password" />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Confirm Password" name="confirm_password" type="password" value={formData.confirm_password} onChange={handleChange} required autoComplete="new-password" />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Email Address" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Optional" />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} placeholder="Optional" />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Admission Date" name="admission_date" type="date" value={formData.admission_date} onChange={handleChange} required InputLabelProps={{ shrink: true }} />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                                <TextField fullWidth label="Room Number" name="room_number" value={formData.room_number} onChange={handleChange} placeholder="e.g. 101-A" />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="Primary Diagnosis" name="diagnosis" value={formData.diagnosis} onChange={handleChange} multiline rows={3} placeholder="Initial assessment notes..." />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <FormControlLabel
+                                    control={<Checkbox name="terms" checked={formData.terms} onChange={handleChange} color="primary" />}
+                                    label={
+                                        <Typography variant="body2" color="text.secondary">
+                                            I agree to the <Link color="primary" underline="hover">Terms of Service</Link> and <Link color="primary" underline="hover">Privacy Policy</Link>
+                                        </Typography>
+                                    }
+                                    sx={{ textAlign: 'left', width: '100%' }}
                                 />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Room Number</label>
-                                <input 
-                                    type="text" 
-                                    name="room_number" 
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                    placeholder="e.g. 101-A" 
-                                />
-                            </div>
-                        </div>
+                            </Grid>
+                        </Grid>
 
-                        <div>
-                            <label className="block text-sm font-medium text-text-secondary mb-2">Primary Diagnosis</label>
-                            <textarea 
-                                name="diagnosis" 
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition text-foreground"
-                                placeholder="Brief description of diagnosis..." 
-                                rows="3"
-                            ></textarea>
-                        </div>
-
-                        <div className="flex items-center mt-4">
-                            <input 
-                                type="checkbox" 
-                                id="terms" 
-                                name="terms" 
-                                required 
-                                onChange={handleChange}
-                                className="w-4 h-4 text-success border-border rounded focus:ring-green-500" 
-                            />
-                            <label htmlFor="terms" className="ml-2 text-sm text-text-secondary">
-                                I agree to the <a href="#" className="text-success hover:underline">Terms of Service</a> and <a href="#" className="text-success hover:underline">Privacy Policy</a>
-                            </label>
-                        </div>
-
-                        <button 
+                        <Button 
                             type="submit" 
-                            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold mt-6 flex items-center justify-center gap-2"
+                            fullWidth 
+                            variant="contained" 
+                            size="large"
+                            disabled={loading}
+                            sx={{ mt: 5, py: 1.8, borderRadius: 2, fontWeight: 700, fontSize: '1rem', textTransform: 'none', bgcolor: '#065f46', '&:hover': { bgcolor: '#064e3b' } }}
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                            </svg>
-                            Create Patient Account
-                        </button>
-                    </form>
+                            {loading ? <CircularProgress size={24} color="inherit" /> : 'Activate Patient Account'}
+                        </Button>
 
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-border"></div>
-                        </div>
-                        <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-surface text-muted-foreground">or</span>
-                        </div>
-                    </div>
+                        <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 4 }}>
+                            <Typography variant="body2" color="text.secondary">Already have an account?</Typography>
+                            <Link component={RouterLink} to="/" fontWeight={700} underline="hover" color="primary">Login here</Link>
+                        </Stack>
+                    </Box>
+                </Paper>
 
-                    <p className="text-center text-sm text-text-secondary">
-                        Already have an account? 
-                        <Link to="/" className="text-success hover:underline font-medium ml-1">Login here</Link>
-                    </p>
-                </div>
-
-                {/* Back to Home */}
-                <div className="text-center mt-6">
-                    <Link to="/" className="text-text-secondary hover:text-foreground flex items-center justify-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                        Back to Login
-                    </Link>
-                </div>
-            </div>
-        </div>
+                <Box sx={{ mt: 4, textAlign: 'center' }}>
+                    <Button 
+                        startIcon={<ArrowBackIcon />} 
+                        component={RouterLink} 
+                        to="/" 
+                        sx={{ color: 'white', opacity: 0.8, '&:hover': { opacity: 1 } }}
+                    >
+                        Back to Identity Portal
+                    </Button>
+                </Box>
+            </Container>
+        </Box>
     );
 };
 
-export default PatientSignup;
+export default PatientSignup;

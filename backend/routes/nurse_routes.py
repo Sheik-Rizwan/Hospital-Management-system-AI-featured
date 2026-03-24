@@ -42,8 +42,8 @@ def get_nurse_stats():
         total_tasks = db.db.tasks.count_documents({'assigned_nurse_id': nurse_id})
         pending_tasks = db.db.tasks.count_documents({'assigned_nurse_id': nurse_id, 'status': 'pending'})
         completed_tasks = db.db.tasks.count_documents({'assigned_nurse_id': nurse_id, 'status': 'completed'})
-        total_patients = db.db.patients.count_documents({})
-        total_handoffs = db.db.handoffs.count_documents({'nurse_id': nurse_id})
+        total_patients = db.patients.count_documents({})
+        total_handoffs = db.handoffs.count_documents({'nurse_id': nurse_id})
 
         return jsonify({
             'success': True,
@@ -373,10 +373,21 @@ def update_patient_details_nurse(patient_id):
         update_fields['updated_at'] = datetime.now()
         update_fields['updated_by'] = nurse_id
         
-        db.db.patients.update_one(
+        db.patients.update_one(
             {'patient_id': patient_id},
             {'$set': update_fields}
         )
+        
+        # Propagate patient_name to denormalized copies
+        if 'patient_name' in update_fields:
+            new_name = update_fields['patient_name']
+            try:
+                db.db.appointments.update_many({'patient_id': patient_id}, {'$set': {'patient_name': new_name}})
+                db.db.tasks.update_many({'patient_id': patient_id}, {'$set': {'patient_name': new_name}})
+                db.healthcare_db['patient_meals'].update_many({'patient_id': patient_id}, {'$set': {'patient_name': new_name}})
+                db.db.wa_users.update_many({'patient_id': patient_id}, {'$set': {'name': new_name}})
+            except Exception:
+                pass  # best-effort propagation
         
         return jsonify({'success': True, 'message': 'Patient updated successfully'})
 
@@ -389,8 +400,19 @@ def get_patients_vitals_nurse():
     """Get patients with latest vitals."""
     try:
         patients = db.get_patients_with_vitals()
+        
+        # Convert datetime objects to string to prevent jsonify serialization errors
+        for p in patients:
+            if 'last_handoff' in p and hasattr(p['last_handoff'], 'isoformat'):
+                p['last_handoff'] = p['last_handoff'].isoformat()
+            if 'created_at' in p and hasattr(p['created_at'], 'isoformat'):
+                p['created_at'] = p['created_at'].isoformat()
+            if 'updated_at' in p and hasattr(p['updated_at'], 'isoformat'):
+                p['updated_at'] = p['updated_at'].isoformat()
+                
         return jsonify({'success': True, 'patients': patients})
     except Exception as e:
+        logger.error(f"Error in get_patients_vitals_nurse: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @nurse_bp.route('/patients/search', methods=['GET'])
@@ -426,11 +448,16 @@ def get_handoffs_nurse():
             if 'timestamp' in h and hasattr(h['timestamp'], 'isoformat'):
                 h['timestamp'] = h['timestamp'].isoformat()
             
-            # Enrich with patient name if missing (copied from doctor logic)
-            if 'patient_name' not in h:
-                 if 'patient_id' in h:
-                    p = db.get_patient(h['patient_id'])
-                    h['patient_name'] = p.get('patient_name') if p else 'Unknown'
+            # Enrich with live patient name
+            if 'patient_id' in h:
+                p = db.get_patient(h['patient_id'])
+                if p:
+                    h['patient_name'] = p.get('patient_name', h.get('patient_name', 'Unknown'))
+            # Enrich with live nurse name
+            if 'nurse_id' in h:
+                nurse = db.get_user_by_id(h['nurse_id'])
+                if nurse:
+                    h['nurse_name'] = nurse.get('full_name', h.get('nurse_name', 'Unknown'))
         
         return jsonify({'success': True, 'handoffs': handoffs})
     except Exception as e:
@@ -445,6 +472,15 @@ def get_handoff_details_nurse(handoff_id):
         if handoff:
             if 'timestamp' in handoff and hasattr(handoff['timestamp'], 'isoformat'):
                 handoff['timestamp'] = handoff['timestamp'].isoformat()
+            # Enrich with live names
+            if 'patient_id' in handoff:
+                p = db.get_patient(handoff['patient_id'])
+                if p:
+                    handoff['patient_name'] = p.get('patient_name', handoff.get('patient_name', 'Unknown'))
+            if 'nurse_id' in handoff:
+                nurse = db.get_user_by_id(handoff['nurse_id'])
+                if nurse:
+                    handoff['nurse_name'] = nurse.get('full_name', handoff.get('nurse_name', 'Unknown'))
             return jsonify({'success': True, 'handoff': handoff})
         return jsonify({'success': False, 'error': 'Handoff not found'}), 404
     except Exception as e:

@@ -1,8 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE, getAuthHeaders } from '../utils/api';
+import { API_BASE, getAuthHeaders, formatTimeAmPm } from '../utils/api';
+import VoiceBooking from './VoiceBooking';
+
+// MUI Components
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Avatar from '@mui/material/Avatar';
+import Chip from '@mui/material/Chip';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+import Paper from '@mui/material/Paper';
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
+import Tooltip from '@mui/material/Tooltip';
+
+// Icons
+import CloseIcon from '@mui/icons-material/Close';
+import MicIcon from '@mui/icons-material/Mic';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import EventIcon from '@mui/icons-material/Event';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import HistoryIcon from '@mui/icons-material/History';
 
 const BookAppointment = ({ patientId = null, patientData = null, onClose, onSuccess, isNurseBooking = false, userRole = 'patient' }) => {
-    const [step, setStep] = useState(1);
+    const [activeStep, setActiveStep] = useState(0);
     const [doctors, setDoctors] = useState([]);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [selectedDate, setSelectedDate] = useState('');
@@ -13,8 +49,9 @@ const BookAppointment = ({ patientId = null, patientData = null, onClose, onSucc
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [filterSpecialization, setFilterSpecialization] = useState('');
+    const [showVoice, setShowVoice] = useState(false);
 
-    // Get API base path based on user role
+    const steps = ['Select Doctor', 'Choose Time', 'Confirm'];
     const apiPath = (isNurseBooking || userRole === 'nurse') ? `${API_BASE}/nurse` : `${API_BASE}/patient`;
 
     useEffect(() => {
@@ -91,7 +128,6 @@ const BookAppointment = ({ patientId = null, patientData = null, onClose, onSucc
                 notes: notes
             };
 
-            // If nurse is booking for patient, add patient_id
             if (isNurseBooking && patientId) {
                 payload.patient_id = patientId;
             }
@@ -119,11 +155,7 @@ const BookAppointment = ({ patientId = null, patientData = null, onClose, onSucc
         setLoading(false);
     };
 
-    const getMinDate = () => {
-        const today = new Date();
-        return today.toISOString().split('T')[0];
-    };
-
+    const getMinDate = () => new Date().toISOString().split('T')[0];
     const getMaxDate = () => {
         const max = new Date();
         max.setMonth(max.getMonth() + 12);
@@ -131,294 +163,256 @@ const BookAppointment = ({ patientId = null, patientData = null, onClose, onSucc
     };
 
     const uniqueSpecializations = [...new Set(doctors.map(d => d.specialization).filter(Boolean))];
-
     const filteredDoctors = filterSpecialization
         ? doctors.filter(d => d.specialization === filterSpecialization)
         : doctors;
 
+    const handleNext = () => setActiveStep((prev) => prev + 1);
+    const handleBack = () => setActiveStep((prev) => prev - 1);
+
     return (
-        <div className="bg-surface rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, overflow: 'hidden', boxShadow: 24, maxWidth: 900, w: '100%', m: 'auto' }}>
+            {showVoice && (
+                <VoiceBooking
+                    onClose={() => setShowVoice(false)}
+                    onSuccess={(appt) => {
+                        setShowVoice(false);
+                        if (onSuccess) onSuccess(appt);
+                    }}
+                />
+            )}
+
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-t-lg">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold">
-                        📅 {isNurseBooking ? 'Book Appointment for Patient' : 'Book an Appointment'}
-                    </h2>
-                    {onClose && (
-                        <button onClick={onClose} className="text-white hover:bg-surface/20 p-2 rounded transition">
-                            ✕
-                        </button>
-                    )}
-                </div>
-                {/* Progress Steps */}
-                <div className="flex mt-4 gap-2">
-                    {[1, 2, 3].map(s => (
-                        <div key={s} className={`flex-1 h-2 rounded ${step >= s ? 'bg-surface' : 'bg-surface/30'}`}></div>
+            <Box sx={{ p: 4, bgcolor: 'primary.main', color: 'white' }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                    <Typography variant="h5" fontWeight={800}>
+                        {isNurseBooking ? 'Book For Patient' : 'Book Appointment'}
+                    </Typography>
+                    <Stack direction="row" spacing={1}>
+                        {!isNurseBooking && (
+                            <Button 
+                                onClick={() => setShowVoice(true)}
+                                variant="contained" 
+                                color="inherit" 
+                                startIcon={<MicIcon />}
+                                sx={{ color: 'primary.main', fontWeight: 800, borderRadius: 2 }}
+                            >
+                                Voice Book
+                            </Button>
+                        )}
+                        {onClose && (
+                            <IconButton onClick={onClose} sx={{ color: 'white' }}><CloseIcon /></IconButton>
+                        )}
+                    </Stack>
+                </Stack>
+                <Stepper activeStep={activeStep} sx={{ '& .MuiStepLabel-label': { color: 'white', opacity: 0.7 }, '& .MuiStepLabel-active .MuiStepLabel-label': { color: 'white', opacity: 1, fontWeight: 800 }, '& .MuiStepIcon-root': { color: 'rgba(255,255,255,0.3)' }, '& .MuiStepIcon-active': { color: 'white' } }}>
+                    {steps.map((label) => (
+                        <Step key={label}><StepLabel>{label}</StepLabel></Step>
                     ))}
-                </div>
-                <div className="flex mt-2 text-sm">
-                    <span className={`flex-1 ${step === 1 ? 'font-bold' : 'opacity-70'}`}>Select Doctor</span>
-                    <span className={`flex-1 text-center ${step === 2 ? 'font-bold' : 'opacity-70'}`}>Choose Time</span>
-                    <span className={`flex-1 text-right ${step === 3 ? 'font-bold' : 'opacity-70'}`}>Confirm</span>
-                </div>
-            </div>
+                </Stepper>
+            </Box>
 
-            <div className="p-6">
-                {/* Error/Success Messages */}
-                {error && (
-                    <div className="mb-4 p-3 bg-error-soft border border-red-500/30 text-error rounded-lg flex justify-between">
-                        <span>{error}</span>
-                        <button onClick={() => setError('')}>✕</button>
-                    </div>
-                )}
-                {success && (
-                    <div className="mb-4 p-3 bg-success-soft border border-green-500/30 text-success rounded-lg">
-                        ✓ {success}
-                    </div>
-                )}
+            <Box sx={{ p: 4 }}>
+                {error && <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setError('')}>{error}</Alert>}
+                {success && <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>{success}</Alert>}
 
-                {/* Step 1: Select Doctor */}
-                {step === 1 && (
-                    <div>
-                        <h3 className="text-lg font-semibold mb-4 text-foreground">Select a Doctor</h3>
-                        
-                        {/* Filter */}
-                        <div className="mb-4">
-                            <select
-                                value={filterSpecialization}
-                                onChange={(e) => setFilterSpecialization(e.target.value)}
-                                className="w-full md:w-auto px-4 py-2 border border-border bg-input rounded-lg focus:ring-2 focus:ring-blue-500 text-foreground"
-                            >
-                                <option value="">All Specializations</option>
-                                {uniqueSpecializations.map(spec => (
-                                    <option key={spec} value={spec}>{spec}</option>
-                                ))}
-                            </select>
-                        </div>
+                {activeStep === 0 && (
+                    <Box>
+                        <Stack direction="row" spacing={2} sx={{ mb: 4 }} alignItems="center">
+                            <FormControl size="small" sx={{ minWidth: 200 }}>
+                                <InputLabel>Specialization</InputLabel>
+                                <Select
+                                    value={filterSpecialization}
+                                    label="Specialization"
+                                    onChange={(e) => setFilterSpecialization(e.target.value)}
+                                >
+                                    <option value="">All Specializations</option>
+                                    {uniqueSpecializations.map(spec => (
+                                        <MenuItem key={spec} value={spec}>{spec}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Stack>
 
-                        {/* Doctor Cards */}
                         {loading ? (
-                            <div className="text-center py-8">
-                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
-                            </div>
+                            <Box sx={{ py: 8, textAlign: 'center' }}><CircularProgress /></Box>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Grid container spacing={2}>
                                 {filteredDoctors.map(doctor => (
-                                    <div
-                                        key={doctor.user_id}
-                                        onClick={() => setSelectedDoctor(doctor)}
-                                        className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-lg ${
-                                            selectedDoctor?.user_id === doctor.user_id
-                                                ? 'border-blue-500 bg-blue-500/10'
-                                                : 'border-border hover:border-blue-400'
-                                        }`}
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-500 text-xl font-bold">
-                                                {doctor.full_name?.charAt(0) || 'D'}
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-semibold text-foreground">{doctor.full_name}</h4>
-                                                <p className="text-sm text-blue-600">{doctor.specialization || 'General'}</p>
-                                                <p className="text-xs text-muted-foreground">{doctor.department}</p>
-                                                {doctor.has_schedule ? (
-                                                    <span className="inline-block mt-2 text-xs bg-success-soft text-success px-2 py-1 rounded">
-                                                        ✓ Available
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-block mt-2 text-xs bg-muted text-muted-foreground px-2 py-1 rounded">
-                                                        No schedule set
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <Grid item xs={12} md={6} key={doctor.user_id}>
+                                        <Card 
+                                            variant="outlined" 
+                                            onClick={() => setSelectedDoctor(doctor)}
+                                            sx={{ 
+                                                cursor: 'pointer', 
+                                                transition: 'all 0.2s',
+                                                borderColor: selectedDoctor?.user_id === doctor.user_id ? 'primary.main' : 'divider',
+                                                bgcolor: selectedDoctor?.user_id === doctor.user_id ? 'primary.lighter' : 'background.paper',
+                                                '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 }
+                                            }}
+                                        >
+                                            <CardContent>
+                                                <Stack direction="row" spacing={2} alignItems="center">
+                                                    <Avatar sx={{ width: 56, height: 56, bgcolor: 'primary.main', fontWeight: 800 }}>
+                                                        {doctor.full_name?.charAt(0)}
+                                                    </Avatar>
+                                                    <Box sx={{ flex: 1 }}>
+                                                        <Typography variant="subtitle1" fontWeight={800}>{doctor.full_name}</Typography>
+                                                        <Typography variant="caption" color="primary" fontWeight={700} sx={{ display: 'block' }}>{doctor.specialization || 'General'}</Typography>
+                                                        <Typography variant="caption" color="text.secondary">{doctor.department}</Typography>
+                                                        <Box sx={{ mt: 1 }}>
+                                                            {doctor.has_schedule ? (
+                                                                <Chip label="Available" size="small" color="success" sx={{ height: 20, fontSize: '10px', fontWeight: 800 }} />
+                                                            ) : (
+                                                                <Chip label="No Schedule" size="small" sx={{ height: 20, fontSize: '10px', fontWeight: 800 }} />
+                                                            )}
+                                                        </Box>
+                                                    </Box>
+                                                </Stack>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
                                 ))}
-                            </div>
+                            </Grid>
                         )}
 
-                        {filteredDoctors.length === 0 && !loading && (
-                            <p className="text-center text-muted-foreground py-8">No doctors available</p>
-                        )}
-
-                        <div className="flex justify-end mt-6">
-                            <button
-                                onClick={() => setStep(2)}
-                                disabled={!selectedDoctor}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition"
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
+                            <Button 
+                                variant="contained" 
+                                disabled={!selectedDoctor} 
+                                onClick={handleNext} 
+                                endIcon={<ArrowForwardIcon />}
+                                sx={{ borderRadius: 2, px: 4 }}
                             >
-                                Next →
-                            </button>
-                        </div>
-                    </div>
+                                Next
+                            </Button>
+                        </Box>
+                    </Box>
                 )}
 
-                {/* Step 2: Select Date & Time */}
-                {step === 2 && (
-                    <div>
-                        <h3 className="text-lg font-semibold mb-4 text-foreground">
-                            Select Date & Time with Dr. {selectedDoctor?.full_name}
-                        </h3>
+                {activeStep === 1 && (
+                    <Box>
+                        <Typography variant="h6" fontWeight={800} sx={{ mb: 3 }}>
+                            Schedule with Dr. {selectedDoctor?.full_name}
+                        </Typography>
 
-                        {/* Date Picker */}
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-text-secondary mb-2">Select Date</label>
-                            <input
-                                type="date"
-                                value={selectedDate}
-                                onChange={handleDateChange}
-                                min={getMinDate()}
-                                max={getMaxDate()}
-                                className="w-full px-4 py-3 border border-border bg-input rounded-lg focus:ring-2 focus:ring-blue-500 text-foreground"
-                            />
-                        </div>
+                        <TextField
+                            label="Select Date"
+                            type="date"
+                            fullWidth
+                            value={selectedDate}
+                            onChange={handleDateChange}
+                            InputLabelProps={{ shrink: true }}
+                            inputProps={{ min: getMinDate(), max: getMaxDate() }}
+                            sx={{ mb: 4 }}
+                        />
 
-                        {/* Shift-Grouped Time Slots */}
                         {selectedDate && (
-                            <div>
-                                <label className="block text-sm font-medium text-text-secondary mb-2">Available Time Slots</label>
+                            <Box>
                                 {loading ? (
-                                    <div className="text-center py-4">
-                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                                    </div>
+                                    <Box sx={{ py: 4, textAlign: 'center' }}><CircularProgress size={24} /></Box>
                                 ) : slots.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {/* Group slots by shift */}
+                                    <Stack spacing={3}>
                                         {(() => {
                                             const shiftGroups = {};
-                                            const shiftOrder = ['Morning', 'Afternoon', 'Evening'];
-                                            const shiftColors = {
-                                                'Morning': { bg: 'bg-amber-500/10', border: 'border-amber-500/30', badge: 'bg-amber-500/20 text-amber-500', icon: '🌅' },
-                                                'Afternoon': { bg: 'bg-blue-500/10', border: 'border-blue-500/30', badge: 'bg-blue-500/20 text-blue-500', icon: '☀️' },
-                                                'Evening': { bg: 'bg-indigo-500/10', border: 'border-indigo-500/30', badge: 'bg-indigo-500/20 text-indigo-400', icon: '🌙' }
-                                            };
+                                            const shiftOrder = ['Morning', 'Afternoon', 'Evening', 'Night'];
                                             slots.forEach(slot => {
                                                 const shift = slot.shift || 'Other';
                                                 if (!shiftGroups[shift]) shiftGroups[shift] = [];
                                                 shiftGroups[shift].push(slot);
                                             });
                                             const orderedShifts = shiftOrder.filter(s => shiftGroups[s]);
-                                            Object.keys(shiftGroups).forEach(s => {
-                                                if (!orderedShifts.includes(s)) orderedShifts.push(s);
-                                            });
-                                            return orderedShifts.map(shift => {
-                                                const colors = shiftColors[shift] || { bg: 'bg-muted', border: 'border-border', badge: 'bg-muted text-muted-foreground', icon: '⏰' };
-                                                return (
-                                                    <div key={shift} className={`${colors.bg} ${colors.border} border rounded-lg p-4`}>
-                                                        <div className="flex items-center gap-2 mb-3">
-                                                            <span className="text-lg">{colors.icon}</span>
-                                                            <h4 className="font-semibold text-foreground">{shift} Shift</h4>
-                                                            <span className={`text-xs px-2 py-0.5 rounded-full ${colors.badge}`}>
-                                                                {shiftGroups[shift].length} slots
-                                                            </span>
-                                                        </div>
-                                                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                                                            {shiftGroups[shift].map((slot, idx) => (
-                                                                <button
-                                                                    key={idx}
+                                            return orderedShifts.map(shift => (
+                                                <Paper variant="outlined" key={shift} sx={{ p: 2, bgcolor: 'action.hover' }}>
+                                                    <Typography variant="subtitle2" fontWeight={800} sx={{ mb: 2, textTransform: 'uppercase' }}>
+                                                        {shift} Shift ({shiftGroups[shift].length} slots)
+                                                    </Typography>
+                                                    <Grid container spacing={1}>
+                                                        {shiftGroups[shift].map((slot, idx) => (
+                                                            <Grid item xs={4} sm={3} md={2} key={idx}>
+                                                                <Button
+                                                                    fullWidth
+                                                                    variant={selectedSlot?.start === slot.start ? 'contained' : 'outlined'}
+                                                                    size="small"
                                                                     onClick={() => setSelectedSlot(slot)}
-                                                                    className={`py-2 px-3 text-sm border rounded-lg transition font-medium ${
-                                                                        selectedSlot?.start === slot.start
-                                                                            ? 'bg-blue-600 text-white border-blue-600'
-                                                                            : 'bg-card text-foreground border-border hover:border-blue-400 hover:bg-blue-500/10'
-                                                                    }`}
+                                                                    sx={{ borderRadius: 2, fontWeight: 700 }}
                                                                 >
-                                                                    {slot.start}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            });
+                                                                    {formatTimeAmPm(slot.start)}
+                                                                </Button>
+                                                            </Grid>
+                                                        ))}
+                                                    </Grid>
+                                                </Paper>
+                                            ));
                                         })()}
-                                    </div>
+                                    </Stack>
                                 ) : (
-                                    <p className="text-muted-foreground text-center py-4">No available slots for this date</p>
+                                    <Typography variant="body2" color="text.secondary" textAlign="center">No available slots for this date</Typography>
                                 )}
-                            </div>
+                            </Box>
                         )}
 
-                        <div className="flex justify-between mt-6">
-                            <button
-                                onClick={() => setStep(1)}
-                                className="px-6 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition"
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+                            <Button onClick={handleBack} startIcon={<ArrowBackIcon />}>Back</Button>
+                            <Button 
+                                variant="contained" 
+                                disabled={!selectedSlot} 
+                                onClick={handleNext} 
+                                endIcon={<ArrowForwardIcon />}
+                                sx={{ borderRadius: 2, px: 4 }}
                             >
-                                ← Back
-                            </button>
-                            <button
-                                onClick={() => setStep(3)}
-                                disabled={!selectedSlot}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition"
-                            >
-                                Next →
-                            </button>
-                        </div>
-                    </div>
+                                Next
+                            </Button>
+                        </Box>
+                    </Box>
                 )}
 
-                {/* Step 3: Confirm */}
-                {step === 3 && (
-                    <div>
-                        <h3 className="text-lg font-semibold mb-4 text-foreground">Confirm Appointment</h3>
+                {activeStep === 2 && (
+                    <Box>
+                        <Paper variant="outlined" sx={{ p: 3, mb: 4, bgcolor: 'action.hover' }}>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase' }}>Doctor</Typography>
+                                    <Typography variant="h6" fontWeight={800}>{selectedDoctor?.full_name}</Typography>
+                                    <Typography variant="body2" color="primary" fontWeight={700}>{selectedDoctor?.specialization}</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, textTransform: 'uppercase' }}>Schedule</Typography>
+                                    <Typography variant="h6" fontWeight={800}>{selectedDate}</Typography>
+                                    <Typography variant="body2" color="text.secondary">{formatTimeAmPm(selectedSlot?.start)} - {formatTimeAmPm(selectedSlot?.end)}</Typography>
+                                    {selectedSlot?.shift && <Chip label={selectedSlot.shift + ' Shift'} size="small" variant="soft" color="info" sx={{ mt: 1, fontWeight: 800 }} />}
+                                </Grid>
+                            </Grid>
+                        </Paper>
 
-                        <div className="bg-muted rounded-lg p-6 mb-6">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Doctor</p>
-                                    <p className="font-semibold text-foreground">{selectedDoctor?.full_name}</p>
-                                    <p className="text-sm text-blue-600">{selectedDoctor?.specialization}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Date & Time</p>
-                                    <p className="font-semibold text-foreground">{selectedDate}</p>
-                                    <p className="text-sm text-text-secondary">{selectedSlot?.start} - {selectedSlot?.end}</p>
-                                    {selectedSlot?.shift && (
-                                        <p className="text-xs text-blue-500 mt-1">🕐 {selectedSlot.shift} Shift</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        <TextField
+                            label="Notes / Reason (Optional)"
+                            multiline
+                            rows={3}
+                            fullWidth
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            placeholder="Describe your symptoms..."
+                            sx={{ mb: 4 }}
+                        />
 
-                        <div className="mb-6">
-                            <label className="block text-sm font-medium text-text-secondary mb-2">
-                                Notes / Reason for Visit (Optional)
-                            </label>
-                            <textarea
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                placeholder="Describe your symptoms or reason for the appointment..."
-                                rows={3}
-                                className="w-full px-4 py-3 border border-border bg-input rounded-lg focus:ring-2 focus:ring-blue-500 text-foreground placeholder:text-muted-foreground"
-                            />
-                        </div>
-
-                        <div className="flex justify-between">
-                            <button
-                                onClick={() => setStep(2)}
-                                className="px-6 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition"
-                            >
-                                ← Back
-                            </button>
-                            <button
-                                onClick={handleBookAppointment}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Button onClick={handleBack} startIcon={<ArrowBackIcon />}>Back</Button>
+                            <Button 
+                                variant="contained" 
+                                color="success" 
+                                onClick={handleBookAppointment} 
                                 disabled={loading}
-                                className="px-8 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-muted disabled:text-muted-foreground transition flex items-center gap-2"
+                                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
+                                sx={{ borderRadius: 2, px: 6, fontWeight: 800 }}
                             >
-                                {loading ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                        Booking...
-                                    </>
-                                ) : (
-                                    <>✓ Confirm Booking</>
-                                )}
-                            </button>
-                        </div>
-                    </div>
+                                {loading ? 'Booking...' : 'Confirm Appointment'}
+                            </Button>
+                        </Box>
+                    </Box>
                 )}
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 };
-
 export default BookAppointment;

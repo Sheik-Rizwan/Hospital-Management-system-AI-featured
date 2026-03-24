@@ -35,61 +35,289 @@ INTENT_QUERY_DOCS   = 'QUERY_DOCTORS'
 INTENT_QUERY_SHIFT  = 'QUERY_DOCTOR_SHIFT'
 INTENT_NONE         = 'NONE'
 
-# Keyword patterns for intent detection
+# Keyword patterns for intent detection — Multilingual
+# Supports: English, Hindi (Romanized + Devanagari), Telugu, Kannada, Urdu
+
 _BOOK_KEYWORDS = [
+    # English
     r'\bbook\b', r'\bappointment\b', r'\bschedule\b', r'\bfix\s+appointment\b',
     r'\bneed\s+(a\s+)?doctor\b', r'\bwant\s+(to\s+)?see\b', r'\bconsult\b',
+    # Common STT mistakes for "appointment"
+    r'\bappar?t?ment\b', r'\bappoitment\b', r'\bappoinment\b', r'\bapoint\b',
+    # Hindi (Romanized)
+    r'\bappointment\s+(book|karo|karna|chahiye|lena|fix)\b',
+    r'\b(book|fix)\s+karo\b', r'\b(book|fix)\s+karna\b',
+    r'\bdoctor\s+(se|ko)\s+(milna|dikhana)\b', r'\bdoctor\s+chahiye\b',
+    r'\bdikhao\b.*\bdoctor\b', r'\bmilna\s+hai\b',
+    r'\bappointment\s+lena\b', r'\bappointment\s+fix\b',
+    # Hinglish (code-mixed)
+    r'\bappointment\s+fix\s+karo\b', r'\b(book|fix)\s+kar\s+do\b',
+    r'\bdoctor\s+(se|ke\s+paas)\s+(milwa\s+do|jaana)\b',
+    r'\bmilna\s+chahta\b', r'\bmilwa\s+do\b',
+    r'\bdoctor\s+ke\s+paas\s+jaana\b',
+    # Common Hindi romanized booking phrases
+    r'\bparsu\s+(ke\s+liye|ko)\b', r'\bkal\s+(ke\s+liye|ko)\b',
+    r'\baaj\s+(ke\s+liye|ko)\b',
+    # Hindi (Devanagari)
+    r'अपॉइंटमेंट', r'बुक\s+कर', r'डॉक्टर\s+से\s+मिलना', r'डॉक्टर\s+चाहिए',
+    r'अपॉइंटमेंट\s+बुक', r'दिखाओ', r'मिलना\s+है',
+    r'परसों', r'कल', r'आज',  # Hindi dates: day after tomorrow, tomorrow, today
+    # Telugu
+    r'అపాయింట్మెంట్', r'బుక్', r'డాక్టర్\s+దగ్గర', r'డాక్టర్\s+కావాలి',
+    r'చూపించు', r'కలవాలి', r'నాకు\s+డాక్టర్',
+    # Telglish (code-mixed)
+    r'\bappointment\s+(book|fix)\s+cheyandi\b',
+    r'\b(book|fix)\s+chesi\s+ivvandi\b',
+    r'\bdoctor\s+daggariki\s+vellali\b',
+    # Kannada
+    r'ಅಪಾಯಿಂಟ್ಮೆಂಟ್', r'ಬುಕ್', r'ಡಾಕ್ಟರ್\s+ಬಳಿ', r'ಡಾಕ್ಟರ್\s+ಬೇಕು',
+    r'ತೋರಿಸಿ', r'ಭೇಟಿ\s+ಮಾಡ',
+    # Kanglish (code-mixed)
+    r'\bappointment\s+(book|fix)\s+maadi\b',
+    r'\b(book|fix)\s+maadkodi\b',
+    r'\bdoctor\s+hatira\s+hogbeku\b',
+    # Urdu
+    r'اپائنٹمنٹ', r'بک\s+کر', r'ڈاکٹر\s+سے\s+ملنا', r'ڈاکٹر\s+چاہیے',
+    r'ملنا\s+ہے', r'دکھاؤ',
 ]
 _SLOT_KEYWORDS = [
+    # English
     r'\bslots?\b', r'\bavailab', r'\btimings?\b', r'\bfree\s+slots?\b',
     r'\bhow\s+many\s+slots?\b', r'\bwhat\s+time\b',
+    # Hindi (Romanized)
+    r'\bslot\s+(available|hai|hain|kitne|dikhao)\b', r'\bsamay\b', r'\bwaqt\b',
+    r'\bkitne\s+slot\b', r'\bkya\s+time\b', r'\btime\s+(kya|batao|dikhao)\b',
+    # Hindi (Devanagari)
+    r'स्लॉट', r'समय', r'कितने\s+स्लॉट', r'टाइम\s+बताओ',
+    # Telugu
+    r'స్లాట్', r'సమయం', r'ఎన్ని\s+స్లాట్', r'టైమ్\s+చెప్పు',
+    # Kannada
+    r'ಸ್ಲಾಟ್', r'ಸಮಯ', r'ಎಷ್ಟು\s+ಸ್ಲಾಟ್', r'ಟೈಮ್\s+ಹೇಳಿ',
+    # Urdu
+    r'سلاٹ', r'وقت', r'کتنے\s+سلاٹ', r'ٹائم\s+بتاؤ',
 ]
 _DOC_KEYWORDS = [
+    # English
     r'\bwhich\s+doctors?\b', r'\bdoctors?\s+available\b', r'\bwho\s+is\s+available\b',
     r'\blist\s+doctors?\b', r'\bdoctors?\s+in\b', r'\bshow\s+(me\s+)?doctors?\b',
+    # Hindi (Romanized)
+    r'\bkaun\s+(sa\s+)?doctor\b', r'\bdoctor\s+(kaun|kon)\b',
+    r'\bdoctor\s+(available|hai)\b', r'\bdoctor\s+dikhao\b',
+    r'\bdoctor\s+batao\b', r'\bdoctor\s+list\b',
+    # Hindi (Devanagari)
+    r'कौन\s+सा\s+डॉक्टर', r'डॉक्टर\s+दिखाओ', r'डॉक्टर\s+बताओ', r'डॉक्टर\s+कौन',
+    # Telugu
+    r'ఏ\s+డాక్టర్', r'డాక్టర్\s+ఎవరు', r'డాక్టర్\s+చూపించు', r'డాక్టర్\s+లిస్ట్',
+    # Kannada
+    r'ಯಾವ\s+ಡಾಕ್ಟರ್', r'ಡಾಕ್ಟರ್\s+ಯಾರು', r'ಡಾಕ್ಟರ್\s+ತೋರಿಸಿ', r'ಡಾಕ್ಟರ್\s+ಪಟ್ಟಿ',
+    # Urdu
+    r'کون\s+سا\s+ڈاکٹر', r'ڈاکٹر\s+دکھاؤ', r'ڈاکٹر\s+بتاؤ', r'ڈاکٹر\s+کون',
 ]
 _SHIFT_KEYWORDS = [
+    # English
     r'\bshift\b', r'\bwhen\s+is\s+dr\b', r'\bdoctor\s+timing\b',
     r'\bmorning\s+shift\b', r'\bevening\s+shift\b', r'\bwork(ing)?\s+hours?\b',
     r'\bwhat\s+time\s+does\b.*\bwork\b',
+    # Hindi (Romanized)
+    r'\bshift\s+(kab|kya|batao)\b', r'\bdoctor\s+(kab|kitne\s+baje)\b',
+    r'\bsubah\s+(ka\s+)?shift\b', r'\bsham\s+(ka\s+)?shift\b',
+    r'\bkab\s+aate\b', r'\btiming\s+(kya|batao)\b',
+    # Hindi (Devanagari)
+    r'शिफ्ट', r'डॉक्टर\s+कब', r'सुबह\s+की\s+शिफ्ट', r'शाम\s+की\s+शिफ्ट',
+    r'कब\s+आते', r'टाइमिंग',
+    # Telugu
+    r'షిఫ్ట్', r'డాక్టర్\s+ఎప్పుడు', r'ఉదయం\s+షిఫ్ట్', r'సాయంత్రం\s+షిఫ్ట్',
+    r'ఎప్పుడు\s+వస్తారు', r'టైమింగ్',
+    # Kannada
+    r'ಶಿಫ್ಟ್', r'ಡಾಕ್ಟರ್\s+ಯಾವಾಗ', r'ಬೆಳಿಗ್ಗೆ\s+ಶಿಫ್ಟ್', r'ಸಂಜೆ\s+ಶಿಫ್ಟ್',
+    r'ಯಾವಾಗ\s+ಬರುತ್ತಾರೆ', r'ಟೈಮಿಂಗ್',
+    # Urdu
+    r'شفٹ', r'ڈاکٹر\s+کب', r'صبح\s+کی\s+شفٹ', r'شام\s+کی\s+شفٹ',
+    r'کب\s+آتے', r'ٹائمنگ',
 ]
 
 # Specialty aliases — maps common words to canonical specialty names
+# Multilingual: English, Hindi (Romanized + Devanagari), Telugu, Kannada, Urdu
 SPECIALTY_ALIASES = {
-    # Cardiology
+    # ── Cardiology ──
     'cardiology': 'Cardiology', 'cardiologist': 'Cardiology', 'heart': 'Cardiology',
     'cardiac': 'Cardiology',
-    # Orthopedics
+    # Hindi
+    'dil': 'Cardiology', 'hriday': 'Cardiology', 'dil ka doctor': 'Cardiology',
+    'हृदय': 'Cardiology', 'दिल': 'Cardiology',
+    # Telugu
+    'గుండె': 'Cardiology', 'హృదయం': 'Cardiology',
+    # Kannada
+    'ಹೃದಯ': 'Cardiology', 'ಎದೆ': 'Cardiology',
+    # Urdu
+    'دل': 'Cardiology',
+
+    # ── Orthopedics ──
     'orthopedics': 'Orthopedics', 'orthopaedics': 'Orthopedics', 'ortho': 'Orthopedics',
     'bone': 'Orthopedics', 'joint': 'Orthopedics', 'fracture': 'Orthopedics',
-    # Dermatology
+    # Hindi
+    'haddi': 'Orthopedics', 'jod': 'Orthopedics', 'haddi ka doctor': 'Orthopedics',
+    'हड्डी': 'Orthopedics', 'जोड़': 'Orthopedics', 'फ्रैक्चर': 'Orthopedics',
+    # Telugu
+    'ఎముక': 'Orthopedics', 'కీళ్ళు': 'Orthopedics',
+    # Kannada
+    'ಮೂಳೆ': 'Orthopedics', 'ಕೀಲು': 'Orthopedics',
+    # Urdu
+    'ہڈی': 'Orthopedics', 'جوڑ': 'Orthopedics',
+
+    # ── Dermatology ──
     'dermatology': 'Dermatology', 'dermatologist': 'Dermatology', 'skin': 'Dermatology',
-    # Neurology
+    # Hindi
+    'twacha': 'Dermatology', 'chamdi': 'Dermatology', 'skin ka doctor': 'Dermatology',
+    'त्वचा': 'Dermatology', 'चमड़ी': 'Dermatology',
+    # Telugu
+    'చర్మం': 'Dermatology',
+    # Kannada
+    'ಚರ್ಮ': 'Dermatology',
+    # Urdu
+    'جلد': 'Dermatology',
+
+    # ── Neurology ──
     'neurology': 'Neurology', 'neurologist': 'Neurology', 'brain': 'Neurology',
     'nerve': 'Neurology',
-    # Pediatrics
+    # Hindi
+    'dimag': 'Neurology', 'naso': 'Neurology', 'dimag ka doctor': 'Neurology',
+    'दिमाग': 'Neurology', 'नस': 'Neurology',
+    # Telugu
+    'మెదడు': 'Neurology', 'నరాలు': 'Neurology',
+    # Kannada
+    'ಮಿದುಳು': 'Neurology', 'ನರ': 'Neurology',
+    # Urdu
+    'دماغ': 'Neurology', 'نس': 'Neurology',
+
+    # ── Pediatrics ──
     'pediatrics': 'Pediatrics', 'paediatrics': 'Pediatrics', 'pediatrician': 'Pediatrics',
     'child': 'Pediatrics', 'kids': 'Pediatrics', 'baby': 'Pediatrics',
-    # ENT
+    # Hindi
+    'bacche': 'Pediatrics', 'bachche': 'Pediatrics', 'bacche ka doctor': 'Pediatrics',
+    'shishu': 'Pediatrics',
+    'बच्चे': 'Pediatrics', 'बच्चों': 'Pediatrics', 'शिशु': 'Pediatrics',
+    # Telugu
+    'పిల్లలు': 'Pediatrics', 'బాబు': 'Pediatrics',
+    # Kannada
+    'ಮಕ್ಕಳ': 'Pediatrics', 'ಮಗು': 'Pediatrics',
+    # Urdu
+    'بچے': 'Pediatrics', 'بچوں': 'Pediatrics',
+
+    # ── ENT ──
     'ent': 'ENT', 'ear': 'ENT', 'nose': 'ENT', 'throat': 'ENT',
-    # Dentistry
+    # Hindi
+    'kan': 'ENT', 'naak': 'ENT', 'gala': 'ENT', 'kan naak gala': 'ENT',
+    'कान': 'ENT', 'नाक': 'ENT', 'गला': 'ENT',
+    # Telugu
+    'చెవి': 'ENT', 'ముక్కు': 'ENT', 'గొంతు': 'ENT',
+    # Kannada
+    'ಕಿವಿ': 'ENT', 'ಮೂಗು': 'ENT', 'ಗಂಟಲು': 'ENT',
+    # Urdu
+    'کان': 'ENT', 'ناک': 'ENT', 'گلا': 'ENT',
+
+    # ── Dentistry ──
     'dentistry': 'Dentistry', 'dentist': 'Dentistry', 'dental': 'Dentistry',
     'teeth': 'Dentistry', 'tooth': 'Dentistry',
-    # General Medicine
+    # Hindi
+    'daant': 'Dentistry', 'dant': 'Dentistry', 'daant ka doctor': 'Dentistry',
+    'दांत': 'Dentistry', 'दन्त': 'Dentistry',
+    # Telugu
+    'దంతాలు': 'Dentistry', 'పళ్ళు': 'Dentistry',
+    # Kannada
+    'ಹಲ್ಲು': 'Dentistry', 'ದಂತ': 'Dentistry',
+    # Urdu
+    'دانت': 'Dentistry',
+
+    # ── General Medicine ──
     'general medicine': 'General Medicine',
     'gp': 'General Medicine', 'fever': 'General Medicine', 'cold': 'General Medicine',
-    # General Consultation
+    # Hindi
+    'bukhar': 'General Medicine', 'bimari': 'General Medicine', 'sardi': 'General Medicine',
+    'बुखार': 'General Medicine', 'बीमारी': 'General Medicine', 'सर्दी': 'General Medicine',
+    # Telugu
+    'జ్వరం': 'General Medicine', 'జలుబు': 'General Medicine',
+    # Kannada
+    'ಜ್ವರ': 'General Medicine', 'ನೆಗಡಿ': 'General Medicine',
+    # Urdu
+    'بخار': 'General Medicine', 'سردی': 'General Medicine',
+
+    # ── General Consultation ──
     'general': 'General Consultation', 'general consultation': 'General Consultation',
     'general consultancy': 'General Consultation', 'consultation': 'General Consultation',
-    # Gynecology
+    # Hindi
+    'aam salah': 'General Consultation', 'samanya': 'General Consultation',
+    'सामान्य': 'General Consultation', 'सामान्य सलाह': 'General Consultation',
+    # Telugu
+    'సాధారణ సంప్రదింపు': 'General Consultation',
+    # Kannada
+    'ಸಾಮಾನ್ಯ ಸಮಾಲೋಚನೆ': 'General Consultation',
+    # Urdu
+    'عام مشورہ': 'General Consultation',
+
+    # ── Gynecology ──
     'gynecology': 'Gynecology', 'gynaecology': 'Gynecology', 'gynecologist': 'Gynecology',
-    # Ophthalmology
+    # Hindi
+    'mahila rog': 'Gynecology', 'stri rog': 'Gynecology', 'pregnancy': 'Gynecology',
+    'महिला रोग': 'Gynecology', 'स्त्री रोग': 'Gynecology',
+    # Telugu
+    'స్త్రీ వైద్యం': 'Gynecology', 'గర్భం': 'Gynecology',
+    # Kannada
+    'ಮಹಿಳಾ ವೈದ್ಯ': 'Gynecology', 'ಗರ್ಭ': 'Gynecology',
+    # Urdu
+    'خواتین': 'Gynecology', 'حمل': 'Gynecology',
+
+    # ── Ophthalmology ──
     'ophthalmology': 'Ophthalmology', 'eye': 'Ophthalmology', 'eyes': 'Ophthalmology',
     'vision': 'Ophthalmology',
-    # Urology
+    # Hindi
+    'aankh': 'Ophthalmology', 'nazar': 'Ophthalmology', 'aankh ka doctor': 'Ophthalmology',
+    'आंख': 'Ophthalmology', 'नजर': 'Ophthalmology',
+    # Telugu
+    'కంటి': 'Ophthalmology', 'కళ్ళు': 'Ophthalmology',
+    # Kannada
+    'ಕಣ್ಣು': 'Ophthalmology', 'ದೃಷ್ಟಿ': 'Ophthalmology',
+    # Urdu
+    'آنکھ': 'Ophthalmology', 'نظر': 'Ophthalmology',
+
+    # ── Urology ──
     'urology': 'Urology', 'urologist': 'Urology',
-    # Psychiatry
+    # Hindi
+    'peshab': 'Urology', 'गुर्दा': 'Urology', 'पेशाब': 'Urology',
+    # Telugu
+    'మూత్రం': 'Urology',
+    # Kannada
+    'ಮೂತ್ರ': 'Urology',
+    # Urdu
+    'پیشاب': 'Urology', 'گردہ': 'Urology',
+
+    # ── Psychiatry ──
     'psychiatry': 'Psychiatry', 'mental': 'Psychiatry', 'psychology': 'Psychiatry',
+    # Hindi
+    'mansik': 'Psychiatry', 'pagal': 'Psychiatry', 'mansik swasthya': 'Psychiatry',
+    'मानसिक': 'Psychiatry', 'मानसिक स्वास्थ्य': 'Psychiatry',
+    # Telugu
+    'మానసిక': 'Psychiatry',
+    # Kannada
+    'ಮಾನಸಿಕ': 'Psychiatry',
+    # Urdu
+    'ذہنی': 'Psychiatry', 'نفسیاتی': 'Psychiatry',
+
+    # ── Code-Mixed Specialty References (Hinglish/Kanglish/Telglish) ──
+    # Hinglish
+    'heart ka doctor': 'Cardiology', 'bone ka doctor': 'Orthopedics',
+    'eye ka doctor': 'Ophthalmology', 'skin ka doctor': 'Dermatology',
+    'pet ka doctor': 'General Medicine', 'bachche ka doctor': 'Pediatrics',
+    'daant ka doctor': 'Dentistry', 'dimag ka doctor': 'Neurology',
+    'eye doctor chahiye': 'Ophthalmology', 'skin problem': 'Dermatology',
+    # Telglish
+    'heart doctor kavali': 'Cardiology', 'bone doctor kavali': 'Orthopedics',
+    'kannu doctor kavali': 'Ophthalmology', 'skin doctor kavali': 'Dermatology',
+    'pillala doctor kavali': 'Pediatrics',
+    # Kanglish
+    'heart doctor beku': 'Cardiology', 'bone doctor beku': 'Orthopedics',
+    'kannu doctor beku': 'Ophthalmology', 'skin doctor beku': 'Dermatology',
+    'makkala doctor beku': 'Pediatrics',
 }
 
 
@@ -470,6 +698,8 @@ class SmartBookingEngine:
                 data['doctor_id'] = doctor_id
                 data['doctor_name'] = doctor['full_name']
                 data['specialty'] = doctor.get('specialization', '')
+                # Persist doctor selection before advancing
+                self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
         # Try specialty match first (user typed "cardiology")
@@ -484,6 +714,8 @@ class SmartBookingEngine:
                         self.notify.send_whatsapp_text(
                             sender_id, f"👨‍⚕️ Dr. {doctors[0]['full_name']} ({canonical})"
                         )
+                        # Persist doctor selection before advancing
+                        self.sm.transition_to(sender_id, data)
                         return self._advance_booking(sender_id, data)
                     else:
                         data['booking_state'] = BK_COLLECT_DOCTOR
@@ -500,13 +732,15 @@ class SmartBookingEngine:
             data['doctor_id'] = matched['user_id']
             data['doctor_name'] = matched['full_name']
             data['specialty'] = matched.get('specialization', '')
+            # Persist doctor selection before advancing
+            self.sm.transition_to(sender_id, data)
             return self._advance_booking(sender_id, data)
 
         # No match
-        self.notify.send_whatsapp_text(
-            sender_id,
-            "I couldn't find that doctor. Please pick from the list or type a name."
-        )
+        doctors = self.appt.get_active_doctors()
+        self._send_missing_doctor_two_step_messages(sender_id, doctors, text)
+        if doctors:
+            self._show_doctor_list_grouped(sender_id, doctors)
 
     def _handle_date_input(self, sender_id, text, data):
         """User is picking a date."""
@@ -520,6 +754,8 @@ class SmartBookingEngine:
         try:
             datetime.strptime(date_str, '%Y-%m-%d')
             data['date'] = date_str
+            # Persist date selection before advancing
+            self.sm.transition_to(sender_id, data)
             return self._advance_booking(sender_id, data)
         except ValueError:
             pass
@@ -528,6 +764,8 @@ class SmartBookingEngine:
         resolved = _parse_date(date_str)
         if resolved:
             data['date'] = resolved
+            # Persist date selection before advancing
+            self.sm.transition_to(sender_id, data)
             return self._advance_booking(sender_id, data)
 
         self.notify.send_whatsapp_text(
@@ -544,6 +782,8 @@ class SmartBookingEngine:
                 data['shift_start'] = parts[0]
                 data['shift_end'] = parts[1]
                 data['shift_name'] = self.appt._classify_shift(parts[0])
+                # Persist shift selection before advancing
+                self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
         # Fuzzy match shift name
@@ -557,6 +797,8 @@ class SmartBookingEngine:
                 data['shift_start'] = s['start']
                 data['shift_end'] = s['end']
                 data['shift_name'] = s['shift_name']
+                # Persist shift selection before advancing
+                self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
         self.notify.send_whatsapp_text(sender_id, "Please pick a shift from the list.")
@@ -565,12 +807,29 @@ class SmartBookingEngine:
         """User is picking a time slot."""
         available = data.get('_available_slots', [])
 
+        # If _available_slots is missing/empty, re-fetch slots from DB
+        # This handles cases where session data wasn't persisted correctly
+        if not available and data.get('doctor_id') and data.get('date'):
+            logger.info(f"🔄 Re-fetching slots for {sender_id} (session data missing _available_slots)")
+            slots = self.appt.get_shift_slots(
+                data.get('doctor_id', ''),
+                data.get('date', ''),
+                data.get('shift_start', ''),
+                data.get('shift_end', '')
+            )
+            available = [s['start'] for s in slots]
+            data['_available_slots'] = available
+            # Persist the re-fetched slots
+            self.sm.transition_to(sender_id, data)
+
         # Button/list selection
         if text.startswith('time_'):
             time_str = text.replace('time_', '', 1)
             if time_str in available:
                 data['time_slot'] = time_str
                 data['end_time'] = self._get_end_time(data, time_str)
+                # Persist slot selection before advancing
+                self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
         # Slot number (1, 2, 3…)
@@ -581,6 +840,8 @@ class SmartBookingEngine:
                 time_str = available[idx]
                 data['time_slot'] = time_str
                 data['end_time'] = self._get_end_time(data, time_str)
+                # Persist slot selection before advancing
+                self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
         # Try time parsing (9am, 10:00, etc)
@@ -590,6 +851,8 @@ class SmartBookingEngine:
             if matched:
                 data['time_slot'] = matched
                 data['end_time'] = self._get_end_time(data, matched)
+                # Persist slot selection before advancing
+                self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
         # "morning" / "afternoon" / "evening" keyword → first matching slot
@@ -597,6 +860,8 @@ class SmartBookingEngine:
         if period_match:
             data['time_slot'] = period_match
             data['end_time'] = self._get_end_time(data, period_match)
+            # Persist slot selection before advancing
+            self.sm.transition_to(sender_id, data)
             return self._advance_booking(sender_id, data)
 
         # Nothing matched
@@ -613,6 +878,8 @@ class SmartBookingEngine:
             return
         data['patient_name'] = name
         data['booked_for'] = 'other'
+        # Persist name selection before advancing
+        self.sm.transition_to(sender_id, data)
         self._advance_booking(sender_id, data)
 
     # ───────────────────────────────────────
@@ -689,7 +956,10 @@ class SmartBookingEngine:
         )
 
     def _show_shifts(self, sender_id, shifts, date_str):
-        """Show available shifts."""
+        """Show available shifts with AM/PM display."""
+        from services.appointment_service import AppointmentService
+        fmt = AppointmentService.format_time_ampm
+
         if len(shifts) <= 3:
             btn_titles = [f"{s['shift_name']} ({s['free_slots']} slots)" for s in shifts]
             btn_ids = [f"shift_{s['start']}_{s['end']}" for s in shifts]
@@ -702,21 +972,25 @@ class SmartBookingEngine:
                 items.append((
                     f"shift_{s['start']}_{s['end']}",
                     s['shift_name'],
-                    f"{s['start']}–{s['end']} ({s['free_slots']} slots)"
+                    f"{fmt(s['start'])}–{fmt(s['end'])} ({s['free_slots']} slots)"
                 ))
             self.notify.send_whatsapp_list(
                 sender_id, f"🕐 Select a shift for {date_str}:", items, title="Shifts"
             )
 
     def _show_slots(self, sender_id, slots, bk):
-        """Show available time slots with numbering."""
+        """Show available time slots with numbering in AM/PM format."""
+        from services.appointment_service import AppointmentService
+        fmt = AppointmentService.format_time_ampm
+
         # ── Text message with ALL slots (no limit) ──
         msg_lines = [
             f"⏰ *Available Slots ({len(slots)})*",
             f"Dr. {bk.get('doctor_name', '?')} | {bk.get('date', '?')} | {bk.get('shift_name', '')} shift\n",
         ]
         for i, slot in enumerate(slots, 1):
-            msg_lines.append(f"  {i}. {slot['start']} – {slot['end']}")
+            next_day_tag = ' (next day)' if slot.get('next_day') else ''
+            msg_lines.append(f"  {i}. {fmt(slot['start'])} – {fmt(slot['end'])}{next_day_tag}")
 
         msg_lines.append("\nReply with a *number* or *time* (e.g. '9 AM').")
         self.notify.send_whatsapp_text(sender_id, '\n'.join(msg_lines))
@@ -724,7 +998,8 @@ class SmartBookingEngine:
         # ── Interactive list (WhatsApp max 10 rows) ──
         items = []
         for slot in slots[:10]:
-            items.append((f"time_{slot['start']}", f"🕐 {slot['start']}", f"{slot['start']} – {slot['end']}"))
+            next_day_tag = ' (next day)' if slot.get('next_day') else ''
+            items.append((f"time_{slot['start']}", f"🕐 {fmt(slot['start'])}", f"{fmt(slot['start'])} – {fmt(slot['end'])}{next_day_tag}"))
 
         list_header = "Select a time slot:"
         if len(slots) > 10:
@@ -761,13 +1036,15 @@ class SmartBookingEngine:
             })
 
             appt_id = new_appt.get('appointment_id', '—')
+            from services.appointment_service import AppointmentService
+            fmt = AppointmentService.format_time_ampm
             confirm_msg = (
                 f"✅ *Appointment Booked!*\n\n"
                 f"🆔 ID: {appt_id}\n"
                 f"👤 Patient: {bk.get('patient_name')}\n"
                 f"👨‍⚕️ Doctor: Dr. {bk.get('doctor_name')}\n"
                 f"📅 Date: {bk['date']}\n"
-                f"⏰ Time: {bk['time_slot']} – {bk.get('end_time', '')}\n\n"
+                f"⏰ Time: {fmt(bk['time_slot'])} – {fmt(bk.get('end_time', ''))}\n\n"
                 f"⏳ Status: Pending Doctor Approval\n"
                 f"_You'll be notified once confirmed._"
             )
@@ -884,7 +1161,8 @@ class SmartBookingEngine:
         if doctor_name:
             matched = self._fuzzy_match_doctor(doctor_name)
             if not matched:
-                self.notify.send_whatsapp_text(sender_id, f"Doctor '{doctor_name}' not found.")
+                doctors = self.appt.get_active_doctors()
+                self._send_missing_doctor_two_step_messages(sender_id, doctors, doctor_name)
                 return
 
             if not date:
@@ -910,11 +1188,13 @@ class SmartBookingEngine:
                 )
                 return
 
+            from services.appointment_service import AppointmentService
+            fmt = AppointmentService.format_time_ampm
             msg = f"⏰ *Dr. {matched['full_name']}* — {date}:\n\n"
             for s in shifts:
                 slots = self.appt.get_shift_slots(matched['user_id'], date, s['start'], s['end'])
-                times = ', '.join(sl['start'] for sl in slots)
-                msg += f"*{s['shift_name']}* ({s['start']}–{s['end']}): {s['free_slots']} slots\n"
+                times = ', '.join(fmt(sl['start']) for sl in slots)
+                msg += f"*{s['shift_name']}* ({fmt(s['start'])}–{fmt(s['end'])}): {s['free_slots']} slots\n"
                 if times:
                     msg += f"  {times}\n"
             msg += "\nWant to book? Just say: _book with Dr. " + matched['full_name'] + f" on {date}_"
@@ -956,7 +1236,8 @@ class SmartBookingEngine:
 
         matched = self._fuzzy_match_doctor(doctor_name)
         if not matched:
-            self.notify.send_whatsapp_text(sender_id, f"Doctor '{doctor_name}' not found.")
+            doctors = self.appt.get_active_doctors()
+            self._send_missing_doctor_two_step_messages(sender_id, doctors, doctor_name)
             return
 
         # Get schedule from DB
@@ -969,6 +1250,8 @@ class SmartBookingEngine:
             self.notify.send_whatsapp_text(sender_id, f"Dr. {matched['full_name']} has no active schedule.")
             return
 
+        from services.appointment_service import AppointmentService
+        fmt = AppointmentService.format_time_ampm
         msg = f"🕐 *Dr. {matched['full_name']}* — Schedule:\n\n"
         # Group by day
         by_day = {}
@@ -982,7 +1265,7 @@ class SmartBookingEngine:
                 shift_strs = []
                 for s in shifts:
                     shift_name = self.appt._classify_shift(s['start_time'])
-                    shift_strs.append(f"{shift_name} ({s['start_time']}–{s['end_time']})")
+                    shift_strs.append(f"{shift_name} ({fmt(s['start_time'])}–{fmt(s['end_time'])})")
                 msg += f"• *{day}*: {', '.join(shift_strs)}\n"
 
         self.notify.send_whatsapp_text(sender_id, msg)
@@ -990,6 +1273,60 @@ class SmartBookingEngine:
     # ───────────────────────────────────────
     #  UTILITY HELPERS
     # ───────────────────────────────────────
+
+    def _build_missing_doctor_line(self, missing_doctor_name=None):
+        """Build the strict first fallback message for unknown doctors."""
+        requested_name = re.sub(
+            r'^\s*dr\.?\s*',
+            '',
+            str(missing_doctor_name or '').strip(),
+            flags=re.IGNORECASE
+        )
+        return (
+            f"Dr. {requested_name} is not there in our database."
+            if requested_name
+            else "That doctor is not there in our database."
+        )
+
+    def _build_present_doctors_list_text(self, doctors, limit=12):
+        """Build the strict second fallback message with numbered doctors + specialization."""
+        if not doctors:
+            return "No active doctors are currently available in the hospital."
+
+        lines = []
+        for doc in doctors[:limit]:
+            name = str(doc.get('full_name', '') or '').strip()
+            if not name:
+                continue
+            specialization = str(doc.get('specialization', 'General') or 'General').strip() or 'General'
+            lines.append(f"{len(lines) + 1}. Dr. {name} ({specialization})")
+
+        if not lines:
+            return "No active doctors are currently available in the hospital."
+
+        return "Present doctors:\n" + "\n".join(lines)
+
+    def _send_missing_doctor_two_step_messages(self, sender_id, doctors, missing_doctor_name=None, limit=12):
+        """Send missing-doctor fallback in exactly two WhatsApp messages."""
+        missing_line = self._build_missing_doctor_line(missing_doctor_name)
+        present_doctors = self._build_present_doctors_list_text(doctors, limit=limit)
+        self.notify.send_whatsapp_text(sender_id, missing_line)
+        self.notify.send_whatsapp_text(sender_id, present_doctors)
+        return missing_line, present_doctors
+
+    def _format_available_doctors_text(self, doctors, missing_doctor_name=None, limit=12):
+        """Return explicit not-found + numbered present doctors fallback text."""
+        missing_line = self._build_missing_doctor_line(missing_doctor_name)
+
+        if not doctors:
+            return f"{missing_line}\nNo active doctors are currently available in the hospital."
+
+        present_doctors = self._build_present_doctors_list_text(doctors, limit=limit)
+
+        if present_doctors == "No active doctors are currently available in the hospital.":
+            return f"{missing_line}\nNo active doctors are currently available in the hospital."
+
+        return f"{missing_line}\n{present_doctors}"
 
     def _fuzzy_match_doctor(self, name_input, doctors=None):
         """Fuzzy match a doctor name against DB. Returns doctor dict or None."""
@@ -1028,14 +1365,18 @@ class SmartBookingEngine:
         return next((t for t in available_times if t.startswith(prefix)), None)
 
     def _match_period(self, text, available_times):
-        """Match 'morning'/'afternoon'/'evening' to first available slot in that period."""
+        """Match 'morning'/'afternoon'/'evening'/'night' to first available slot.
+        Supports multilingual period words (Hindi, Telugu, Kannada, Urdu)."""
+        from services.booking_utils import MORNING_WORDS, AFTERNOON_WORDS, EVENING_WORDS, NIGHT_WORDS
         t = text.lower().strip()
-        if 'morning' in t:
-            return next((tm for tm in available_times if int(tm.split(':')[0]) < 12), None)
-        if 'afternoon' in t:
+        if any(w in t for w in MORNING_WORDS):
+            return next((tm for tm in available_times if 7 <= int(tm.split(':')[0]) < 12), None)
+        if any(w in t for w in AFTERNOON_WORDS):
             return next((tm for tm in available_times if 12 <= int(tm.split(':')[0]) < 17), None)
-        if 'evening' in t or 'night' in t:
-            return next((tm for tm in available_times if int(tm.split(':')[0]) >= 17), None)
+        if any(w in t for w in NIGHT_WORDS):
+            return next((tm for tm in available_times if int(tm.split(':')[0]) >= 22 or int(tm.split(':')[0]) < 7), None)
+        if any(w in t for w in EVENING_WORDS):
+            return next((tm for tm in available_times if 17 <= int(tm.split(':')[0]) < 22), None)
         return None
 
     def _get_end_time(self, data, time_str):
@@ -1064,11 +1405,17 @@ class SmartBookingEngine:
 
 def _parse_date(text):
     """
-    Parse natural language date to YYYY-MM-DD.
+    Parse natural language date to YYYY-MM-DD — Multilingual.
+    Supports English, Hindi (Romanized + Devanagari), Telugu, Kannada, Urdu.
     Handles: today, tomorrow, day after tomorrow, weekday names,
     month+day ('feb 27', '27th feb'), ordinals ('27th'), relative ('in 3 days').
     Returns None if unparseable.
     """
+    from services.booking_utils import (
+        TODAY_WORDS, TOMORROW_WORDS, DAY_AFTER_WORDS,
+        MULTILINGUAL_DAY_NAMES, IN_N_DAYS_PATTERNS, NUMBER_WORDS, MONTH_MAP
+    )
+
     t = text.lower().strip()
     today = datetime.now()
 
@@ -1081,20 +1428,34 @@ def _parse_date(text):
         except ValueError:
             pass
 
-    # Relative (check multi-word first to avoid premature match)
-    if re.search(r'\bday\s+after\s+tomorrow\b|\bparson\b', t):
+    # Relative — day after tomorrow (check multi-word first)
+    if any(w in t for w in DAY_AFTER_WORDS):
         return (today + timedelta(days=2)).strftime('%Y-%m-%d')
-    if re.search(r'\btoday\b|\baaj\b', t):
+
+    # Today (multilingual)
+    if any(w in t for w in TODAY_WORDS):
         return today.strftime('%Y-%m-%d')
-    if re.search(r'\btomorrow\b|\bkal\b', t):
+
+    # Tomorrow (multilingual)
+    if any(w in t for w in TOMORROW_WORDS):
         return (today + timedelta(days=1)).strftime('%Y-%m-%d')
 
-    # "in N days"
-    m = re.search(r'\bin\s+(\d+)\s+days?\b', t)
-    if m:
-        return (today + timedelta(days=int(m.group(1)))).strftime('%Y-%m-%d')
+    # "in N days" (multilingual patterns)
+    for pattern in IN_N_DAYS_PATTERNS:
+        m = re.search(pattern, t)
+        if m:
+            return (today + timedelta(days=int(m.group(1)))).strftime('%Y-%m-%d')
 
-    # Day names
+    # Word-number based "teen din baad" etc.
+    for word, num in NUMBER_WORDS.items():
+        if word in t:
+            day_words = ['din', 'days', 'day', 'दिन', 'రోజు', 'రోజుల', 'ದಿನ', 'ದಿನಗಳ', 'دن']
+            for dw in day_words:
+                if dw in t:
+                    return (today + timedelta(days=num)).strftime('%Y-%m-%d')
+            break
+
+    # English day names
     day_names = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
     for i, day_name in enumerate(day_names):
         if day_name in t:
@@ -1103,14 +1464,16 @@ def _parse_date(text):
                 days_ahead = 7
             return (today + timedelta(days=days_ahead)).strftime('%Y-%m-%d')
 
+    # Multilingual day names (Hindi, Telugu, Kannada, Urdu)
+    for day_word, weekday_idx in MULTILINGUAL_DAY_NAMES.items():
+        if day_word in t:
+            days_ahead = (weekday_idx - today.weekday()) % 7
+            if days_ahead == 0:
+                days_ahead = 7
+            return (today + timedelta(days=days_ahead)).strftime('%Y-%m-%d')
+
     # Month + day: "feb 27", "27 feb", "february 27th", "27th of february"
-    month_map = {
-        'jan': 1, 'january': 1, 'feb': 2, 'february': 2, 'mar': 3, 'march': 3,
-        'apr': 4, 'april': 4, 'may': 5, 'jun': 6, 'june': 6, 'jul': 7, 'july': 7,
-        'aug': 8, 'august': 8, 'sep': 9, 'september': 9, 'oct': 10, 'october': 10,
-        'nov': 11, 'november': 11, 'dec': 12, 'december': 12
-    }
-    for month_name, month_num in month_map.items():
+    for month_name, month_num in MONTH_MAP.items():
         if month_name in t:
             # Extract day number (handles "27th", "3rd", "1st")
             day_match = re.search(r'(\d{1,2})(?:st|nd|rd|th)?', t)
@@ -1174,10 +1537,13 @@ def _parse_time(text):
             h = 0
         return f"{h:02d}:{mn:02d}"
 
-    # Word numbers
+    # Word numbers (English + Hindi Romanized)
     word_nums = {
         'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6,
         'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10, 'eleven': 11, 'twelve': 12,
+        # Hindi Romanized
+        'ek': 1, 'do': 2, 'teen': 3, 'char': 4, 'paanch': 5, 'cheh': 6,
+        'saat': 7, 'aath': 8, 'nau': 9, 'das': 10, 'gyarah': 11, 'barah': 12,
     }
     for word, num in word_nums.items():
         if word in t:
@@ -1186,6 +1552,13 @@ def _parse_time(text):
                 h += 12
             elif 'am' in t and h == 12:
                 h = 0
+            return f"{h:02d}:00"
+
+    # Multilingual number words for time
+    from services.booking_utils import NUMBER_WORDS
+    for word, num in NUMBER_WORDS.items():
+        if word in text.lower() and 1 <= num <= 12:
+            h = num
             return f"{h:02d}:00"
 
     # Bare number: "10", "9" — treat as hour
