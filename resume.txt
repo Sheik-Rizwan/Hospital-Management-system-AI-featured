@@ -1,0 +1,117 @@
+================================================================================
+                                  YOUR NAME
+================================================================================
+
+Phone: 123-456-7890
+Email: your.email@example.com
+LinkedIn: linkedin.com/in/yourprofile
+GitHub: github.com/yourusername
+
+================================================================================
+EDUCATION
+================================================================================
+
+University Name — City, State
+Bachelor of Science in Computer Science
+Expected Graduation: Month Year
+
+  • GPA: 3.XX/4.0
+  • Relevant Coursework: Data Structures, Algorithms, Database Systems,
+    Software Engineering, AI/ML
+
+================================================================================
+EXPERIENCE
+================================================================================
+
+Software Engineering Intern — Company Name, City, State
+Month Year – Month Year
+
+  • Developed and maintained web applications using modern frameworks and
+    technologies
+  • Collaborated with cross-functional teams to deliver features on schedule
+  • Implemented responsive UI components and integrated RESTful APIs
+
+================================================================================
+PROJECTS
+================================================================================
+
+Hospital Management & AI-Featured System
+React, Python/Flask, MongoDB, Docker, AI/ML | 2025 – Present
+
+  • Architected and developed a full-stack healthcare management platform
+    serving multiple user roles (doctors, nurses, patients, vendors) with
+    real-time communication and AI-powered automation
+
+  • Engineered voice-to-text handoff system using Sarvam AI that converts
+    nurse dictations into structured clinical documents, reducing
+    documentation time by 70%
+
+  • Built multilingual WhatsApp conversational bot supporting 5 languages
+    (Telugu, Hindi, Urdu, Kannada, English) for appointment booking,
+    leveraging Groq LLaMA 3.3 70B for natural language understanding
+
+  • Implemented automated care plan task distribution system that assigns
+    nursing tasks based on shift schedules and workload balancing algorithms
+
+  • Designed comprehensive procurement pipeline with real-time vendor chat,
+    quotation management, and department budget tracking using Socket.IO for
+    instant updates
+
+  • Developed context-aware AI chatbot for patient queries using RAG
+    (Retrieval-Augmented Generation) pattern to answer questions about
+    medical handoffs and hospital procedures
+
+  • Built scalable microservices architecture with 54 Python modules, 42 React
+    components, and Docker containerization for production deployment
+
+  • Integrated JWT-based authentication with role-based access control (RBAC)
+    across 4 user types and 8 major API route groups
+
+  • Implemented real-time push notifications system using Flask-SocketIO for
+    role-specific hospital events and updates
+
+--------------------------------------------------------------------------------
+
+Project Name | Technology Stack
+Month Year – Month Year
+
+  • Description of project achievements and technical contributions
+  • Quantifiable impact and technologies used
+
+================================================================================
+TECHNICAL SKILLS
+================================================================================
+
+Languages:
+  JavaScript/TypeScript, Python, HTML/CSS, SQL, LaTeX
+
+Frontend:
+  React 19, Vite, Material UI (MUI), Tailwind CSS, Socket.IO Client,
+  Responsive Design
+
+Backend:
+  Flask, Node.js, Express, RESTful APIs, WebSocket/Socket.IO,
+  JWT Authentication
+
+Databases:
+  MongoDB, PyMongo, Database Design, NoSQL
+
+AI/ML:
+  Groq LLaMA 3.3 70B, Sarvam AI, NLP, Voice Processing, RAG Pattern,
+  AI Integration
+
+DevOps & Tools:
+  Docker, Docker Compose, Git/GitHub, Gunicorn, CI/CD, Linux
+
+Other:
+  Multilingual Systems, Real-Time Systems, Healthcare Domain, Agile/Scrum
+
+================================================================================
+CERTIFICATIONS
+================================================================================
+
+Certification Name | Issuing Organization — Month Year
+
+Certification Name | Issuing Organization — Month Year
+
+================================================================================

@@ -1,14 +1,24 @@
-# Resume Template
+# Resume Templates
 
-This directory contains a professional resume template in LaTeX format (Jake's Resume style) that showcases the Hospital Management & AI-Featured System project.
+This directory contains a professional resume in multiple formats (Jake's Resume style) that showcases the Hospital Management & AI-Featured System project.
 
 ## Files
 
-- `resume.tex` - LaTeX source file for the resume
+- `resume.tex` - LaTeX source file for the resume (for PDF generation)
+- `resume.md` - Markdown version (easy to copy and edit)
+- `resume.txt` - Plain text version (easy to copy for ATS systems)
 
 ## How to Use
 
-### Option 1: Compile Locally
+### Quick Copy (Recommended)
+
+**For easy copying:**
+1. Open `resume.md` (Markdown format) - best for viewing and copying on GitHub
+2. Open `resume.txt` (Plain text format) - best for copying into ATS systems or plain text applications
+
+Both formats contain the same content and are ready to copy directly.
+
+### Generate Professional PDF (LaTeX)
 
 1. Install LaTeX distribution:
    - **Windows**: Install [MiKTeX](https://miktex.org/download)
@@ -22,7 +32,7 @@ This directory contains a professional resume template in LaTeX format (Jake's R
 
 3. The output will be `resume.pdf`
 
-### Option 2: Use Online LaTeX Editor
+**Or use an online LaTeX editor:**
 
 1. Go to [Overleaf](https://www.overleaf.com)
 2. Create a free account
