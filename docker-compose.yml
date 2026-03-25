@@ -34,10 +34,9 @@ services:
     build: 
       context: ./frontend
       args:
-        # Defaulting to localhost:5000 so that a user's browser hitting the frontend on localhost 
-        # routes API calls directly to their local machine's exposed backend port.
-        - VITE_API_BASE=http://localhost:5000/api
-        - VITE_SOCKET_URL=http://localhost:5000
+        # Allow overriding for global deployments while keeping localhost defaults for local dev.
+        - VITE_API_BASE=${VITE_API_BASE:-http://localhost:5000/api}
+        - VITE_SOCKET_URL=${VITE_SOCKET_URL:-http://localhost:5000}
     container_name: hospital_frontend
     ports:
       - "3000:80"

@@ -45,6 +45,11 @@ From the root folder where `docker-compose.yml` is located, build and run the se
 docker compose up --build -d
 ```
 
+For global/remote deployment, point the frontend to your public backend host when building:
+```bash
+VITE_API_BASE=https://api.example.com/api VITE_SOCKET_URL=https://api.example.com docker compose up --build -d
+```
+
 * **Frontend App:** [http://localhost:3000](http://localhost:3000)
 * **Backend API:** [http://localhost:5000](http://localhost:5000)
 * **Database:** `localhost:27017`
