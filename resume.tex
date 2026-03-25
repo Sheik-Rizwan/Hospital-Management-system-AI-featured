@@ -1,0 +1,192 @@
+%-------------------------
+% Resume in LaTeX
+% Based on Jake's Resume Template
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphs-utf8}
+
+%----------FONT OPTIONS----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge \scshape Your Name} \\ \vspace{1pt}
+    \small 123-456-7890 $|$ \href{mailto:your.email@example.com}{\underline{your.email@example.com}} $|$
+    \href{https://linkedin.com/in/yourprofile}{\underline{linkedin.com/in/yourprofile}} $|$
+    \href{https://github.com/yourusername}{\underline{github.com/yourusername}}
+\end{center}
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {University Name}{City, State}
+      {Bachelor of Science in Computer Science}{Expected Graduation: Month Year}
+    \resumeItemListStart
+        \resumeItem{GPA: 3.XX/4.0}
+        \resumeItem{Relevant Coursework: Data Structures, Algorithms, Database Systems, Software Engineering, AI/ML}
+    \resumeItemListEnd
+  \resumeSubHeadingListEnd
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Software Engineering Intern}{Month Year -- Month Year}
+      {Company Name}{City, State}
+      \resumeItemListStart
+        \resumeItem{Developed and maintained web applications using modern frameworks and technologies}
+        \resumeItem{Collaborated with cross-functional teams to deliver features on schedule}
+        \resumeItem{Implemented responsive UI components and integrated RESTful APIs}
+      \resumeItemListEnd
+
+% Add more experience entries as needed
+
+  \resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+
+      \resumeProjectHeading
+          {\textbf{Hospital Management \& AI-Featured System} $|$ \emph{React, Python/Flask, MongoDB, Docker, AI/ML}}{2025 -- Present}
+          \resumeItemListStart
+            \resumeItem{Architected and developed a full-stack healthcare management platform serving multiple user roles (doctors, nurses, patients, vendors) with real-time communication and AI-powered automation}
+            \resumeItem{Engineered voice-to-text handoff system using Sarvam AI that converts nurse dictations into structured clinical documents, reducing documentation time by 70\%}
+            \resumeItem{Built multilingual WhatsApp conversational bot supporting 5 languages (Telugu, Hindi, Urdu, Kannada, English) for appointment booking, leveraging Groq LLaMA 3.3 70B for natural language understanding}
+            \resumeItem{Implemented automated care plan task distribution system that assigns nursing tasks based on shift schedules and workload balancing algorithms}
+            \resumeItem{Designed comprehensive procurement pipeline with real-time vendor chat, quotation management, and department budget tracking using Socket.IO for instant updates}
+            \resumeItem{Developed context-aware AI chatbot for patient queries using RAG (Retrieval-Augmented Generation) pattern to answer questions about medical handoffs and hospital procedures}
+            \resumeItem{Built scalable microservices architecture with 54 Python modules, 42 React components, and Docker containerization for production deployment}
+            \resumeItem{Integrated JWT-based authentication with role-based access control (RBAC) across 4 user types and 8 major API route groups}
+            \resumeItem{Implemented real-time push notifications system using Flask-SocketIO for role-specific hospital events and updates}
+          \resumeItemListEnd
+
+      \resumeProjectHeading
+          {\textbf{Project Name} $|$ \emph{Technology Stack}}{Month Year -- Month Year}
+          \resumeItemListStart
+            \resumeItem{Description of project achievements and technical contributions}
+            \resumeItem{Quantifiable impact and technologies used}
+          \resumeItemListEnd
+
+    \resumeSubHeadingListEnd
+
+%-----------TECHNICAL SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{Languages}{: JavaScript/TypeScript, Python, HTML/CSS, SQL, LaTeX} \\
+     \textbf{Frontend}{: React 19, Vite, Material UI (MUI), Tailwind CSS, Socket.IO Client, Responsive Design} \\
+     \textbf{Backend}{: Flask, Node.js, Express, RESTful APIs, WebSocket/Socket.IO, JWT Authentication} \\
+     \textbf{Databases}{: MongoDB, PyMongo, Database Design, NoSQL} \\
+     \textbf{AI/ML}{: Groq LLaMA 3.3 70B, Sarvam AI, NLP, Voice Processing, RAG Pattern, AI Integration} \\
+     \textbf{DevOps \& Tools}{: Docker, Docker Compose, Git/GitHub, Gunicorn, CI/CD, Linux} \\
+     \textbf{Other}{: Multilingual Systems, Real-Time Systems, Healthcare Domain, Agile/Scrum}
+    }}
+ \end{itemize}
+
+%-----------CERTIFICATIONS-----------
+\section{Certifications}
+ \resumeSubHeadingListStart
+   \resumeProjectHeading
+       {\textbf{Certification Name} $|$ \emph{Issuing Organization}}{Month Year}
+   \resumeProjectHeading
+       {\textbf{Certification Name} $|$ \emph{Issuing Organization}}{Month Year}
+ \resumeSubHeadingListEnd
+
+%-------------------------------------------
+\end{document}
