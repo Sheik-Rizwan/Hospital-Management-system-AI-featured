@@ -1,6 +1,6 @@
-# Hospital Management & Nurse Handoff System
+# Hospital Management & AI-Featured System
 
-An intelligent hospital management platform featuring AI-powered voice handoffs, automated care plan task assignment, and a multilingual WhatsApp booking engine.
+AI-powered hospital management system with voice handoffs, automated care plans, and a multilingual WhatsApp booking engine.
 
 ## ✨ Features
 
