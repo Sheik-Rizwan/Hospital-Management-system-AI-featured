@@ -176,7 +176,7 @@ def resolve_date(text: str, today: date = None) -> tuple:
     except ValueError:
         pass
 
-    # "today" → reject (multilingual)
+    # "today"  reject (multilingual)
     if any(w == text_lower or text_lower.startswith(w + ' ') or w in text_lower for w in TODAY_WORDS):
         return None, "Same-day bookings are not available. Please choose from tomorrow onwards."
 
@@ -240,7 +240,7 @@ def resolve_date(text: str, today: date = None) -> tuple:
                     pass
             break
 
-    # Just a number like "15" → try current month, then next month
+    # Just a number like "15"  try current month, then next month
     num_match = re.match(r'^\s*(\d{1,2})(?:st|nd|rd|th)?\s*$', text_lower)
     if num_match:
         day = int(num_match.group(1))
@@ -334,9 +334,9 @@ def resolve_ambiguous_time(time_text: str, doctor_id: str, date_str: str, appt_s
     Logic:
     - Parse the bare time to get hour + minute.
     - Check if that time (or its +12h version) is an available slot.
-    - If only one matches → use it.
-    - If both match → pick the first available one.
-    - If neither matches → return None with a helpful message.
+    - If only one matches  use it.
+    - If both match  pick the first available one.
+    - If neither matches  return None with a helpful message.
 
     Returns: (resolved_HH:MM: str | None, error_msg: str | None)
     """
@@ -347,7 +347,7 @@ def resolve_ambiguous_time(time_text: str, doctor_id: str, date_str: str, appt_s
         resolved = resolve_time(time_text)
         return (resolved, None) if resolved else (None, "Could not parse the time.")
 
-    # Parse bare time: "2:30" → h=2, m=30 | "2" → h=2, m=0 | "14:30" → h=14, m=30
+    # Parse bare time: "2:30"  h=2, m=30 | "2"  h=2, m=0 | "14:30"  h=14, m=30
     h, mn = None, 0
     m = re.match(r'^(\d{1,2})(?::(\d{2}))?$', text_clean)
     if m:
@@ -384,14 +384,14 @@ def resolve_ambiguous_time(time_text: str, doctor_id: str, date_str: str, appt_s
         pm_match = candidate_pm in all_slot_times
 
         if am_match and not pm_match:
-            logger.info(f"⏰ Resolved ambiguous '{time_text}' → {candidate_am} (AM shift available)")
+            logger.info(f" Resolved ambiguous '{time_text}'  {candidate_am} (AM shift available)")
             return candidate_am, None
         elif pm_match and not am_match:
-            logger.info(f"⏰ Resolved ambiguous '{time_text}' → {candidate_pm} (PM shift available)")
+            logger.info(f" Resolved ambiguous '{time_text}'  {candidate_pm} (PM shift available)")
             return candidate_pm, None
         elif am_match and pm_match:
             # Both available — default to the earlier one
-            logger.info(f"⏰ Both {candidate_am} and {candidate_pm} available, defaulting to {candidate_am}")
+            logger.info(f" Both {candidate_am} and {candidate_pm} available, defaulting to {candidate_am}")
             return candidate_am, None
         else:
             # Neither EXACT match is available. Look for closest matches in the same hour.

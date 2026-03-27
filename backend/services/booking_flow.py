@@ -4,7 +4,7 @@
 # Architecture:
 #   1. Intent Classifier   (regex/keyword — no LLM)
 #   2. Entity Extractor    (date, doctor, specialty, timeslot — regex + fuzzy)
-#   3. State Machine       (IDLE → … → BOOKED)
+#   3. State Machine       (IDLE  …  BOOKED)
 #   4. Query Handlers      (doctor list, shift info, slot info — read-only)
 #
 # All appointment data comes from the database. LLM is only used
@@ -439,7 +439,7 @@ class SmartBookingEngine:
     def _start_booking(self, sender_id, text, entities, current_data):
         """
         Start a booking flow. Identify what we already have and ask only for what's missing.
-        Order of collection: doctor → date → shift → slot → patient_name → book.
+        Order of collection: doctor  date  shift  slot  patient_name  book.
         """
         bk = {
             'booking_state': BK_IDLE,
@@ -514,7 +514,7 @@ class SmartBookingEngine:
     def _advance_booking(self, sender_id, bk):
         """
         Check what info is still missing and transition to that state.
-        If everything is ready → book directly.
+        If everything is ready  book directly.
         """
         # ── Step 1: Need a doctor? ──
         if not bk.get('doctor_id'):
@@ -536,7 +536,7 @@ class SmartBookingEngine:
                     bk['doctor_name'] = doctors[0]['full_name']
                     self.notify.send_whatsapp_text(
                         sender_id,
-                        f"👨‍⚕️ Dr. {doctors[0]['full_name']} ({bk['specialty']})"
+                        f"‍️ Dr. {doctors[0]['full_name']} ({bk['specialty']})"
                     )
                     # Continue advancing
                     return self._advance_booking(sender_id, bk)
@@ -645,7 +645,7 @@ class SmartBookingEngine:
                 self.notify.send_whatsapp_text(sender_id, "What is the *patient's name*?")
                 return
 
-        # ── ALL READY → BOOK ──
+        # ── ALL READY  BOOK ──
         self._do_booking(sender_id, bk)
 
     # ───────────────────────────────────────
@@ -676,7 +676,7 @@ class SmartBookingEngine:
                         data['doctor_id'] = doctors[0]['user_id']
                         data['doctor_name'] = doctors[0]['full_name']
                         self.notify.send_whatsapp_text(
-                            sender_id, f"👨‍⚕️ Dr. {doctors[0]['full_name']} ({canonical})"
+                            sender_id, f"‍️ Dr. {doctors[0]['full_name']} ({canonical})"
                         )
                         # Persist doctor selection before advancing
                         self.sm.transition_to(sender_id, data)
@@ -774,7 +774,7 @@ class SmartBookingEngine:
         # If _available_slots is missing/empty, re-fetch slots from DB
         # This handles cases where session data wasn't persisted correctly
         if not available and data.get('doctor_id') and data.get('date'):
-            logger.info(f"🔄 Re-fetching slots for {sender_id} (session data missing _available_slots)")
+            logger.info(f" Re-fetching slots for {sender_id} (session data missing _available_slots)")
             slots = self.appt.get_shift_slots(
                 data.get('doctor_id', ''),
                 data.get('date', ''),
@@ -819,7 +819,7 @@ class SmartBookingEngine:
                 self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
-        # "morning" / "afternoon" / "evening" keyword → first matching slot
+        # "morning" / "afternoon" / "evening" keyword  first matching slot
         period_match = self._match_period(text, available)
         if period_match:
             data['time_slot'] = period_match
@@ -862,7 +862,7 @@ class SmartBookingEngine:
                 spec[:72]
             ))
 
-        header = f"👨‍⚕️ Doctors in *{specialty_label}*:" if specialty_label else "👨‍⚕️ Choose a doctor:"
+        header = f"‍️ Doctors in *{specialty_label}*:" if specialty_label else "‍️ Choose a doctor:"
         self.notify.send_whatsapp_list(
             sender_id, header, items, title="Doctors", button_text="Choose Doctor"
         )
@@ -874,7 +874,7 @@ class SmartBookingEngine:
             spec = d.get('specialization', 'Other')
             groups.setdefault(spec, []).append(d)
 
-        msg = "👨‍⚕️ *Our Doctors:*\n\n"
+        msg = "‍️ *Our Doctors:*\n\n"
         for spec, docs in sorted(groups.items()):
             msg += f"*{spec}*\n"
             for d in docs:
@@ -914,7 +914,7 @@ class SmartBookingEngine:
 
         self.notify.send_whatsapp_list(
             sender_id,
-            f"📅 Dr. {doctor_name}\nSelect an available date:",
+            f" Dr. {doctor_name}\nSelect an available date:",
             items,
             title="Available Dates"
         )
@@ -928,7 +928,7 @@ class SmartBookingEngine:
             btn_titles = [f"{s['shift_name']} ({s['free_slots']} slots)" for s in shifts]
             btn_ids = [f"shift_{s['start']}_{s['end']}" for s in shifts]
             self.notify.send_whatsapp_buttons(
-                sender_id, f"🕐 Select a shift for {date_str}:", btn_titles[:3], btn_ids[:3]
+                sender_id, f" Select a shift for {date_str}:", btn_titles[:3], btn_ids[:3]
             )
         else:
             items = []
@@ -939,7 +939,7 @@ class SmartBookingEngine:
                     f"{fmt(s['start'])}–{fmt(s['end'])} ({s['free_slots']} slots)"
                 ))
             self.notify.send_whatsapp_list(
-                sender_id, f"🕐 Select a shift for {date_str}:", items, title="Shifts"
+                sender_id, f" Select a shift for {date_str}:", items, title="Shifts"
             )
 
     def _show_slots(self, sender_id, slots, bk):
@@ -949,7 +949,7 @@ class SmartBookingEngine:
 
         # ── Text message with ALL slots (no limit) ──
         msg_lines = [
-            f"⏰ *Available Slots ({len(slots)})*",
+            f" *Available Slots ({len(slots)})*",
             f"Dr. {bk.get('doctor_name', '?')} | {bk.get('date', '?')} | {bk.get('shift_name', '')} shift\n",
         ]
         for i, slot in enumerate(slots, 1):
@@ -963,7 +963,7 @@ class SmartBookingEngine:
         items = []
         for slot in slots[:10]:
             next_day_tag = ' (next day)' if slot.get('next_day') else ''
-            items.append((f"time_{slot['start']}", f"🕐 {fmt(slot['start'])}", f"{fmt(slot['start'])} – {fmt(slot['end'])}{next_day_tag}"))
+            items.append((f"time_{slot['start']}", f" {fmt(slot['start'])}", f"{fmt(slot['start'])} – {fmt(slot['end'])}{next_day_tag}"))
 
         list_header = "Select a time slot:"
         if len(slots) > 10:
@@ -1017,13 +1017,13 @@ class SmartBookingEngine:
             from services.appointment_service import AppointmentService
             fmt = AppointmentService.format_time_ampm
             confirm_msg = (
-                f"✅ *Appointment Booked!*\n\n"
+                f" *Appointment Booked!*\n\n"
                 f"🆔 ID: {appt_id}\n"
-                f"👤 Patient: {bk.get('patient_name')}\n"
-                f"👨‍⚕️ Doctor: Dr. {bk.get('doctor_name')}\n"
-                f"📅 Date: {bk['date']}\n"
-                f"⏰ Time: {fmt(bk['time_slot'])} – {fmt(bk.get('end_time', ''))}\n\n"
-                f"⏳ Status: Pending Doctor Approval\n"
+                f" Patient: {bk.get('patient_name')}\n"
+                f"‍️ Doctor: Dr. {bk.get('doctor_name')}\n"
+                f" Date: {bk['date']}\n"
+                f" Time: {fmt(bk['time_slot'])} – {fmt(bk.get('end_time', ''))}\n\n"
+                f" Status: Pending Doctor Approval\n"
                 f"_You'll be notified once confirmed._"
             )
             self.notify.send_whatsapp_text(sender_id, confirm_msg)
@@ -1035,12 +1035,12 @@ class SmartBookingEngine:
             except Exception as e:
                 logger.warning(f"Socket notify failed (non-critical): {e}")
 
-            logger.info(f"✅ Smart booking: {appt_id} for {bk.get('patient_name')} with Dr. {bk.get('doctor_name')} on {bk['date']} at {bk['time_slot']}")
+            logger.info(f" Smart booking: {appt_id} for {bk.get('patient_name')} with Dr. {bk.get('doctor_name')} on {bk['date']} at {bk['time_slot']}")
 
         except ValueError as e:
             self.notify.send_whatsapp_text(
                 sender_id,
-                f"⚠️ That slot was just taken! Please try another time.\n_{str(e)}_"
+                f"️ That slot was just taken! Please try another time.\n_{str(e)}_"
             )
             # Reset slot so slots are re-shown
             bk['time_slot'] = None
@@ -1050,7 +1050,7 @@ class SmartBookingEngine:
 
         except Exception as e:
             logger.error(f"Booking failed: {e}")
-            self.notify.send_whatsapp_text(sender_id, f"❌ Booking Failed: {str(e)}")
+            self.notify.send_whatsapp_text(sender_id, f" Booking Failed: {str(e)}")
 
         # Reset state
         bk['booking_state'] = BK_IDLE
@@ -1091,7 +1091,7 @@ class SmartBookingEngine:
                 self.notify.send_whatsapp_text(sender_id, f"No doctors available{spec_label} on {date}.")
                 return
 
-            msg = f"👨‍⚕️ *Doctors available on {date}*"
+            msg = f"‍️ *Doctors available on {date}*"
             if specialty:
                 msg += f" ({specialty})"
             msg += ":\n\n"
@@ -1108,7 +1108,7 @@ class SmartBookingEngine:
                 spec = d.get('specialization', 'Other')
                 groups.setdefault(spec, []).append(d)
 
-            msg = "👨‍⚕️ *Our Doctors*"
+            msg = "‍️ *Our Doctors*"
             if specialty:
                 msg += f" — {specialty}"
             msg += ":\n\n"
@@ -1149,7 +1149,7 @@ class SmartBookingEngine:
                 if not available:
                     self.notify.send_whatsapp_text(sender_id, f"Dr. {matched['full_name']} has no upcoming dates.")
                     return
-                msg = f"📅 *Dr. {matched['full_name']}* — upcoming availability:\n\n"
+                msg = f" *Dr. {matched['full_name']}* — upcoming availability:\n\n"
                 for d in available:
                     shifts = self.appt.get_available_shifts(matched['user_id'], d['date'])
                     total = sum(s['free_slots'] for s in shifts) if shifts else 0
@@ -1168,7 +1168,7 @@ class SmartBookingEngine:
 
             from services.appointment_service import AppointmentService
             fmt = AppointmentService.format_time_ampm
-            msg = f"⏰ *Dr. {matched['full_name']}* — {date}:\n\n"
+            msg = f" *Dr. {matched['full_name']}* — {date}:\n\n"
             for s in shifts:
                 slots = self.appt.get_shift_slots(matched['user_id'], date, s['start'], s['end'])
                 times = ', '.join(fmt(sl['start']) for sl in slots)
@@ -1188,7 +1188,7 @@ class SmartBookingEngine:
             if not date:
                 date = datetime.now().strftime('%Y-%m-%d')  # default to today
 
-            msg = f"⏰ *{specialty} Slots on {date}*:\n\n"
+            msg = f" *{specialty} Slots on {date}*:\n\n"
             any_available = False
             for doc in doctors:
                 shifts = self.appt.get_available_shifts(doc['user_id'], date)
@@ -1230,7 +1230,7 @@ class SmartBookingEngine:
 
         from services.appointment_service import AppointmentService
         fmt = AppointmentService.format_time_ampm
-        msg = f"🕐 *Dr. {matched['full_name']}* — Schedule:\n\n"
+        msg = f" *Dr. {matched['full_name']}* — Schedule:\n\n"
         # Group by day
         by_day = {}
         for s in schedules:
@@ -1338,7 +1338,7 @@ class SmartBookingEngine:
         """Match a parsed HH:MM against available slot times. Returns matched time or None."""
         if parsed_time in available_times:
             return parsed_time
-        # Try prefix match (user says "07" → "07:00")
+        # Try prefix match (user says "07"  "07:00")
         prefix = parsed_time[:2] + ':'
         return next((t for t in available_times if t.startswith(prefix)), None)
 

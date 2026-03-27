@@ -88,7 +88,7 @@ def is_transcript_valid(transcript: str) -> tuple:
             if start <= code_point <= end:
                 # Found an unsupported character
                 script_name = _get_script_name(code_point)
-                logger.warning(f"⚠️ Unsupported script detected: {script_name} (char: {char}, code: {hex(code_point)})")
+                logger.warning(f"️ Unsupported script detected: {script_name} (char: {char}, code: {hex(code_point)})")
                 return False, f"unsupported_script:{script_name}"
 
     return True, None
@@ -140,7 +140,7 @@ def is_garbage_transcription(text: str) -> bool:
         # Check if all parts are the same or very similar
         unique_parts = set(parts)
         if len(unique_parts) == 1 and len(parts) >= 2:
-            logger.warning(f"🗑️ Garbage detected: repetitive phrase '{parts[0]}'")
+            logger.warning(f"️ Garbage detected: repetitive phrase '{parts[0]}'")
             return True
 
     # 2. Check for known garbage patterns from STT
@@ -159,7 +159,7 @@ def is_garbage_transcription(text: str) -> bool:
     ]
     for pattern in garbage_patterns:
         if re.search(pattern, text_lower):
-            logger.warning(f"🗑️ Garbage detected: matches pattern '{pattern}'")
+            logger.warning(f"️ Garbage detected: matches pattern '{pattern}'")
             return True
 
     # 3. Check word repetition (same word repeated 3+ times)
@@ -171,7 +171,7 @@ def is_garbage_transcription(text: str) -> bool:
                 word_counts[w] = word_counts.get(w, 0) + 1
         for word, count in word_counts.items():
             if count >= 3 and count / len(words) > 0.4:  # Same word is 40%+ of text
-                logger.warning(f"🗑️ Garbage detected: word '{word}' repeated {count} times")
+                logger.warning(f"️ Garbage detected: word '{word}' repeated {count} times")
                 return True
 
     return False
@@ -273,19 +273,19 @@ class WhatsAppService:
         try:
             self.sarvam = SarvamService()
             if self.sarvam.is_available():
-                logger.info("✅ Sarvam AI Service initialized successfully")
+                logger.info(" Sarvam AI Service initialized successfully")
             else:
-                logger.warning("⚠️ Sarvam AI Service initialized but API key missing")
+                logger.warning("️ Sarvam AI Service initialized but API key missing")
         except Exception as e:
-            logger.warning(f"⚠️ Sarvam Service unavailable: {e}")
+            logger.warning(f"️ Sarvam Service unavailable: {e}")
             self.sarvam = None
 
         # Local Voice Service (Whisper & MMS)
         try:
             self.local_voice = LocalVoiceService()
-            logger.info("✅ Local Voice Service initialized successfully")
+            logger.info(" Local Voice Service initialized successfully")
         except Exception as e:
-            logger.warning(f"⚠️ Local Voice Service initialization failed: {e}")
+            logger.warning(f"️ Local Voice Service initialization failed: {e}")
             self.local_voice = None
 
         # Legacy STT (Groq Whisper fallback)
@@ -376,7 +376,7 @@ class WhatsAppService:
                 self._transition_to(sender_id, STATE_REGISTER_NAME)
                 self.notifier.send_whatsapp_text(
                     sender_id,
-                    "👋 Welcome! It looks like you're new here.\n\nPlease enter your *Full Name* to register:"
+                    " Welcome! It looks like you're new here.\n\nPlease enter your *Full Name* to register:"
                 )
                 return
 
@@ -406,7 +406,7 @@ class WhatsAppService:
                     return
                 else:
                     # Ignore accidental 'hi'/'hello'/'start' — let the booking flow continue
-                    logger.info(f"🚫 Ignoring reset command '{text_lower}' during active booking for {sender_id}")
+                    logger.info(f" Ignoring reset command '{text_lower}' during active booking for {sender_id}")
                     return
             else:
                 self._transition_to(sender_id, STATE_MENU, clear_data=True)
@@ -423,7 +423,7 @@ class WhatsAppService:
         # Works in ALL states — booking engine returns False if intent is NONE.
         try:
             if self._booking_engine.try_handle(sender_id, str(message_content), session):
-                logger.info(f"📋 SmartBookingEngine handled message from {sender_id}")
+                logger.info(f" SmartBookingEngine handled message from {sender_id}")
                 return
         except Exception as e:
             logger.error(f"SmartBookingEngine error: {e}", exc_info=True)
@@ -432,7 +432,7 @@ class WhatsAppService:
             if booking_active:
                 self.notifier.send_whatsapp_text(
                     sender_id,
-                    "⚠️ Something went wrong. Please try again or type *reset* to start over."
+                    "️ Something went wrong. Please try again or type *reset* to start over."
                 )
                 return
             # Otherwise fall through to old state machine
@@ -442,7 +442,7 @@ class WhatsAppService:
         #    but try_handle returned False (shouldn't normally happen), don't let
         #    the legacy machine send the menu.
         if booking_active:
-            logger.warning(f"⚠️ Booking engine active but returned False for '{message_content}' from {sender_id}")
+            logger.warning(f"️ Booking engine active but returned False for '{message_content}' from {sender_id}")
             return
         self._process_state(sender_id, current_state, message_content, session)
 
@@ -540,7 +540,7 @@ class WhatsAppService:
         # Fallback — only send menu if there is no active booking engine flow
         bk_state = data.get('booking_state', BK_IDLE)
         if bk_state != BK_IDLE:
-            logger.warning(f"⚠️ Legacy fallback reached while booking_state={bk_state} for {sender_id}, ignoring menu send")
+            logger.warning(f"️ Legacy fallback reached while booking_state={bk_state} for {sender_id}, ignoring menu send")
             return
         self.notifier.send_whatsapp_text(sender_id, "Something went wrong. Sending you back to menu.")
         self._transition_to(sender_id, STATE_MENU, clear_data=True)
@@ -559,7 +559,7 @@ class WhatsAppService:
         detected_lang = detect_language(str(input_text))
         if detected_lang != 'en':
             data['detected_lang'] = detected_lang
-            logger.info(f"🌐 Language detected: {get_language_name(detected_lang)} for {sender_id}")
+            logger.info(f" Language detected: {get_language_name(detected_lang)} for {sender_id}")
         elif not data.get('detected_lang'):
             data['detected_lang'] = 'en'
 
@@ -602,7 +602,7 @@ class WhatsAppService:
 
         suppress_ai_reply = bool(data.pop('_suppress_next_ai_text', False))
         if suppress_ai_reply:
-            logger.info("📩 Missing-doctor fallback already sent directly; suppressing extra AI chat text")
+            logger.info(" Missing-doctor fallback already sent directly; suppressing extra AI chat text")
             messages.append({"role": "assistant", "content": "[Missing-doctor fallback sent via direct WhatsApp messages.]"})
         else:
             messages.append({"role": "assistant", "content": ai_response_text})
@@ -622,22 +622,22 @@ class WhatsAppService:
         Returns transcribed text, or None on failure.
         """
         if not media_id:
-            self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not process voice note.")
+            self.notifier.send_whatsapp_text(sender_id, "️ Could not process voice note.")
             return None
 
         try:
             _status_msgs = {
-                'te': '🎤 మీ వాయిస్ మెసేజ్ ప్రాసెస్ చేస్తున్నాము...',
-                'hi': '🎤 आपका वॉइस मैसेज प्रोसेस हो रहा है...',
-                'ta': '🎤 உங்கள் குரல் செய்தியை செயலாக்குகிறோம்...',
-                'kn': '🎤 ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶವನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ...',
-                'ur': '🎤 آپ کا وائس پیغام پروسیس ہو رہا ہے...'
+                'te': ' మీ వాయిస్ మెసేజ్ ప్రాసెస్ చేస్తున్నాము...',
+                'hi': ' आपका वॉइस मैसेज प्रोसेस हो रहा है...',
+                'ta': ' உங்கள் குரல் செய்தியை செயலாக்குகிறோம்...',
+                'kn': ' ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶವನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ...',
+                'ur': ' آپ کا وائس پیغام پروسیس ہو رہا ہے...'
             }
-            self.notifier.send_whatsapp_text(sender_id, _status_msgs.get(lang_code, "🎤 Processing your voice message..."))
+            self.notifier.send_whatsapp_text(sender_id, _status_msgs.get(lang_code, " Processing your voice message..."))
             audio_path = self._download_media(media_id)
 
             if not audio_path:
-                self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not download audio. Please try text.")
+                self.notifier.send_whatsapp_text(sender_id, "️ Could not download audio. Please try text.")
                 return None
 
             transcribed = None
@@ -660,7 +660,7 @@ class WhatsAppService:
                                             if has_native:
                                                 transcribed = transcript_text
                                                 final_lang_code = try_lang
-                                                logger.info(f"🎤 Chat STT found native {try_lang}: '{transcribed[:60]}'")
+                                                logger.info(f" Chat STT found native {try_lang}: '{transcribed[:60]}'")
                                                 break
                                             else:
                                                 detected = detect_language(transcript_text)
@@ -684,13 +684,13 @@ class WhatsAppService:
                         if sarvam_result and sarvam_result.get('transcript'):
                             transcribed = sarvam_result['transcript']
                             final_lang_code = lang_code
-                            logger.info(f"🎤 Chat Sarvam STT ({lang_code}): '{transcribed}'")
+                            logger.info(f" Chat Sarvam STT ({lang_code}): '{transcribed}'")
                 except Exception as e:
                     logger.warning(f"Sarvam STT failed: {e}")
 
             # Only fallback to Groq Whisper as last resort
             if not transcribed and self.stt:
-                logger.warning("⚠️ Sarvam STT failed, trying Groq Whisper as last resort")
+                logger.warning("️ Sarvam STT failed, trying Groq Whisper as last resort")
                 transcribed = self.stt.transcribe_audio_file(audio_path, lang_code)
 
             # Update lang_code for response
@@ -707,29 +707,29 @@ class WhatsAppService:
                 if transcribed:
                     processed = post_process_stt(transcribed, language_code=lang_code)
                     if processed.get('is_likely_appointment_intent') and processed.get('corrected'):
-                        logger.info(f"🔧 STT post-processing corrected: '{transcribed}' → '{processed['corrected']}'")
+                        logger.info(f" STT post-processing corrected: '{transcribed}'  '{processed['corrected']}'")
                         transcribed = processed['corrected']
                     else:
                         # Still garbage after post-processing
                         self.notifier.send_whatsapp_text(
-                            sender_id, "⚠️ Could not understand audio. Please try again or use text."
+                            sender_id, "️ Could not understand audio. Please try again or use text."
                         )
                         return None
                 else:
                     self.notifier.send_whatsapp_text(
-                        sender_id, "⚠️ Could not understand audio. Please try again or use text."
+                        sender_id, "️ Could not understand audio. Please try again or use text."
                     )
                     return None
 
-            logger.info(f"📝 Chat voice transcription ({lang_code}): '{transcribed}'")
+            logger.info(f" Chat voice transcription ({lang_code}): '{transcribed}'")
 
-            _heard_prefix = {'te': '📝 నేను విన్నది', 'hi': '📝 मैंने सुना', 'ta': '📝 நான் கேட்டது', 'kn': '📝 ನಾನು ಕೇಳಿದ್ದು', 'ur': '📝 میں نے سنا'}
-            self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, '📝 I heard')}: \"{transcribed}\"")
+            _heard_prefix = {'te': ' నేను విన్నది', 'hi': ' मैंने सुना', 'ta': ' நான் கேட்டது', 'kn': ' ನಾನು ಕೇಳಿದ್ದು', 'ur': ' میں نے سنا'}
+            self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, ' I heard')}: \"{transcribed}\"")
             return transcribed
 
         except Exception as e:
             logger.error(f"Chat audio transcription failed: {e}")
-            self.notifier.send_whatsapp_text(sender_id, "⚠️ Voice processing failed. Please use text.")
+            self.notifier.send_whatsapp_text(sender_id, "️ Voice processing failed. Please use text.")
             return None
 
 
@@ -1214,13 +1214,13 @@ class WhatsAppService:
         self._transition_to(sender_id, STATE_REGISTER_EMAIL, {'temp_name': name})
         self.notifier.send_whatsapp_text(
             sender_id,
-            f"Nice to meet you, {name}! 😊\n\nPlease enter your *Email Address*:"
+            f"Nice to meet you, {name}! \n\nPlease enter your *Email Address*:"
         )
 
     def _register_email(self, sender_id, email, data):
         # Basic email validation
         if '@' not in email or '.' not in email:
-            self.notifier.send_whatsapp_text(sender_id, "⚠️ Please enter a valid email address (e.g. name@example.com):")
+            self.notifier.send_whatsapp_text(sender_id, "️ Please enter a valid email address (e.g. name@example.com):")
             return
 
         phone = sender_id.replace('+', '').replace(' ', '')
@@ -1244,10 +1244,10 @@ class WhatsAppService:
         patient_id = db_patient.get('patient_id', f"wa_{phone}")
 
         msg = (
-            "✅ *Registration Complete!*\n\n"
+            " *Registration Complete!*\n\n"
             "You can now access our Patient Web Dashboard to view your appointments and details.\n\n"
-            f"🔹 *Login ID:* {patient_id}\n"
-            f"🔹 *Password:* {plain_pwd}\n\n"
+            f" *Login ID:* {patient_id}\n"
+            f" *Password:* {plain_pwd}\n\n"
             "Please save these details. You can change your password in the dashboard."
         )
 
@@ -1273,17 +1273,17 @@ class WhatsAppService:
         elif action == 'check_appointments':
             self._check_appointments(sender_id)
         elif action == 'menu_more':
-            # Step 3: User tapped "More Options" → send full list
+            # Step 3: User tapped "More Options"  send full list
             items = [
-                ("book_appointment", "📅 Book Appointment", "Book a new appointment"),
-                ("check_appointments", "🔍 Check Appointments", "View upcoming appointments"),
-                ("reschedule_appointment", "🔄 Reschedule", "Modify your current booking"),
-                ("list_services", "🏥 Services", "Browse available services"),
-                ("voice_booking", "🎤 Voice Booking", "Book via voice in your language"),
+                ("book_appointment", " Book Appointment", "Book a new appointment"),
+                ("check_appointments", " Check Appointments", "View upcoming appointments"),
+                ("reschedule_appointment", " Reschedule", "Modify your current booking"),
+                ("list_services", " Services", "Browse available services"),
+                ("voice_booking", " Voice Booking", "Book via voice in your language"),
             ]
             self.notifier.send_whatsapp_list(
                 sender_id,
-                "👋 How can I help you today?",
+                " How can I help you today?",
                 items,
                 title="All Options",
                 button_text="See all options"
@@ -1301,7 +1301,7 @@ class WhatsAppService:
 
             if detected_lang != 'en' or is_freeform:
                 # Switch to AI chat mode and process the message there
-                logger.info(f"🌐 Routing freeform text to AI chat (lang={detected_lang}): '{input_text[:50]}'")
+                logger.info(f" Routing freeform text to AI chat (lang={detected_lang}): '{input_text[:50]}'")
                 session = self._get_session(sender_id)
                 data = session.get('data', {})
                 data['detected_lang'] = detected_lang
@@ -1348,7 +1348,7 @@ class WhatsAppService:
             'booked_for': 'other',
             'patient_name': patient_name
         })
-        self.notifier.send_whatsapp_text(sender_id, f"📝 Booking for: *{patient_name}*")
+        self.notifier.send_whatsapp_text(sender_id, f" Booking for: *{patient_name}*")
         self._send_service_list(sender_id)
 
     # ═══════════════════════════════════════════
@@ -1369,13 +1369,13 @@ class WhatsAppService:
         btn_ids = [f"svc_{svc['service_id']}" for svc in top_services] + ["svc_more"]
         self.notifier.send_whatsapp_buttons(
             sender_id,
-            "🏥 Select a Service:",
+            " Select a Service:",
             btn_titles[:3],
             btn_ids[:3]
         )
 
     def _handle_service_selection(self, sender_id, selection_id):
-        # Step 2: User tapped "See all options" → send full service list
+        # Step 2: User tapped "See all options"  send full service list
         if selection_id == 'svc_more':
             services = self.appt_service.get_services()
             if not services:
@@ -1390,7 +1390,7 @@ class WhatsAppService:
                 ))
             self.notifier.send_whatsapp_list(
                 sender_id,
-                "🏥 Select a Service:",
+                " Select a Service:",
                 items,
                 title="All Services",
                 button_text="View Services"
@@ -1409,7 +1409,7 @@ class WhatsAppService:
             
             services = self.appt_service.get_services()
             service_names = [s['service_name'] for s in services]
-            logger.info(f"🔎 fuzzy match input='{input_clean}' against {service_names}")
+            logger.info(f" fuzzy match input='{input_clean}' against {service_names}")
             
             # Exact/Partial match on service name
             matched = next((s for s in services if s['service_name'].lower().strip() == input_clean or input_clean in s['service_name'].lower() or s['service_name'].lower().strip() in input_clean), None)
@@ -1460,7 +1460,7 @@ class WhatsAppService:
                 btn_ids.append(f"doc_{doc['user_id']}")
             self.notifier.send_whatsapp_buttons(
                 sender_id,
-                "👨‍⚕️ Select a Doctor:",
+                "‍️ Select a Doctor:",
                 btn_titles,
                 btn_ids
             )
@@ -1477,7 +1477,7 @@ class WhatsAppService:
             btn_ids.append("doc_more")
             self.notifier.send_whatsapp_buttons(
                 sender_id,
-                "👨‍⚕️ Select a Doctor:",
+                "‍️ Select a Doctor:",
                 btn_titles[:3],
                 btn_ids[:3]
             )
@@ -1486,7 +1486,7 @@ class WhatsAppService:
             self._transition_to(sender_id, STATE_SELECT_DOCTOR, {'_pending_doctor_ids': doc_ids})
 
     def _handle_doctor_selection(self, sender_id, selection_id, data=None):
-        # Step 2: User tapped "See all options" → send full doctor list
+        # Step 2: User tapped "See all options"  send full doctor list
         if selection_id == 'doc_more':
             data = data or {}
             service_id = data.get('service_id')
@@ -1506,7 +1506,7 @@ class WhatsAppService:
                 items.append((f"doc_{doc['user_id']}", doc_label[:24], spec[:72]))
             self.notifier.send_whatsapp_list(
                 sender_id,
-                "👨‍⚕️ Select a Doctor:",
+                "‍️ Select a Doctor:",
                 items,
                 title="All Doctors",
                 button_text="Select"
@@ -1582,17 +1582,15 @@ class WhatsAppService:
 
         items = []
         for d in available:
-            shift_str = ', '.join(d.get('shifts', []))
-            display = f"{d['display']} ({shift_str})" if shift_str else d['display']
             items.append((
                 f"date_{d['date']}",
-                display[:24],
+                d['display'][:24],
                 d['date']
             ))
 
         self.notifier.send_whatsapp_list(
             sender_id,
-            f"📅 Dr. {doctor_name}\nSelect an available date:",
+            f" Dr. {doctor_name}\nSelect an available date:",
             items,
             title="Available Dates"
         )
@@ -1691,7 +1689,7 @@ class WhatsAppService:
             # Try natural language date resolution
             resolved = self._resolve_natural_date(date_str, data.get('doctor_id', ''))
             if resolved:
-                logger.info(f"📅 Resolved natural date '{date_str}' → {resolved}")
+                logger.info(f" Resolved natural date '{date_str}'  {resolved}")
                 date_str = resolved
             else:
                 self.notifier.send_whatsapp_text(sender_id, "Invalid date. Please select from the list.")
@@ -1699,45 +1697,69 @@ class WhatsAppService:
                 return
 
 
-        # Get available shifts
+        # Collect ALL available slots across all schedule entries (no shift step)
         shifts = self.appt_service.get_available_shifts(data['doctor_id'], date_str)
 
         if not shifts:
             self.notifier.send_whatsapp_text(
                 sender_id,
-                f"No available shifts on {date_str}. Try another date."
+                f"No available slots on {date_str}. Try another date."
             )
             self._send_available_dates(sender_id, data['doctor_id'], data.get('doctor_name', ''))
             return
 
-        self._transition_to(sender_id, STATE_SELECT_SHIFT, {'date': date_str})
+        # Gather all free slots from every schedule block
+        all_slots = []
+        for s in shifts:
+            block_slots = self.appt_service.get_shift_slots(
+                data['doctor_id'], date_str, s['start'], s['end']
+            )
+            all_slots.extend(block_slots)
 
-        # Send shift options
-        if len(shifts) <= 3:
-            # Use buttons for ≤3 shifts
-            btn_titles = [f"{s['shift_name']} ({s['free_slots']} slots)" for s in shifts]
-            btn_ids = [f"shift_{s['start']}_{s['end']}" for s in shifts]
-            self.notifier.send_whatsapp_buttons(
+        if not all_slots:
+            self.notifier.send_whatsapp_text(
                 sender_id,
-                f"🕐 Select a shift for {date_str}:",
-                btn_titles[:3],
-                btn_ids[:3]
+                f"All slots are booked on {date_str}. Try another date."
             )
-        else:
-            # Use list for >3 shifts
-            items = []
-            for s in shifts:
-                items.append((
-                    f"shift_{s['start']}_{s['end']}",
-                    f"{s['shift_name']}",
-                    f"{self._format_time_display(s['start'])}–{self._format_time_display(s['end'])} ({s['free_slots']} slots)"
-                ))
-            self.notifier.send_whatsapp_list(
-                sender_id,
-                f"🕐 Select a shift for {date_str}:",
-                items,
-                title="Shifts"
+            self._send_available_dates(sender_id, data['doctor_id'], data.get('doctor_name', ''))
+            return
+
+        # Skip shift step — go directly to time selection
+        self._transition_to(sender_id, STATE_SELECT_TIME, {'date': date_str})
+
+        # ── Text message with ALL slots ──
+        msg_lines = [
+            f" *Available Slots ({len(all_slots)})*",
+            f"Dr. {data.get('doctor_name', '?')} | {date_str}\n",
+        ]
+        for i, slot in enumerate(all_slots, 1):
+            msg_lines.append(
+                f"  {i}. {self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
             )
+        msg_lines.append("\nReply with a *number* or *time* (e.g. '9 AM').")
+        self.notifier.send_whatsapp_text(sender_id, '\n'.join(msg_lines))
+
+        # ── Interactive list (WhatsApp max 10 rows) ──
+        items = []
+        for slot in all_slots[:10]:
+            items.append((
+                f"time_{slot['start']}",
+                f" {self._format_time_display(slot['start'])}",
+                f"{self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
+            ))
+
+        list_header = (
+            f" Available slots\n"
+            f"Dr. {data.get('doctor_name', '?')} | {date_str}"
+        )
+        if len(all_slots) > 10:
+            list_header += f"\nTap for slots 1-10. For 11-{len(all_slots)}, reply with the number."
+        self.notifier.send_whatsapp_list(
+            sender_id,
+            list_header,
+            items,
+            title="Time Slots"
+        )
 
     # ═══════════════════════════════════════════
     #  SHIFT SELECTION
@@ -1762,7 +1784,7 @@ class WhatsAppService:
                 )
                 if matched_shift:
                     input_text = f"shift_{matched_shift['start']}_{matched_shift['end']}"
-                    logger.info(f"🕐 Fuzzy matched shift '{text_clean}' → {matched_shift['shift_name']}")
+                    logger.info(f" Fuzzy matched shift '{text_clean}'  {matched_shift['shift_name']}")
 
             if not input_text.startswith('shift_'):
                 self.notifier.send_whatsapp_text(sender_id, "Invalid selection. Please pick a shift.")
@@ -1806,7 +1828,7 @@ class WhatsAppService:
 
         # ── Text message with ALL slots (no limit) ──
         msg_lines = [
-            f"⏰ *Available Slots ({len(slots)}) — {shift_name} shift*",
+            f" *Available Slots ({len(slots)}) — {shift_name} shift*",
             f"Dr. {data.get('doctor_name', '?')} | {data['date']}\n",
         ]
         for i, slot in enumerate(slots, 1):
@@ -1821,12 +1843,12 @@ class WhatsAppService:
         for slot in slots[:10]:
             items.append((
                 f"time_{slot['start']}",
-                f"🕐 {self._format_time_display(slot['start'])}",
+                f" {self._format_time_display(slot['start'])}",
                 f"{self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
             ))
 
         list_header = (
-            f"⏰ Available slots ({shift_name} shift)\n"
+            f" Available slots ({shift_name} shift)\n"
             f"Dr. {data.get('doctor_name', '?')} | {data['date']}"
         )
         if len(slots) > 10:
@@ -1851,9 +1873,9 @@ class WhatsAppService:
             import re
             text_clean = input_text.lower().strip()
 
-            # Get available slots to match against
-            slots = self.appt_service.get_shift_slots(
-                data['doctor_id'], data['date'], data['shift_start'], data['shift_end']
+            # Get available slots to match against (all schedule blocks combined)
+            slots = self.appt_service.get_all_date_slots(
+                data['doctor_id'], data['date']
             )
             free_times = [s['start'] for s in slots]  # e.g. ['07:00', '07:30', '08:00']
 
@@ -1905,13 +1927,13 @@ class WhatsAppService:
 
             if matched_time and matched_time in free_times:
                 input_text = f"time_{matched_time}"
-                logger.info(f"⏰ Fuzzy matched time '{text_clean}' → {matched_time}")
+                logger.info(f" Fuzzy matched time '{text_clean}'  {matched_time}")
             elif matched_time:
                 # Try closest match (e.g. user says "7" but slot is "07:00")
                 closest = next((t for t in free_times if t.startswith(matched_time[:2] + ':')), None)
                 if closest:
                     input_text = f"time_{closest}"
-                    logger.info(f"⏰ Closest time match '{text_clean}' → {closest}")
+                    logger.info(f" Closest time match '{text_clean}'  {closest}")
 
             if not input_text.startswith('time_'):
                 self.notifier.send_whatsapp_text(sender_id, "Invalid selection. Please pick a time slot.")
@@ -1920,22 +1942,19 @@ class WhatsAppService:
         time_str = input_text.replace('time_', '', 1)
 
         # Double-check availability (concurrency guard)
-        slots = self.appt_service.get_shift_slots(
-            data['doctor_id'], data['date'], data['shift_start'], data['shift_end']
+        slots = self.appt_service.get_all_date_slots(
+            data['doctor_id'], data['date']
         )
         free_times = [s['start'] for s in slots]
 
         if time_str not in free_times:
             self.notifier.send_whatsapp_text(
                 sender_id,
-                "⚠️ That slot was just taken! Please select another."
+                "️ That slot was just taken! Please select another."
             )
-            # Re-send the shift slots
-            self._handle_shift_selection(
-                sender_id,
-                f"shift_{data['shift_start']}_{data['shift_end']}",
-                data
-            )
+            # Re-send date selection so user can try again
+            self._send_available_dates(sender_id, data['doctor_id'], data.get('doctor_name', ''))
+            self._transition_to(sender_id, STATE_SELECT_DATE)
             return
 
         # Calculate end time from slot_duration
@@ -1950,17 +1969,17 @@ class WhatsAppService:
         booked_for = data.get('booked_for', 'self')
 
         summary = (
-            f"*📋 Confirm Booking?*\n\n"
-            f"👤 Patient: {patient_name}\n"
-            f"🏥 Service: {data.get('service_name', '—')}\n"
-            f"👨‍⚕️ Doctor: Dr. {data.get('doctor_name', '—')}\n"
-            f"🏥 Specialization: {data.get('doctor_specialization', 'General')}\n"
-            f"📅 Date: {data['date']}\n"
-            f"🕐 Shift: {data.get('shift', '—')}\n"
-            f"⏰ Time: {self._format_time_display(time_str)} – {self._format_time_display(end_time)}\n\n"
+            f"* Confirm Booking?*\n\n"
+            f" Patient: {patient_name}\n"
+            f" Service: {data.get('service_name', '—')}\n"
+            f"‍️ Doctor: Dr. {data.get('doctor_name', '—')}\n"
+            f" Specialization: {data.get('doctor_specialization', 'General')}\n"
+            f" Date: {data['date']}\n"
+            f" Shift: {data.get('shift', '—')}\n"
+            f" Time: {self._format_time_display(time_str)} – {self._format_time_display(end_time)}\n\n"
             f"_Please arrive 10 minutes early._"
         )
-        self.notifier.send_whatsapp_buttons(sender_id, summary, ["✅ Confirm", "❌ Cancel"], ["confirm_yes", "confirm_no"])
+        self.notifier.send_whatsapp_buttons(sender_id, summary, [" Confirm", " Cancel"], ["confirm_yes", "confirm_no"])
 
     # ═══════════════════════════════════════════
     #  CONFIRMATION
@@ -2033,16 +2052,16 @@ class WhatsAppService:
                     logger.warning(f"Failed to cancel old appointment during reschedule: {e}")
 
             confirm_msg = (
-                f"✅ *Appointment Booked!*\n\n"
+                f" *Appointment Booked!*\n\n"
                 f"🆔 ID: {appt_id}\n"
-                f"👤 Patient: {patient_name}\n"
-                f"🏥 Service: {data.get('service_name', '—')}\n"
-                f"👨‍⚕️ Doctor: Dr. {data.get('doctor_name', '—')}\n"
-                f"🏥 Specialization: {data.get('doctor_specialization', 'General')}\n"
-                f"📅 Date: {data['date']}\n"
-                f"🕐 Shift: {data.get('shift', '—')}\n"
-                f"⏰ Time: {self._format_time_display(data['time'])} – {self._format_time_display(data.get('end_time', ''))}\n\n"
-                f"⏳ Status: Pending Doctor Approval\n"
+                f" Patient: {patient_name}\n"
+                f" Service: {data.get('service_name', '—')}\n"
+                f"‍️ Doctor: Dr. {data.get('doctor_name', '—')}\n"
+                f" Specialization: {data.get('doctor_specialization', 'General')}\n"
+                f" Date: {data['date']}\n"
+                f" Shift: {data.get('shift', '—')}\n"
+                f" Time: {self._format_time_display(data['time'])} – {self._format_time_display(data.get('end_time', ''))}\n\n"
+                f" Status: Pending Doctor Approval\n"
                 f"_You will receive a notification once confirmed._"
             )
             self.notifier.send_whatsapp_text(sender_id, confirm_msg)
@@ -2051,7 +2070,7 @@ class WhatsAppService:
 
         except Exception as e:
             logger.error(f"Booking failed: {e}")
-            self.notifier.send_whatsapp_text(sender_id, f"❌ Booking Failed: {str(e)}")
+            self.notifier.send_whatsapp_text(sender_id, f" Booking Failed: {str(e)}")
 
         self._transition_to(sender_id, STATE_MENU, clear_data=True)
         self._send_main_menu(sender_id)
@@ -2072,11 +2091,11 @@ class WhatsAppService:
         appts = self.appt_service.get_patient_appointments(patient['patient_id'])
 
         if not appts:
-            self.notifier.send_whatsapp_text(sender_id, "📭 No upcoming appointments found.")
+            self.notifier.send_whatsapp_text(sender_id, " No upcoming appointments found.")
         else:
-            msg = "*📅 Your Upcoming Appointments:*\n\n"
+            msg = "* Your Upcoming Appointments:*\n\n"
             for a in appts:
-                icon = {"pending_doctor_approval": "⏳", "confirmed": "✅", "rejected": "❌"}.get(a['status'], "❓")
+                icon = {"pending_doctor_approval": "", "confirmed": "", "rejected": ""}.get(a['status'], "")
                 doc_name = a.get('doctor_name', '?')
                 msg += (
                     f"{icon} *{a['date']}* at {self._format_time_display(a['start_time'])}\n"
@@ -2099,7 +2118,7 @@ class WhatsAppService:
             self._send_main_menu(sender_id)
             return
 
-        msg = "*🏥 Our Services:*\n\n"
+        msg = "* Our Services:*\n\n"
         for i, svc in enumerate(services, 1):
             msg += f"{i}. {svc['service_name']}\n"
 
@@ -2125,7 +2144,7 @@ class WhatsAppService:
         active = [a for a in appts if a.get('status') in ('pending_doctor_approval', 'confirmed')]
 
         if not active:
-            self.notifier.send_whatsapp_text(sender_id, "📭 No active appointments to reschedule.")
+            self.notifier.send_whatsapp_text(sender_id, " No active appointments to reschedule.")
             self._send_main_menu(sender_id)
             return
 
@@ -2140,7 +2159,7 @@ class WhatsAppService:
 
         self.notifier.send_whatsapp_list(
             sender_id,
-            "🔄 *Reschedule Appointment*\n\nSelect the appointment you want to modify:",
+            " *Reschedule Appointment*\n\nSelect the appointment you want to modify:",
             items,
             title="Your Appointments",
             button_text="Select"
@@ -2162,7 +2181,7 @@ class WhatsAppService:
 
         self.notifier.send_whatsapp_text(
             sender_id,
-            f"🔄 You selected to reschedule appointment *{appt_id}*.\n\n"
+            f" You selected to reschedule appointment *{appt_id}*.\n\n"
             "Let's book a new slot first. When confirmed, your old appointment will be cancelled."
         )
 
@@ -2183,8 +2202,8 @@ class WhatsAppService:
         # Step 1: Show top 2 actions as buttons + "More Options"
         self.notifier.send_whatsapp_buttons(
             sender_id,
-            "👋 How can I help you today?",
-            ["📅 Book Appointment", "🔍 Check Appts", "More Options"],
+            " How can I help you today?",
+            [" Book Appointment", " Check Appts", "More Options"],
             ["book_appointment", "check_appointments", "menu_more"]
         )
 
@@ -2198,19 +2217,19 @@ class WhatsAppService:
         Returns the mapped command string, or None on failure.
         """
         if not self.stt:
-            self.notifier.send_whatsapp_text(sender_id, "⚠️ Voice messages are not supported. Please use text.")
+            self.notifier.send_whatsapp_text(sender_id, "️ Voice messages are not supported. Please use text.")
             return None
 
         if not media_id:
-            self.notifier.send_whatsapp_text(sender_id, "⚠️ Failed to process voice note. Please try text.")
+            self.notifier.send_whatsapp_text(sender_id, "️ Failed to process voice note. Please try text.")
             return None
 
         try:
-            self.notifier.send_whatsapp_text(sender_id, "🎤 Processing your voice message...")
+            self.notifier.send_whatsapp_text(sender_id, " Processing your voice message...")
             audio_path = self._download_media(media_id)
 
             if not audio_path:
-                self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not download audio. Please try text.")
+                self.notifier.send_whatsapp_text(sender_id, "️ Could not download audio. Please try text.")
                 return None
 
             transcribed = self.stt.transcribe_audio_file(audio_path)
@@ -2222,11 +2241,11 @@ class WhatsAppService:
                 pass
 
             if not transcribed:
-                self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not understand audio. Please try again or use text.")
+                self.notifier.send_whatsapp_text(sender_id, "️ Could not understand audio. Please try again or use text.")
                 return None
 
-            logger.info(f"📝 Transcribed: '{transcribed}'")
-            self.notifier.send_whatsapp_text(sender_id, f"📝 I heard: \"{transcribed}\"")
+            logger.info(f" Transcribed: '{transcribed}'")
+            self.notifier.send_whatsapp_text(sender_id, f" I heard: \"{transcribed}\"")
 
             # Map to command
             text_lower = transcribed.lower().strip()
@@ -2235,7 +2254,7 @@ class WhatsAppService:
                     return cmd
 
             # Fallback to AI Intent Extraction with enhanced for-whom detection
-            logger.info(f"🤔 keyphrase miss. Asking AI for intent from: '{transcribed}'")
+            logger.info(f" keyphrase miss. Asking AI for intent from: '{transcribed}'")
             
             # Fetch services context for AI
             services = self.appt_service.get_services()
@@ -2255,7 +2274,7 @@ class WhatsAppService:
                 else:
                     available_doctors = self.appt_service.get_active_doctors()
                 doctor_names = [d.get('full_name', 'Dr. Unknown') for d in available_doctors]
-                logger.info(f"🩺 STATE_SELECT_DOCTOR: available doctors = {doctor_names}")
+                logger.info(f" STATE_SELECT_DOCTOR: available doctors = {doctor_names}")
 
             intent_data = self.ai_service.extract_booking_intent(transcribed, service_names, doctor_names)
             
@@ -2271,7 +2290,7 @@ class WhatsAppService:
                 if match:
                     resolved_service_id = match['service_id']
 
-            logger.info(f"🧠 AI understood: intent={intent}, for_whom={for_whom}, service={resolved_service_id}, doctor={predicted_doc}")
+            logger.info(f" AI understood: intent={intent}, for_whom={for_whom}, service={resolved_service_id}, doctor={predicted_doc}")
 
             # ── PRIORITY: Context-aware state handling ──
             # If the user is already in a selection state, handle it directly
@@ -2288,21 +2307,21 @@ class WhatsAppService:
                         None
                     )
                     if matched_doc:
-                        logger.info(f"✅ Voice matched doctor: {matched_doc['full_name']} (ID: {matched_doc['user_id']})")
+                        logger.info(f" Voice matched doctor: {matched_doc['full_name']} (ID: {matched_doc['user_id']})")
                         self._handle_doctor_selection(sender_id, f"doc_{matched_doc['user_id']}", session_data)
                         return None
                     else:
-                        logger.info(f"⚠️ AI returned doctor='{predicted_doc}' but no fuzzy match found")
+                        logger.info(f"️ AI returned doctor='{predicted_doc}' but no fuzzy match found")
                 
                 # Fallback: if only ONE doctor is available, auto-select them
                 if len(available_doctors) == 1:
                     only_doc = available_doctors[0]
-                    logger.info(f"🎯 Only one doctor available, auto-selecting: {only_doc['full_name']}")
+                    logger.info(f" Only one doctor available, auto-selecting: {only_doc['full_name']}")
                     self._handle_doctor_selection(sender_id, f"doc_{only_doc['user_id']}", session_data)
                     return None
                 
                 # Last resort: return raw text for _handle_doctor_selection to try
-                logger.info(f"⚠️ Voice doctor selection: returning raw text '{transcribed}' for fuzzy match")
+                logger.info(f"️ Voice doctor selection: returning raw text '{transcribed}' for fuzzy match")
                 return transcribed
 
             if current_state == STATE_SELECT_DATE:
@@ -2323,7 +2342,7 @@ class WhatsAppService:
                     # Try natural language resolution
                     resolved = self._resolve_natural_date(transcribed, doctor_id)
                     if resolved:
-                        logger.info(f"📅 Voice resolved date '{transcribed}' → {resolved}")
+                        logger.info(f" Voice resolved date '{transcribed}'  {resolved}")
                         self._handle_date_selection(sender_id, f"date_{resolved}", session_data)
                         return None
                 
@@ -2386,7 +2405,7 @@ class WhatsAppService:
                             })
                             
                             self._transition_to(sender_id, target_state, next_step_data)
-                            self.notifier.send_whatsapp_text(sender_id, f"📝 Booking for: *{guest_name}*")
+                            self.notifier.send_whatsapp_text(sender_id, f" Booking for: *{guest_name}*")
                             
                             if resolved_service_id:
                                 doctors = self.appt_service.get_doctors_by_service(resolved_service_id)
@@ -2411,7 +2430,7 @@ class WhatsAppService:
 
         except Exception as e:
             logger.error(f"STT Error: {e}")
-            self.notifier.send_whatsapp_text(sender_id, "⚠️ Voice processing failed. Please use text.")
+            self.notifier.send_whatsapp_text(sender_id, "️ Voice processing failed. Please use text.")
             return None
 
     # ═══════════════════════════════════════════
@@ -2425,7 +2444,7 @@ class WhatsAppService:
         # Step 1: Show English & Hindi as buttons + "Other Languages"
         self.notifier.send_whatsapp_buttons(
             sender_id,
-            "🌐 *Select Your Preferred Language*\n\n"
+            " *Select Your Preferred Language*\n\n"
             "Choose a language for voice booking:",
             ["English", "हिन्दी (Hindi)", "Other Languages"],
             ["lang_en", "lang_hi", "lang_more"]
@@ -2442,7 +2461,7 @@ class WhatsAppService:
         """Handle user's language selection input."""
         text = input_text.strip()
 
-        # Step 2: User tapped "Other Languages" → send full language list
+        # Step 2: User tapped "Other Languages"  send full language list
         if text == 'lang_more':
             lang_items = [
                 ("lang_te", "తెలుగు (Telugu)", "Speak in Telugu"),
@@ -2453,7 +2472,7 @@ class WhatsAppService:
             ]
             self.notifier.send_whatsapp_list(
                 sender_id,
-                "🌐 *Select Your Preferred Language*\n\n"
+                " *Select Your Preferred Language*\n\n"
                 "Choose the language you'd like to use for voice booking:",
                 lang_items,
                 title="All Languages",
@@ -2474,7 +2493,7 @@ class WhatsAppService:
         if not lang_code or lang_code not in SARVAM_SUPPORTED_LANGUAGES:
             self.notifier.send_whatsapp_text(
                 sender_id,
-                "⚠️ I didn't understand that. Please select a language from the list, or type a number 1-5."
+                "️ I didn't understand that. Please select a language from the list, or type a number 1-5."
             )
             self._start_voice_flow(sender_id)
             return
@@ -2491,8 +2510,8 @@ class WhatsAppService:
 
         # Send confirmation
         confirm_msg = (
-            f"✅ Language set to *{lang_display} ({lang_name})*\n\n"
-            f"🎤 You can now send voice notes or type in {lang_name} to book appointments.\n\n"
+            f" Language set to *{lang_display} ({lang_name})*\n\n"
+            f" You can now send voice notes or type in {lang_name} to book appointments.\n\n"
             f"_Send a voice note or type your request to get started!_"
         )
         self.notifier.send_whatsapp_text(sender_id, confirm_msg)
@@ -2522,7 +2541,7 @@ class WhatsAppService:
         This is the primary voice pipeline when Sarvam is available.
         """
         if not media_id:
-            self.notifier.send_whatsapp_text(sender_id, "⚠️ Failed to process voice note. Please try again.")
+            self.notifier.send_whatsapp_text(sender_id, "️ Failed to process voice note. Please try again.")
             return
 
         current_state = session.get('state', STATE_INIT)
@@ -2531,23 +2550,23 @@ class WhatsAppService:
 
         try:
             _status_msgs = {
-                'te': '🎤 మీ వాయిస్ మెసేజ్ ప్రాసెస్ చేస్తున్నాము...',
-                'hi': '🎤 आपका वॉइस मैसेज प्रोसेस हो रहा है...',
-                'ta': '🎤 உங்கள் குரல் செய்தியை செயலாக்குகிறோம்...',
-                'kn': '🎤 ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶವನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ...',
-                'ur': '🎤 آپ کا وائس پیغام پروسیس ہو رہا ہے...'
+                'te': ' మీ వాయిస్ మెసేజ్ ప్రాసెస్ చేస్తున్నాము...',
+                'hi': ' आपका वॉइस मैसेज प्रोसेस हो रहा है...',
+                'ta': ' உங்கள் குரல் செய்தியை செயலாக்குகிறோம்...',
+                'kn': ' ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶವನ್ನು ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ...',
+                'ur': ' آپ کا وائس پیغام پروسیس ہو رہا ہے...'
             }
-            self.notifier.send_whatsapp_text(sender_id, _status_msgs.get(lang_code, "🎤 Processing your voice message..."))
+            self.notifier.send_whatsapp_text(sender_id, _status_msgs.get(lang_code, " Processing your voice message..."))
 
             # 1. Download audio from WhatsApp
             audio_path = self._download_media(media_id)
             if not audio_path:
-                self.notifier.send_whatsapp_text(sender_id, "⚠️ Could not download audio. Please try again.")
+                self.notifier.send_whatsapp_text(sender_id, "️ Could not download audio. Please try again.")
                 return
 
             # 2. If no language selected yet, auto-detect from this voice note
             if current_state not in [STATE_VOICE_CHAT, STATE_LANG_SELECT] and current_state not in [STATE_REGISTER_NAME, STATE_REGISTER_EMAIL]:
-                logger.info(f"🎤 AUTO-DETECT: First voice note from {sender_id}, auto-detecting language...")
+                logger.info(f" AUTO-DETECT: First voice note from {sender_id}, auto-detecting language...")
 
                 # PRIORITY: Use Sarvam STT for Indian language detection
                 # Local Whisper "tiny" is unreliable for Indian languages and often outputs garbage
@@ -2566,7 +2585,7 @@ class WhatsAppService:
                             temp_stt = self.sarvam.speech_to_text(audio_path, try_lang)
                             if temp_stt and temp_stt.get('transcript'):
                                 transcript_text = temp_stt['transcript'].strip()
-                                logger.info(f"🎤 AUTO-DETECT trying {try_lang}: '{transcript_text[:60]}'")
+                                logger.info(f" AUTO-DETECT trying {try_lang}: '{transcript_text[:60]}'")
 
                                 # Check if this looks like valid content (not garbage)
                                 if transcript_text and len(transcript_text) > 2:
@@ -2577,7 +2596,7 @@ class WhatsAppService:
                                             # Found native script - this is likely the correct language
                                             best_result = temp_stt
                                             best_lang = try_lang
-                                            logger.info(f"✅ AUTO-DETECT found native script for {try_lang}")
+                                            logger.info(f" AUTO-DETECT found native script for {try_lang}")
                                             break
                                         else:
                                             # Romanized text - check with language patterns
@@ -2585,7 +2604,7 @@ class WhatsAppService:
                                             if detected == try_lang:
                                                 best_result = temp_stt
                                                 best_lang = try_lang
-                                                logger.info(f"✅ AUTO-DETECT matched Romanized {try_lang}")
+                                                logger.info(f" AUTO-DETECT matched Romanized {try_lang}")
                                                 break
                                             elif not best_result:
                                                 # Keep as fallback
@@ -2603,18 +2622,18 @@ class WhatsAppService:
                     if best_result:
                         stt_result = best_result
                         lang_code = best_lang
-                        logger.info(f"🎤 AUTO-DETECT selected {lang_code}: '{stt_result['transcript'][:60]}'")
+                        logger.info(f" AUTO-DETECT selected {lang_code}: '{stt_result['transcript'][:60]}'")
 
                 # If Sarvam failed completely, try local Whisper as last resort
                 if not stt_result and self.local_voice and self.local_voice.stt_available:
-                    logger.warning("⚠️ Sarvam STT failed for all languages, trying local Whisper...")
+                    logger.warning("️ Sarvam STT failed for all languages, trying local Whisper...")
                     try:
                         whisper_result = self.local_voice.speech_to_text(audio_path, 'hi')
                         if whisper_result and whisper_result.get('transcript'):
                             stt_result = whisper_result
                             detected_lang = whisper_result.get('language_code', 'hi')
                             lang_code = detected_lang if detected_lang in SARVAM_SUPPORTED_LANGUAGES else 'hi'
-                            logger.info(f"🎤 LOCAL Whisper fallback: {lang_code} - '{stt_result['transcript'][:60]}'")
+                            logger.info(f" LOCAL Whisper fallback: {lang_code} - '{stt_result['transcript'][:60]}'")
                     except Exception as e:
                         logger.error(f"Local Whisper fallback failed: {e}")
 
@@ -2629,11 +2648,11 @@ class WhatsAppService:
                     # VALIDATE: Check for unsupported language scripts (Chinese, Japanese, Korean, etc.)
                     is_valid, issue = is_transcript_valid(transcript)
                     if not is_valid:
-                        logger.warning(f"⚠️ INVALID TRANSCRIPT: {issue} - '{transcript[:60]}'")
+                        logger.warning(f"️ INVALID TRANSCRIPT: {issue} - '{transcript[:60]}'")
                         # Send "language not detected" message in multiple supported languages
                         self.notifier.send_whatsapp_text(
                             sender_id,
-                            "⚠️ *Language not detected / भाषा पहचान नहीं हुई*\n\n"
+                            "️ *Language not detected / भाषा पहचान नहीं हुई*\n\n"
                             "I only understand these languages:\n"
                             "• Telugu (తెలుగు)\n"
                             "• Hindi (हिंदी)\n"
@@ -2651,10 +2670,10 @@ class WhatsAppService:
 
                     # Also validate that language code is in our trained set
                     if lang_code not in TRAINED_LANGUAGES:
-                        logger.warning(f"⚠️ Language {lang_code} not in trained set, defaulting to 'hi'")
+                        logger.warning(f"️ Language {lang_code} not in trained set, defaulting to 'hi'")
                         lang_code = 'hi'
 
-                    logger.info(f"🌐 AUTO-DETECT language result: {lang_code} ({get_language_name(lang_code)}) for '{transcript[:60]}'")
+                    logger.info(f" AUTO-DETECT language result: {lang_code} ({get_language_name(lang_code)}) for '{transcript[:60]}'")
 
                     # Set language and transition directly to voice chat — skip language selection
                     self._transition_to(sender_id, STATE_VOICE_CHAT, {
@@ -2662,18 +2681,18 @@ class WhatsAppService:
                         'messages': []
                     })
                     _activation_msgs = {
-                        'te': f"🎤 వాయిస్ బుకింగ్ యాక్టివేట్ అయింది! భాష: *{get_language_name(lang_code)}*",
-                        'hi': f"🎤 वॉइस बुकिंग एक्टिवेट! भाषा: *{get_language_name(lang_code)}*",
-                        'ta': f"🎤 குரல் முன்பதிவு செயல்படுத்தப்பட்டது! மொழி: *{get_language_name(lang_code)}*",
-                        'kn': f"🎤 ಧ್ವನಿ ಬುಕಿಂಗ್ ಸಕ್ರಿಯಗೊಂಡಿದೆ! ಭಾಷೆ: *{get_language_name(lang_code)}*",
-                        'ur': f"🎤 وائس بکنگ ایکٹیویٹ! زبان: *{get_language_name(lang_code)}*"
+                        'te': f" వాయిస్ బుకింగ్ యాక్టివేట్ అయింది! భాష: *{get_language_name(lang_code)}*",
+                        'hi': f" वॉइस बुकिंग एक्टिवेट! भाषा: *{get_language_name(lang_code)}*",
+                        'ta': f" குரல் முன்பதிவு செயல்படுத்தப்பட்டது! மொழி: *{get_language_name(lang_code)}*",
+                        'kn': f" ಧ್ವನಿ ಬುಕಿಂಗ್ ಸಕ್ರಿಯಗೊಂಡಿದೆ! ಭಾಷೆ: *{get_language_name(lang_code)}*",
+                        'ur': f" وائس بکنگ ایکٹیویٹ! زبان: *{get_language_name(lang_code)}*"
                     }
                     self.notifier.send_whatsapp_text(
                         sender_id,
-                        _activation_msgs.get(lang_code, f"🎤 Voice booking activated! Language: *{get_language_name(lang_code)}*")
+                        _activation_msgs.get(lang_code, f" Voice booking activated! Language: *{get_language_name(lang_code)}*")
                     )
-                    _heard_prefix = {'te': '📝 నేను విన్నది', 'hi': '📝 मैंने सुना', 'ta': '📝 நான் கேட்டது', 'kn': '📝 ನಾನು ಕೇಳಿದ್ದು', 'ur': '📝 میں نے سنا'}
-                    self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, '📝 I heard')}: \"{transcript}\"")
+                    _heard_prefix = {'te': ' నేను విన్నది', 'hi': ' मैंने सुना', 'ta': ' நான் கேட்டது', 'kn': ' ನಾನು ಕೇಳಿದ್ದು', 'ur': ' میں نے سنا'}
+                    self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, ' I heard')}: \"{transcript}\"")
 
                     # Process this transcript immediately (don't waste the first message)
                     session = self._get_session(sender_id)
@@ -2682,7 +2701,7 @@ class WhatsAppService:
                     # Try booking engine first (only if NOT already in voice chat)
                     try:
                         if current_state != STATE_VOICE_CHAT and self._booking_engine.try_handle(sender_id, transcript, session):
-                            logger.info(f"📋 SmartBookingEngine handled auto-detected voice from {sender_id}")
+                            logger.info(f" SmartBookingEngine handled auto-detected voice from {sender_id}")
                             return
                     except Exception as e:
                         logger.error(f"SmartBookingEngine auto-detect error: {e}", exc_info=True)
@@ -2691,22 +2710,22 @@ class WhatsAppService:
                     self._process_sarvam_conversation(sender_id, transcript, data, lang_code)
                 else:
                     # Could not transcribe with ANY method - default to Hindi and ask user to try again
-                    logger.warning(f"⚠️ AUTO-DETECT: All STT methods failed, defaulting to Hindi voice mode")
+                    logger.warning(f"️ AUTO-DETECT: All STT methods failed, defaulting to Hindi voice mode")
                     self._transition_to(sender_id, STATE_VOICE_CHAT, {
                         'language': 'hi',
                         'messages': []
                     })
                     self.notifier.send_whatsapp_text(
                         sender_id,
-                        "🎤 *वॉइस बुकिंग एक्टिवेट!*\n\n"
-                        "⚠️ आपकी आवाज़ साफ़ नहीं सुनाई दी। कृपया धीरे और साफ़ बोलें।\n\n"
+                        " *वॉइस बुकिंग एक्टिवेट!*\n\n"
+                        "️ आपकी आवाज़ साफ़ नहीं सुनाई दी। कृपया धीरे और साफ़ बोलें।\n\n"
                         "_Voice booking activated! Could not understand clearly. Please speak slowly and clearly._"
                     )
                 return
 
             # 3. Handle language selection state via voice - auto-detect instead of requiring language name
             if current_state == STATE_LANG_SELECT:
-                logger.info(f"🎤 User in LANG_SELECT sent voice - auto-detecting language instead...")
+                logger.info(f" User in LANG_SELECT sent voice - auto-detecting language instead...")
                 # Auto-detect language from voice content
                 stt_result = None
                 best_lang = 'hi'
@@ -2755,8 +2774,8 @@ class WhatsAppService:
                         'language': best_lang,
                         'messages': []
                     })
-                    _heard_prefix = {'te': '📝 నేను విన్నది', 'hi': '📝 मैंने सुना', 'ta': '📝 நான் கேட்டது', 'kn': '📝 ನಾನು ಕೇಳಿದ್ದು', 'ur': '📝 میں نے سنا'}
-                    self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(best_lang, '📝 I heard')}: \"{transcript}\"")
+                    _heard_prefix = {'te': ' నేను విన్నది', 'hi': ' मैंने सुना', 'ta': ' நான் கேட்டது', 'kn': ' ನಾನು ಕೇಳಿದ್ದು', 'ur': ' میں نے سنا'}
+                    self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(best_lang, ' I heard')}: \"{transcript}\"")
 
                     # Process the transcript
                     session = self._get_session(sender_id)
@@ -2772,7 +2791,7 @@ class WhatsAppService:
                     self._transition_to(sender_id, STATE_VOICE_CHAT, {'language': 'hi', 'messages': []})
                     self.notifier.send_whatsapp_text(
                         sender_id,
-                        "🎤 वॉइस बुकिंग एक्टिवेट!\n⚠️ कृपया साफ़ बोलें। _Please speak clearly._"
+                        " वॉइस बुकिंग एक्टिवेट!\n️ कृपया साफ़ बोलें। _Please speak clearly._"
                     )
                 return
 
@@ -2801,7 +2820,7 @@ class WhatsAppService:
                                             if has_native_script:
                                                 best_result = temp_stt
                                                 best_lang = try_lang
-                                                logger.info(f"✅ Re-detect found native script for {try_lang}")
+                                                logger.info(f" Re-detect found native script for {try_lang}")
                                                 break
                                             else:
                                                 detected = detect_language(transcript_text)
@@ -2824,12 +2843,12 @@ class WhatsAppService:
                             stt_result = best_result
                             detected_lang = best_lang
                             lang_code = best_lang
-                            logger.info(f"🎤 Re-detect selected {lang_code}: '{stt_result['transcript'][:60]}'")
+                            logger.info(f" Re-detect selected {lang_code}: '{stt_result['transcript'][:60]}'")
                     else:
                         # Transcribe directly in the known native language
                         stt_result = self.sarvam.speech_to_text(audio_path, lang_code)
                         if stt_result and stt_result.get('transcript'):
-                            logger.info(f"🎤 Sarvam native STT [{lang_code}]: '{stt_result['transcript']}'")
+                            logger.info(f" Sarvam native STT [{lang_code}]: '{stt_result['transcript']}'")
                         else:
                             stt_result = None
                 except Exception as e:
@@ -2838,10 +2857,10 @@ class WhatsAppService:
 
             # Only use local Whisper as last resort if Sarvam completely failed
             if not stt_result and self.local_voice:
-                logger.warning("⚠️ Sarvam STT failed, trying local Whisper as last resort")
+                logger.warning("️ Sarvam STT failed, trying local Whisper as last resort")
                 stt_result = self.local_voice.speech_to_text(audio_path, lang_code)
                 if stt_result and stt_result.get('transcript'):
-                    logger.info(f"🎤 Local STT last-resort fallback: '{stt_result['transcript'][:60]}'")
+                    logger.info(f" Local STT last-resort fallback: '{stt_result['transcript'][:60]}'")
 
             # Update session language if it changed
             if detected_lang != lang_code:
@@ -2850,7 +2869,7 @@ class WhatsAppService:
                     {'sender_id': sender_id},
                     {'$set': {'data.language': detected_lang}}
                 )
-                logger.info(f"🌐 Updated session language to {detected_lang} ({get_language_name(detected_lang)}) for {sender_id}")
+                logger.info(f" Updated session language to {detected_lang} ({get_language_name(detected_lang)}) for {sender_id}")
 
             # Clean up audio file
             try:
@@ -2860,34 +2879,34 @@ class WhatsAppService:
 
             if not stt_result or not stt_result.get('transcript'):
                 _cant_understand = {
-                    'te': '⚠️ మీ వాయిస్ మెసేజ్ అర్థం కాలేదు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
-                    'hi': '⚠️ आपका वॉइस मैसेज समझ नहीं आया। कृपया फिर से कोशिश करें।',
-                    'ta': '⚠️ உங்கள் குரல் செய்தி புரியவில்லை. மீண்டும் முயற்சிக்கவும்.',
-                    'kn': '⚠️ ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶ ಅರ್ಥವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
-                    'ur': '⚠️ آپ کا وائس پیغام سمجھ نہیں آیا۔ دوبارہ کوشش کریں۔'
+                    'te': '️ మీ వాయిస్ మెసేజ్ అర్థం కాలేదు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
+                    'hi': '️ आपका वॉइस मैसेज समझ नहीं आया। कृपया फिर से कोशिश करें।',
+                    'ta': '️ உங்கள் குரல் செய்தி புரியவில்லை. மீண்டும் முயற்சிக்கவும்.',
+                    'kn': '️ ನಿಮ್ಮ ಧ್ವನಿ ಸಂದೇಶ ಅರ್ಥವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+                    'ur': '️ آپ کا وائس پیغام سمجھ نہیں آیا۔ دوبارہ کوشش کریں۔'
                 }
                 self.notifier.send_whatsapp_text(
                     sender_id,
-                    _cant_understand.get(lang_code, "⚠️ Could not understand your voice message. Please try again or type your request.")
+                    _cant_understand.get(lang_code, "️ Could not understand your voice message. Please try again or type your request.")
                 )
                 return
 
             transcript = stt_result['transcript']
-            logger.info(f"🎤 Sarvam STT [{lang_code}]: '{transcript}'")
+            logger.info(f" Sarvam STT [{lang_code}]: '{transcript}'")
 
             # 4b. VALIDATE: Reject transcripts with unsupported language scripts
             is_valid, issue = is_transcript_valid(transcript)
             if not is_valid:
-                logger.warning(f"⚠️ INVALID TRANSCRIPT in VOICE_CHAT: {issue} - '{transcript[:60]}'")
+                logger.warning(f"️ INVALID TRANSCRIPT in VOICE_CHAT: {issue} - '{transcript[:60]}'")
                 _lang_not_detected = {
-                    'te': '⚠️ భాష గుర్తించబడలేదు. దయచేసి తెలుగు, హిందీ, ఇంగ్లీష్, తమిళం లేదా కన్నడలో మాట్లాడండి.',
-                    'hi': '⚠️ भाषा पहचान नहीं हुई। कृपया हिंदी, अंग्रेजी, तेलुगु, तमिल या कन्नड़ में बोलें।',
-                    'ta': '⚠️ மொழி கண்டறியப்படவில்லை. தயவுசெய்து தமிழ், இந்தி, ஆங்கிலம், தெலுங்கு அல்லது கன்னடம் பேசுங்கள்.',
-                    'kn': '⚠️ ಭಾಷೆ ಪತ್ತೆಯಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಕನ್ನಡ, ಹಿಂದಿ, ಇಂಗ್ಲಿಷ್, ತೆಲುಗು ಅಥವಾ ತಮಿಳುನಲ್ಲಿ ಮಾತನಾಡಿ.',
+                    'te': '️ భాష గుర్తించబడలేదు. దయచేసి తెలుగు, హిందీ, ఇంగ్లీష్, తమిళం లేదా కన్నడలో మాట్లాడండి.',
+                    'hi': '️ भाषा पहचान नहीं हुई। कृपया हिंदी, अंग्रेजी, तेलुगु, तमिल या कन्नड़ में बोलें।',
+                    'ta': '️ மொழி கண்டறியப்படவில்லை. தயவுசெய்து தமிழ், இந்தி, ஆங்கிலம், தெலுங்கு அல்லது கன்னடம் பேசுங்கள்.',
+                    'kn': '️ ಭಾಷೆ ಪತ್ತೆಯಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಕನ್ನಡ, ಹಿಂದಿ, ಇಂಗ್ಲಿಷ್, ತೆಲುಗು ಅಥವಾ ತಮಿಳುನಲ್ಲಿ ಮಾತನಾಡಿ.',
                 }
                 self.notifier.send_whatsapp_text(
                     sender_id,
-                    _lang_not_detected.get(lang_code, "⚠️ Language not detected. Please speak in Telugu, Hindi, English, Tamil, or Kannada.")
+                    _lang_not_detected.get(lang_code, "️ Language not detected. Please speak in Telugu, Hindi, English, Tamil, or Kannada.")
                 )
                 return
 
@@ -2896,23 +2915,23 @@ class WhatsAppService:
             # may be expecting short answers (e.g., a patient name, yes/no)
             has_active_conversation = len(data.get('messages', [])) > 0
             if not has_active_conversation and self._is_garbage_transcript(transcript):
-                logger.warning(f"🗑️ Rejected garbage transcription: '{transcript}'")
+                logger.warning(f"️ Rejected garbage transcription: '{transcript}'")
                 self.notifier.send_whatsapp_text(
                     sender_id,
-                    "⚠️ I couldn't understand that clearly. Please speak closer to the mic and try again."
+                    "️ I couldn't understand that clearly. Please speak closer to the mic and try again."
                 )
                 return
 
             # Echo transcription in user's language
-            _heard_prefix = {'te': '📝 నేను విన్నది', 'hi': '📝 मैंने सुना', 'ta': '📝 நான் கேட்டது', 'kn': '📝 ನಾನು ಕೇಳಿದ್ದು', 'ur': '📝 میں نے سنا'}
-            self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, '📝 I heard')}: \"{transcript}\"")
+            _heard_prefix = {'te': ' నేను విన్నది', 'hi': ' मैंने सुना', 'ta': ' நான் கேட்டது', 'kn': ' ನಾನು ಕೇಳಿದ್ದು', 'ur': ' میں نے سنا'}
+            self.notifier.send_whatsapp_text(sender_id, f"{_heard_prefix.get(lang_code, ' I heard')}: \"{transcript}\"")
 
             # 5. Check for global commands
             text_lower = transcript.lower().strip()
             voice_booking_active = data.get('booking_state', BK_IDLE) != BK_IDLE
             if text_lower in ['hi', 'hello', 'menu', 'reset', 'start']:
                 if voice_booking_active and text_lower not in ['reset', 'menu']:
-                    logger.info(f"🚫 Ignoring voice reset command '{text_lower}' during active booking for {sender_id}")
+                    logger.info(f" Ignoring voice reset command '{text_lower}' during active booking for {sender_id}")
                     return
                 if voice_booking_active:
                     self.db.whatsapp_sessions.update_one(
@@ -2929,14 +2948,14 @@ class WhatsAppService:
             # the deterministic engine from getting stuck in a loop.
             try:
                 if current_state != STATE_VOICE_CHAT and self._booking_engine.try_handle(sender_id, transcript, session):
-                    logger.info(f"📋 SmartBookingEngine handled voice transcript from {sender_id}")
+                    logger.info(f" SmartBookingEngine handled voice transcript from {sender_id}")
                     return
             except Exception as e:
                 logger.error(f"SmartBookingEngine voice error: {e}", exc_info=True)
                 if voice_booking_active:
                     self.notifier.send_whatsapp_text(
                         sender_id,
-                        "⚠️ Something went wrong. Please try again or type *reset* to start over."
+                        "️ Something went wrong. Please try again or type *reset* to start over."
                     )
                     return
 
@@ -2944,17 +2963,17 @@ class WhatsAppService:
             self._process_sarvam_conversation(sender_id, transcript, data, lang_code)
 
         except Exception as e:
-            logger.error(f"❌ Sarvam voice processing error: {e}")
+            logger.error(f" Sarvam voice processing error: {e}")
             import traceback
             logger.error(traceback.format_exc())
             _fail_msgs = {
-                'te': '⚠️ వాయిస్ ప్రాసెసింగ్ విఫలమైంది. దయచేసి టెక్స్ట్ ద్వారా ప్రయత్నించండి.',
-                'hi': '⚠️ वॉइस प्रोसेसिंग विफल हुई। कृपया टेक्स्ट से प्रयास करें।',
-                'ta': '⚠️ குரல் செயலாக்கம் தோல்வி. உரை மூலம் முயற்சிக்கவும்.',
-                'kn': '⚠️ ಧ್ವನಿ ಪ್ರಕ್ರಿಯೆ ವಿಫಲ. ದಯವಿಟ್ಟು ಪಠ್ಯ ಮೂಲಕ ಪ್ರಯತ್ನಿಸಿ.',
-                'ur': '⚠️ وائس پروسیسنگ ناکام ہوئی۔ ٹیکسٹ سے کوشش کریں۔'
+                'te': '️ వాయిస్ ప్రాసెసింగ్ విఫలమైంది. దయచేసి టెక్స్ట్ ద్వారా ప్రయత్నించండి.',
+                'hi': '️ वॉइस प्रोसेसिंग विफल हुई। कृपया टेक्स्ट से प्रयास करें।',
+                'ta': '️ குரல் செயலாக்கம் தோல்வி. உரை மூலம் முயற்சிக்கவும்.',
+                'kn': '️ ಧ್ವನಿ ಪ್ರಕ್ರಿಯೆ ವಿಫಲ. ದಯವಿಟ್ಟು ಪಠ್ಯ ಮೂಲಕ ಪ್ರಯತ್ನಿಸಿ.',
+                'ur': '️ وائس پروسیسنگ ناکام ہوئی۔ ٹیکسٹ سے کوشش کریں۔'
             }
-            self.notifier.send_whatsapp_text(sender_id, _fail_msgs.get(lang_code, "⚠️ Voice processing failed. Please try text instead."))
+            self.notifier.send_whatsapp_text(sender_id, _fail_msgs.get(lang_code, "️ Voice processing failed. Please try text instead."))
 
     # ═══════════════════════════════════════════
     #  SARVAM TEXT CHAT (typed messages in voice flow)
@@ -2986,7 +3005,7 @@ class WhatsAppService:
                 spoken = self.appt_service._time_to_spoken(selected_time)
                 input_text = f"I choose slot {selected_idx} at {spoken}"
                 logger.info(
-                    f"🔢 Hybrid numeric slot selection: idx={selected_idx} -> {selected_time} for {sender_id}"
+                    f" Hybrid numeric slot selection: idx={selected_idx} -> {selected_time} for {sender_id}"
                 )
 
         # Convert hybrid button IDs to natural language for the AI
@@ -3089,11 +3108,11 @@ class WhatsAppService:
                 "clearly tell the user: 'There are 2 doctors named Dr. X — one in [Specialty A] and one in [Specialty B]. "
                 "Which specialization do you need?' Never silently pick one. "
                 "MANDATORY CONFIRMATION: Before calling book_appointment, you MUST present ALL details in this EXACT structured format and ask the user to confirm:\n"
-                "👤 Patient Name: [name]\n"
-                "👨‍⚕️ Doctor: Dr. [name]\n"
-                "🏥 Specialization: [specialization]\n"
-                "📅 Date: [date]\n"
-                "⏰ Time Slot: [start_time] – [end_time]\n\n"
+                " Patient Name: [name]\n"
+                "‍️ Doctor: Dr. [name]\n"
+                " Specialization: [specialization]\n"
+                " Date: [date]\n"
+                " Time Slot: [start_time] – [end_time]\n\n"
                 "'Should I go ahead and book this?' "
                 "Only call book_appointment AFTER the user says yes, confirm, haan, avunu, or haudu."
                 "LANGUAGE CONSISTENCY: ALL your responses MUST be entirely in the user's selected language. "
@@ -3120,7 +3139,7 @@ class WhatsAppService:
 
         suppress_ai_reply = bool(data.pop('_suppress_next_ai_text', False))
         if suppress_ai_reply:
-            logger.info("📩 Missing-doctor fallback already sent directly; suppressing extra Sarvam text/TTS")
+            logger.info(" Missing-doctor fallback already sent directly; suppressing extra Sarvam text/TTS")
             messages.append({"role": "assistant", "content": "[Missing-doctor fallback sent via direct WhatsApp messages.]"})
         else:
             messages.append({"role": "assistant", "content": ai_response})
@@ -3194,12 +3213,12 @@ class WhatsAppService:
                         for doc in available_doctors[:10]:
                             items.append((
                                 f"doc_pick_{doc['name'].replace(' ', '_')}",
-                                f"👨‍⚕️ {doc['name']}",
+                                f"‍️ {doc['name']}",
                                 f"{doc['specialization']} | {', '.join(doc['shifts'])}"
                             ))
                         self.notifier.send_whatsapp_list(
                             sender_id,
-                            f"🏥 Doctors available on {date_str}:",
+                            f" Doctors available on {date_str}:",
                             items,
                             title="Available Doctors",
                             button_text="Choose Doctor"
@@ -3216,12 +3235,12 @@ class WhatsAppService:
                     for doc in doctors[:10]:
                         items.append((
                             f"doc_pick_{doc['full_name'].replace(' ', '_')}",
-                            f"👨‍⚕️ {doc['full_name']}",
+                            f"‍️ {doc['full_name']}",
                             doc.get('specialization', 'General')
                         ))
                     self.notifier.send_whatsapp_list(
                         sender_id,
-                        "🏥 Our available doctors:",
+                        " Our available doctors:",
                         items,
                         title="Doctors",
                         button_text="Choose Doctor"
@@ -3390,7 +3409,7 @@ class WhatsAppService:
                     self.notifier.send_whatsapp_text(
                         sender_id,
                         (
-                            f"⚠️ Dr. {doc_name} ({doctor_specialization}) is not available at {self._format_time_display(requested_time)} on {date_str}. "
+                            f"️ Dr. {doc_name} ({doctor_specialization}) is not available at {self._format_time_display(requested_time)} on {date_str}. "
                             f"Please choose another slot from the available options below."
                         )
                     )
@@ -3569,25 +3588,25 @@ class WhatsAppService:
 
                     # ── HYBRID: Send booking confirmation as WhatsApp message ──
                     _confirm_labels = {
-                        'te': {'title': '✅ *అపాయింట్‌మెంట్ బుక్ అయింది!*', 'patient': 'రోగి', 'doctor': 'డాక్టర్', 'spec': 'స్పెషలైజేషన్', 'date': 'తేదీ', 'time': 'సమయం', 'status': 'డాక్టర్ ఆమోదం పెండింగ్‌'},
-                        'hi': {'title': '✅ *अपॉइंटमेंट बुक हो गई!*', 'patient': 'मरीज', 'doctor': 'डॉक्टर', 'spec': 'विशेषज्ञता', 'date': 'तारीख', 'time': 'समय', 'status': 'डॉक्टर अनुमोदन पेंडिंग'},
-                        'ta': {'title': '✅ *நேரம் பதிவு செய்யப்பட்டது!*', 'patient': 'நோயாளி', 'doctor': 'மருத்துவர்', 'spec': 'சிறப்பு', 'date': 'தேதி', 'time': 'நேரம்', 'status': 'மருத்துவர் அனுமதி நிலுவையில்'},
-                        'kn': {'title': '✅ *ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಆಗಿದೆ!*', 'patient': 'ರೋಗಿ', 'doctor': 'ಡಾಕ್ಟರ್', 'spec': 'ವಿಶೇಷತೆ', 'date': 'ದಿನಾಂಕ', 'time': 'ಸಮಯ', 'status': 'ಡಾಕ್ಟರ್ ಅನುಮೋದನೆ ಬಾಕಿ'},
-                        'ur': {'title': '✅ *اپائنٹمنٹ بک ہو گئی!*', 'patient': 'مریض', 'doctor': 'ڈاکٹر', 'spec': 'ماہر', 'date': 'تاریخ', 'time': 'وقت', 'status': 'ڈاکٹر منظوری باقی'}
+                        'te': {'title': ' *అపాయింట్‌మెంట్ బుక్ అయింది!*', 'patient': 'రోగి', 'doctor': 'డాక్టర్', 'spec': 'స్పెషలైజేషన్', 'date': 'తేదీ', 'time': 'సమయం', 'status': 'డాక్టర్ ఆమోదం పెండింగ్‌'},
+                        'hi': {'title': ' *अपॉइंटमेंट बुक हो गई!*', 'patient': 'मरीज', 'doctor': 'डॉक्टर', 'spec': 'विशेषज्ञता', 'date': 'तारीख', 'time': 'समय', 'status': 'डॉक्टर अनुमोदन पेंडिंग'},
+                        'ta': {'title': ' *நேரம் பதிவு செய்யப்பட்டது!*', 'patient': 'நோயாளி', 'doctor': 'மருத்துவர்', 'spec': 'சிறப்பு', 'date': 'தேதி', 'time': 'நேரம்', 'status': 'மருத்துவர் அனுமதி நிலுவையில்'},
+                        'kn': {'title': ' *ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಆಗಿದೆ!*', 'patient': 'ರೋಗಿ', 'doctor': 'ಡಾಕ್ಟರ್', 'spec': 'ವಿಶೇಷತೆ', 'date': 'ದಿನಾಂಕ', 'time': 'ಸಮಯ', 'status': 'ಡಾಕ್ಟರ್ ಅನುಮೋದನೆ ಬಾಕಿ'},
+                        'ur': {'title': ' *اپائنٹمنٹ بک ہو گئی!*', 'patient': 'مریض', 'doctor': 'ڈاکٹر', 'spec': 'ماہر', 'date': 'تاریخ', 'time': 'وقت', 'status': 'ڈاکٹر منظوری باقی'}
                     }
                     _cl = _confirm_labels.get(_lang_code, {
-                        'title': '✅ *Appointment Booked!*',
+                        'title': ' *Appointment Booked!*',
                         'patient': 'Patient', 'doctor': 'Doctor', 'spec': 'Specialization',
                         'date': 'Date', 'time': 'Time', 'status': 'Pending Doctor Approval'
                     })
                     confirm_msg = (
                         f"{_cl['title']}\n\n"
-                        f"👤 {_cl['patient']}: {booked_for_name}\n"
-                        f"👨‍⚕️ {_cl['doctor']}: Dr. {matched_doctor['full_name']}\n"
-                        f"🏥 {_cl['spec']}: {doctor_specialization}\n"
-                        f"📅 {_cl['date']}: {date_str}\n"
-                        f"⏰ {_cl['time']}: {self._format_time_display(time_str)} – {self._format_time_display(end_time_str)}\n\n"
-                        f"⏳ {_cl['status']}"
+                        f" {_cl['patient']}: {booked_for_name}\n"
+                        f"‍️ {_cl['doctor']}: Dr. {matched_doctor['full_name']}\n"
+                        f" {_cl['spec']}: {doctor_specialization}\n"
+                        f" {_cl['date']}: {date_str}\n"
+                        f" {_cl['time']}: {self._format_time_display(time_str)} – {self._format_time_display(end_time_str)}\n\n"
+                        f" {_cl['status']}"
                     )
                     self.notifier.send_whatsapp_text(sender_id, confirm_msg)
 
@@ -3637,11 +3656,11 @@ class WhatsAppService:
                 if isinstance(session_data, dict):
                     if patient_name:
                         session_data['_temp_patient_name'] = patient_name
-                        logger.info(f"💾 Saved temp patient name: '{patient_name}' for {sender_id}")
+                        logger.info(f" Saved temp patient name: '{patient_name}' for {sender_id}")
                     if date_val:
                         resolved = self._parse_natural_date(date_val)
                         session_data['_temp_date'] = resolved or date_val
-                        logger.info(f"💾 Saved temp date: '{resolved or date_val}' for {sender_id}")
+                        logger.info(f" Saved temp date: '{resolved or date_val}' for {sender_id}")
                 saved_parts = []
                 if patient_name:
                     saved_parts.append(f"patient name: {patient_name}")
@@ -3672,14 +3691,14 @@ class WhatsAppService:
                 return
 
             _shift_labels = {
-                'te': {'header': f"📋 Dr. {doctor_name} — {date_str}\nఅందుబాటులో ఉన్న షిఫ్ట్‌లు (ఎంచుకోండి):", 'title': 'షిఫ్ట్‌లు', 'btn': 'చూడండి'},
-                'hi': {'header': f"📋 Dr. {doctor_name} — {date_str}\nउपलब्ध शिफ्ट (चुनें):", 'title': 'शिफ्ट', 'btn': 'देखें'},
-                'ta': {'header': f"📋 Dr. {doctor_name} — {date_str}\nகிடைக்கும் ஷிஃப்ட்ஸ் (தேர்வு செய்யவும்):", 'title': 'ஷிஃப்ட்ஸ்', 'btn': 'பார்க்க'},
-                'kn': {'header': f"📋 Dr. {doctor_name} — {date_str}\nಲಭ್ಯವಿರುವ ಶಿಫ್ಟ್‌ಗಳು (ಆಯ್ಕೆ ಮಾಡಿ):", 'title': 'ಶಿಫ್ಟ್‌ಗಳು', 'btn': 'ನೋಡಿ'},
-                'ur': {'header': f"📋 Dr. {doctor_name} — {date_str}\nدستیاب شفٹیں (منتخب کریں):", 'title': 'شفٹیں', 'btn': 'دیکھیں'}
+                'te': {'header': f" Dr. {doctor_name} — {date_str}\nఅందుబాటులో ఉన్న షిఫ్ట్‌లు (ఎంచుకోండి):", 'title': 'షిఫ్ట్‌లు', 'btn': 'చూడండి'},
+                'hi': {'header': f" Dr. {doctor_name} — {date_str}\nउपलब्ध शिफ्ट (चुनें):", 'title': 'शिफ्ट', 'btn': 'देखें'},
+                'ta': {'header': f" Dr. {doctor_name} — {date_str}\nகிடைக்கும் ஷிஃப்ட்ஸ் (தேர்வு செய்யவும்):", 'title': 'ஷிஃப்ட்ஸ்', 'btn': 'பார்க்க'},
+                'kn': {'header': f" Dr. {doctor_name} — {date_str}\nಲಭ್ಯವಿರುವ ಶಿಫ್ಟ್‌ಗಳು (ಆಯ್ಕೆ ಮಾಡಿ):", 'title': 'ಶಿಫ್ಟ್‌ಗಳು', 'btn': 'ನೋಡಿ'},
+                'ur': {'header': f" Dr. {doctor_name} — {date_str}\nدستیاب شفٹیں (منتخب کریں):", 'title': 'شفٹیں', 'btn': 'دیکھیں'}
             }
             _sl = _shift_labels.get(lang_code, {
-                'header': f"📋 Dr. {doctor_name} — {date_str}\nAvailable shifts (tap to select):",
+                'header': f" Dr. {doctor_name} — {date_str}\nAvailable shifts (tap to select):",
                 'title': 'Shifts', 'btn': 'View Shifts'
             })
 
@@ -3712,13 +3731,13 @@ class WhatsAppService:
 
                 self.notifier.send_whatsapp_list(
                     sender_id,
-                    f"📋 Dr. {doctor_name} — {date_str}\n{_sl['title']}:",
+                    f" Dr. {doctor_name} — {date_str}\n{_sl['title']}:",
                     items,
                     title=_sl['title'],
                     button_text=_sl['btn']
                 )
 
-            logger.info(f"📤 Hybrid: Sent shift list to {sender_id} for {doctor_name} on {date_str}")
+            logger.info(f" Hybrid: Sent shift list to {sender_id} for {doctor_name} on {date_str}")
 
         except Exception as e:
             logger.error(f"Hybrid shift delivery error: {e}")
@@ -3750,7 +3769,7 @@ class WhatsAppService:
 
             # Preserve schedule-generated order from get_shift_slots().
             # Do NOT lexicographically sort by HH:MM here, or overnight shifts
-            # (e.g. 22:00→07:00) will incorrectly appear AM-first.
+            # (e.g. 22:0007:00) will incorrectly appear AM-first.
             slots_ordered = list(slots)
 
             # Save slot index mapping so user can reply with a number like "11".
@@ -3787,13 +3806,13 @@ class WhatsAppService:
                 end_spoken = self.appt_service._time_to_spoken(slot['end'])
                 items.append((
                     f"vslot_{slot['start']}",
-                    f"🕐 {start_spoken}",
+                    f" {start_spoken}",
                     f"{start_spoken} – {end_spoken}"
                 ))
 
             header = (
-                f"⏰ {shift_name} — Dr. {doctor_name}\n"
-                f"📅 {date_str}\n\n"
+                f" {shift_name} — Dr. {doctor_name}\n"
+                f" {date_str}\n\n"
                 f"{_sll['tap']}"
             )
             if len(slots_ordered) > 10:
@@ -3814,7 +3833,7 @@ class WhatsAppService:
                 button_text=_sll['btn']
             )
 
-            logger.info(f"📤 Hybrid: Sent slot list to {sender_id} for {shift_name} shift")
+            logger.info(f" Hybrid: Sent slot list to {sender_id} for {shift_name} shift")
 
         except Exception as e:
             logger.error(f"Hybrid slot delivery error: {e}")
@@ -3873,14 +3892,14 @@ class WhatsAppService:
             send_response = requests.post(send_url, headers=send_headers, json=send_payload)
 
             if send_response.status_code == 200:
-                logger.info(f"🔊 Audio sent to {sender_id}")
+                logger.info(f" Audio sent to {sender_id}")
                 return True
             else:
                 logger.error(f"Audio send failed: {send_response.status_code} {send_response.text}")
                 return False
 
         except Exception as e:
-            logger.error(f"❌ WhatsApp audio send error: {e}")
+            logger.error(f" WhatsApp audio send error: {e}")
             return False
         finally:
             # Clean up audio file

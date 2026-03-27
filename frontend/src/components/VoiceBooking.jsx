@@ -4,14 +4,14 @@ import { API_BASE, getAuthHeaders } from '../utils/api';
 /**
  * VoiceBooking — Multilingual voice-driven appointment booking.
  * Supports English, Hindi, Telugu, Kannada.
- * Flow: Language select → Mic record → STT → AI turn → TTS playback → repeat until booked.
+ * Flow: Language select  Mic record  STT  AI turn  TTS playback  repeat until booked.
  */
 
 const LANGUAGES = [
-  { code: 'en', label: 'English',  native: 'English',  flag: '🇬🇧', webSpeech: 'en-IN' },
-  { code: 'hi', label: 'Hindi',    native: 'हिन्दी',  flag: '🇮🇳', webSpeech: 'hi-IN' },
-  { code: 'te', label: 'Telugu',   native: 'తెలుగు',  flag: '🇮🇳', webSpeech: 'te-IN' },
-  { code: 'kn', label: 'Kannada',  native: 'ಕನ್ನಡ',  flag: '🇮🇳', webSpeech: 'kn-IN' },
+  { code: 'en', label: 'English',  native: 'English',  flag: '', webSpeech: 'en-IN' },
+  { code: 'hi', label: 'Hindi',    native: 'हिन्दी',  flag: '', webSpeech: 'hi-IN' },
+  { code: 'te', label: 'Telugu',   native: 'తెలుగు',  flag: '', webSpeech: 'te-IN' },
+  { code: 'kn', label: 'Kannada',  native: 'ಕನ್ನಡ',  flag: '', webSpeech: 'kn-IN' },
 ];
 
 const STATUS_LABELS = {
@@ -20,7 +20,7 @@ const STATUS_LABELS = {
   processing:  { text: 'Processing your speech…', color: '#f59e0b', pulse: true  },
   thinking:    { text: 'AI is thinking…',          color: '#3b82f6', pulse: true  },
   speaking:    { text: 'Playing response…',        color: '#10b981', pulse: true  },
-  confirmed:   { text: 'Booking confirmed! 🎉',   color: '#10b981', pulse: false },
+  confirmed:   { text: 'Booking confirmed! ',   color: '#10b981', pulse: false },
   error:       { text: 'Something went wrong',    color: '#ef4444', pulse: false },
 };
 
@@ -48,7 +48,7 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
   const authToken = () =>
     sessionStorage.getItem('patient_token') || sessionStorage.getItem('token') || '';
 
-  // ─── STT: browser MediaRecorder → backend Sarvam ───────────────────────────
+  // ─── STT: browser MediaRecorder  backend Sarvam ───────────────────────────
 
   const startRecording = async () => {
     setErrorMsg('');
@@ -268,14 +268,14 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
         {/* Header */}
         <div style={styles.header}>
           <div style={styles.headerLeft}>
-            <span style={styles.headerIcon}>🎙️</span>
+            <span style={styles.headerIcon}>️</span>
             <div>
               <h2 style={styles.headerTitle}>Voice Booking</h2>
               <p style={styles.headerSub}>Speak to book your appointment</p>
             </div>
           </div>
           {onClose && (
-            <button onClick={onClose} style={styles.closeBtn}>✕</button>
+            <button onClick={onClose} style={styles.closeBtn}></button>
           )}
         </div>
 
@@ -304,7 +304,7 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
         <div style={styles.chatArea}>
           {messages.length === 0 ? (
             <div style={styles.emptyChat}>
-              <span style={styles.emptyChatIcon}>🏥</span>
+              <span style={styles.emptyChatIcon}></span>
               <p style={styles.emptyChatText}>
                 {language === 'hi' ? 'बोलना शुरू करें — जैसे "मुझे डॉक्टर से appointment चाहिए"' :
                  language === 'te' ? 'మాట్లాడటం ప్రారంభించండి — "నాకు అపాయింట్‌మెంట్ కావాలి"' :
@@ -322,7 +322,7 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
                 }}
               >
                 {msg.role === 'assistant' && (
-                  <div style={styles.botAvatar}>🏥</div>
+                  <div style={styles.botAvatar}></div>
                 )}
                 <div
                   style={{
@@ -333,7 +333,7 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
                   {msg.content}
                 </div>
                 {msg.role === 'user' && (
-                  <div style={styles.userAvatar}>👤</div>
+                  <div style={styles.userAvatar}></div>
                 )}
               </div>
             ))
@@ -344,7 +344,7 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
         {/* Booking Confirmation Card */}
         {booking && (
           <div style={styles.confirmCard}>
-            <div style={styles.confirmHeader}>✅ Appointment Booked!</div>
+            <div style={styles.confirmHeader}> Appointment Booked!</div>
             <div style={styles.confirmGrid}>
               {booking.doctor_name && <><span style={styles.confirmLabel}>Doctor</span><span style={styles.confirmValue}>{booking.doctor_name}</span></>}
               {booking.date && <><span style={styles.confirmLabel}>Date</span><span style={styles.confirmValue}>{booking.date}</span></>}
@@ -358,8 +358,8 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
         {/* Error Message */}
         {errorMsg && (
           <div style={styles.errorBanner}>
-            ⚠️ {errorMsg}
-            <button onClick={() => { setErrorMsg(''); setStatus('idle'); }} style={styles.errorDismiss}>✕</button>
+            ️ {errorMsg}
+            <button onClick={() => { setErrorMsg(''); setStatus('idle'); }} style={styles.errorDismiss}></button>
           </div>
         )}
 
@@ -383,7 +383,7 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
               ...(useWebSpeech ? styles.toggleBtnActive : {}),
             }}
           >
-            {useWebSpeech ? '🌐' : '☁️'}
+            {useWebSpeech ? '' : '️'}
           </button>
 
           {/* Stop speaking button */}
@@ -405,8 +405,8 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
             }}
           >
             {status === 'recording' ? '⏹' :
-             status === 'processing' || status === 'thinking' ? '⏳' :
-             status === 'confirmed' ? '✅' : '🎤'}
+             status === 'processing' || status === 'thinking' ? '' :
+             status === 'confirmed' ? '' : ''}
           </button>
 
           {/* Clear / Reset */}
@@ -416,7 +416,7 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
               title="Clear conversation and start over"
               style={styles.clearBtn}
             >
-              🔄
+              
             </button>
           )}
         </div>
@@ -424,8 +424,8 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
         {/* Hint */}
         <p style={styles.hint}>
           {useWebSpeech
-            ? '🌐 Browser STT — no upload needed, English often best'
-            : '☁️ Backend STT — supports Kannada, Telugu, Hindi, English clearly'}
+            ? ' Browser STT — no upload needed, English often best'
+            : '️ Backend STT — supports Kannada, Telugu, Hindi, English clearly'}
         </p>
 
         {/* Hidden audio player */}

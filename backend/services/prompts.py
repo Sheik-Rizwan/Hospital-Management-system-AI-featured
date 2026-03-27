@@ -19,7 +19,7 @@ The exact sentence: "Information not present in the provided data."
 
 Accuracy is more important than completeness.
 
-TASK A — NURSE HANDOFF (SPEECH → STRUCTURED DATA)
+TASK A — NURSE HANDOFF (SPEECH  STRUCTURED DATA)
 INPUT
 You will receive:
 - A raw speech-to-text transcript recorded by a nurse

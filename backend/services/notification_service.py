@@ -69,11 +69,11 @@ class NotificationService:
     def notify_appointment_approved(to, patient_name, date, time, doctor_name):
         """Send approval notification."""
         msg = (
-            f"✅ Appointment Confirmed!\n\n"
+            f" Appointment Confirmed!\n\n"
             f"Dear {patient_name},\n"
             f"Your appointment with Dr. {doctor_name} is confirmed.\n"
-            f"📅 Date: {date}\n"
-            f"⏰ Time: {time}\n\n"
+            f" Date: {date}\n"
+            f" Time: {time}\n\n"
             f"Please arrive 10 minutes early."
         )
         NotificationService.send_whatsapp_text(to, msg)
@@ -82,7 +82,7 @@ class NotificationService:
     def notify_appointment_rejected(to, patient_name, date, time, doctor_name, reason=""):
         """Send rejection notification."""
         msg = (
-            f"❌ Appointment Update\n\n"
+            f" Appointment Update\n\n"
             f"Dear {patient_name},\n"
             f"Your appointment request with Dr. {doctor_name} for {date} at {time} could not be confirmed.\n"
             f"Reason: {reason}\n\n"

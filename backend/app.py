@@ -1,5 +1,5 @@
 # app.py - Main Flask Application Entry Point
-# Clean architecture: routes → controllers → services → models
+# Clean architecture: routes  controllers  services  models
 
 import os
 from datetime import datetime, timedelta

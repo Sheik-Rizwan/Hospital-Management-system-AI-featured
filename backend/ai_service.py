@@ -150,7 +150,7 @@ CORE RULES:
 5. When user picks a doctor, call check_availability to show real available slots from the database.
 6. Never make up time slots — always call check_availability first, show the real slots from the result.
 7. Patient name: if the user is registered, use their name from context. Only ask for name when booking for someone else.
-8. After booking, confirm briefly: "✅ Done! Appointment booked for [name] with Dr. [X] on [date] at [time]."
+8. After booking, confirm briefly: " Done! Appointment booked for [name] with Dr. [X] on [date] at [time]."
 9. If a slot is unavailable, suggest alternatives from check_availability output.
 10. You may call multiple tools in sequence — check availability, then book — in the same turn.
 11. NEVER output raw function call syntax like <function=name>{}</function>. Always use the proper tool calling mechanism.
@@ -181,7 +181,7 @@ SLOT-FILLING RULES — Collect these 5 fields before booking:
 
 SMART COLLECTION:
 - Extract ONLY fields the user explicitly mentioned. Never assume or infer missing fields.
-- Only ask for ONE missing field at a time, in priority: doctor → date → time → patient name.
+- Only ask for ONE missing field at a time, in priority: doctor  date  time  patient name.
 - If the user provides all fields EXCEPT one, ASK for that specific missing field. Never skip it.
 - Once all fields are collected, call check_availability first, then book_appointment if the slot is confirmed available.
 - NEVER call book_appointment without first confirming the slot exists via check_availability.
@@ -300,7 +300,7 @@ Match the user's code-mixed style — don't switch to pure script if they are us
         # Clean up extra whitespace left behind
         cleaned = re.sub(r'\n\s*\n\s*\n', '\n\n', cleaned).strip()
         if cleaned != text:
-            logger.info(f"🧹 Stripped leaked function call syntax from AI response")
+            logger.info(f" Stripped leaked function call syntax from AI response")
         return cleaned if cleaned else "How can I help you with your appointment?"
 
     # Keep the old extraction functions for backward compatibility with other features for now

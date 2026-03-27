@@ -9,7 +9,7 @@ class VitalsErrorBoundary extends Component {
         if (this.state.hasError) {
             return (
                 <div style={{ padding: 24, textAlign: 'center', color: '#888' }}>
-                    <p style={{ fontSize: '2rem' }}>⚠️</p>
+                    <p style={{ fontSize: '2rem' }}>️</p>
                     <p>Vitals panel encountered a display error. Please reload and try again.</p>
                     <button onClick={() => this.setState({ hasError: false, error: null })} style={{ marginTop: 8, cursor: 'pointer' }}>Retry</button>
                 </div>
@@ -35,6 +35,35 @@ import AppNotification from '../components/ui/AppNotification';
 import StatCard from '../components/ui/StatCard';
 import PageHeader from '../components/ui/PageHeader';
 import StatusChip from '../components/ui/StatusChip';
+
+
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
+import AirOutlinedIcon from '@mui/icons-material/AirOutlined';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined';
+import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
+import WbTwilightOutlinedIcon from '@mui/icons-material/WbTwilightOutlined';
+import NightlightOutlinedIcon from '@mui/icons-material/NightlightOutlined';
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -154,9 +183,9 @@ const NurseDashboard = () => {
     }, []);
 
     useRealtimeEvents({
-        'task_assigned': (data) => { showNotify(`📋 New task: ${data.message || data.description}`, 'info'); loadTasks(); loadDashboardData(); },
-        'appointment_status': (data) => { showNotify(`📅 Appointment ${data.status}: ${data.date || ''}`, 'info'); },
-        'inventory_updated': (data) => { showNotify(`📦 Inventory ${data.action || 'updated'}: ${data.name || 'item'}`, 'info'); setInventoryRefreshKey(k => k + 1); }
+        'task_assigned': (data) => { showNotify(` New task: ${data.message || data.description}`, 'info'); loadTasks(); loadDashboardData(); },
+        'appointment_status': (data) => { showNotify(` Appointment ${data.status}: ${data.date || ''}`, 'info'); },
+        'inventory_updated': (data) => { showNotify(`Inventory ${data.action || 'updated'}: ${data.name || 'item'}`, 'info'); setInventoryRefreshKey(k => k + 1); }
     }, null, null, 'nurse');
 
     const refreshData = () => { loadDashboardData(); loadTasks(); if (viewRef.current === 'patients') loadPatients(); if (viewRef.current === 'handoffs') loadHandoffs(); };
@@ -171,9 +200,9 @@ const NurseDashboard = () => {
     const loadPatientsWithVitals = async () => { try { const res = await fetch(`${API_BASE}/nurse/patients/with-vitals`, { headers: getAuthHeaders() }); if (!res.ok) { throw new Error(`HTTP error! status: ${res.status}`); } const data = await res.json(); if (data.success) { // Filter out any null/non-object entries to prevent React child crash
             const safePatients = (Array.isArray(data.patients) ? data.patients : []).filter(p => p != null && typeof p === 'object'); setPatientsWithVitals(safePatients); setShowPatientsVitals(true); } else { showNotify(data.error || 'Failed to load vitals from server', 'error'); } } catch (e) { showNotify('Failed to load vitals: ' + e.message, 'error'); handleAuthError(e, showNotify); } };
     const loadTasks = async () => { try { const data = await taskService.getNurseTasks(); if (data.success) setTasks(data.tasks); } catch {} };
-    const handleCompleteTask = async (taskId) => { try { const res = await taskService.updateTaskStatus(taskId, 'completed'); if (res.success) { showNotify('Task marked completed! ✔', 'success'); setTasks(prev => prev.filter(t => t.task_id !== taskId)); loadDashboardData(); } else showNotify(res.error || 'Failed', 'error'); } catch (e) { showNotify(`Failed: ${e.message}`, 'error'); } };
+    const handleCompleteTask = async (taskId) => { try { const res = await taskService.updateTaskStatus(taskId, 'completed'); if (res.success) { showNotify('Task marked completed! ', 'success'); setTasks(prev => prev.filter(t => t.task_id !== taskId)); loadDashboardData(); } else showNotify(res.error || 'Failed', 'error'); } catch (e) { showNotify(`Failed: ${e.message}`, 'error'); } };
     const handleRejectTask = async () => { if (!rejectingTask) return; try { const res = await fetch(`${API_BASE}/nurse/tasks/${rejectingTask.task_id || rejectingTask._id}/reject`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ reason: rejectReason || 'No reason provided' }) }); const data = await res.json(); if (data.success) { showNotify(data.message || 'Task rejected', 'success'); setShowRejectModal(false); setRejectingTask(null); setRejectReason(''); loadTasks(); } else showNotify(data.error || 'Failed', 'error'); } catch { showNotify('Error rejecting task', 'error'); } };
-    const handleStatusChange = async (newStatus) => { try { const res = await taskService.updateNurseStatus(newStatus); if (res.success) { setNurseStatus(newStatus); showNotify(`Status: ${newStatus.toUpperCase()}`, 'success'); if (res.reassigned_tasks > 0) { showNotify(`⚠️ ${res.reassigned_tasks} tasks reassigned`, 'warning'); loadTasks(); } } else showNotify(res.error, 'error'); } catch { showNotify('Failed to update status', 'error'); } };
+    const handleStatusChange = async (newStatus) => { try { const res = await taskService.updateNurseStatus(newStatus); if (res.success) { setNurseStatus(newStatus); showNotify(`Status: ${newStatus.toUpperCase()}`, 'success'); if (res.reassigned_tasks > 0) { showNotify(`️ ${res.reassigned_tasks} tasks reassigned`, 'warning'); loadTasks(); } } else showNotify(res.error, 'error'); } catch { showNotify('Failed to update status', 'error'); } };
     const handleCreatePatient = async (e) => { e.preventDefault(); const f = new FormData(e.target); const data = Object.fromEntries(f.entries()); data.allergies = data.allergies ? data.allergies.split(',').map(a => a.trim()) : []; if (data.password !== data.confirm_password) { showNotify('Passwords do not match!', 'error'); return; } try { const res = await fetch(`${API_BASE}/nurse/patients`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(data) }); const result = await res.json(); if (result.success) { showNotify('Patient created!', 'success'); setShowCreatePatient(false); loadPatients(); loadDashboardData(); e.target.reset(); } else showNotify(result.error, 'error'); } catch { showNotify('Failed to create patient', 'error'); } };
     const handleDeletePatient = async (patientId) => { if (!window.confirm('Delete this patient?')) return; try { const res = await fetch(`${API_BASE}/nurse/patients/${patientId}`, { method: 'DELETE', headers: getAuthHeaders() }); const result = await res.json(); if (result.success) { showNotify('Patient deleted', 'success'); loadPatients(); loadDashboardData(); } else showNotify(result.error, 'error'); } catch { showNotify('Failed to delete', 'error'); } };
     const handleCreateHandoff = async (startData) => { showNotify('Creating handoff...', 'info'); try { const res = await fetch(`${API_BASE}/nurse/handoffs`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ patient_id: startData.patient_id, shift: startData.shift, transcript: startData.transcript }) }); const result = await res.json(); if (result.success) { showNotify('Handoff saved!', 'success'); setShowCreateHandoff(false); loadHandoffs(); loadDashboardData(); } else showNotify(result.error, 'error'); } catch { showNotify('Failed to save handoff', 'error'); } };
@@ -192,17 +221,17 @@ const NurseDashboard = () => {
         {
             label: 'Navigation',
             items: [
-                { id: 'dashboard', icon: '🏠', label: 'Dashboard' },
-                { id: 'patients', icon: '👥', label: 'Patients' },
-                { id: 'handoffs', icon: '📋', label: 'Handoffs' },
-                { id: 'inventory', icon: '📊', label: 'Inventory' },
+                { id: 'dashboard', icon: '', label: 'Dashboard' },
+                { id: 'patients', icon: '', label: 'Patients' },
+                { id: 'handoffs', icon: <AssignmentOutlinedIcon fontSize="small" />, label: 'Handoffs' },
+                { id: 'inventory', icon: '', label: 'Inventory' },
             ]
         },
         {
             label: 'Quick Actions',
             items: [
-                { id: '_vitals', icon: '💓', label: 'View Vitals' },
-                { id: '_request', icon: '📦', label: 'Request Supply' },
+                { id: '_vitals', icon: '', label: 'View Vitals' },
+                { id: '_request', icon: <Inventory2OutlinedIcon fontSize="small" />, label: 'Request Supply' },
             ]
         }
     ];
@@ -227,12 +256,12 @@ const NurseDashboard = () => {
     // --- Vital style helper ---
     const getVitalStyle = (k) => {
         const l = k.toLowerCase();
-        if (l.includes('heart') || l.includes('pulse') || l.includes('hr')) return { icon: '❤️', color: 'error.main', bg: 'rgba(255,77,79,0.08)' };
-        if (l.includes('pressure') || l.includes('bp')) return { icon: '🩸', color: 'secondary.main', bg: 'rgba(114,46,209,0.08)' };
-        if (l.includes('temp')) return { icon: '🌡️', color: 'warning.main', bg: 'rgba(255,152,0,0.08)' };
-        if (l.includes('oxygen') || l.includes('spo2')) return { icon: '🌬️', color: 'info.main', bg: 'rgba(3,169,244,0.08)' };
-        if (l.includes('respiratory') || l.includes('resp')) return { icon: '🫁', color: 'primary.main', bg: 'rgba(24,144,255,0.08)' };
-        return { icon: '📊', color: 'text.secondary', bg: 'action.hover' };
+        if (l.includes('heart') || l.includes('pulse') || l.includes('hr')) return { icon: '️', color: 'error.main', bg: 'rgba(255,77,79,0.08)' };
+        if (l.includes('pressure') || l.includes('bp')) return { icon: '', color: 'secondary.main', bg: 'rgba(114,46,209,0.08)' };
+        if (l.includes('temp')) return { icon: '️', color: 'warning.main', bg: 'rgba(255,152,0,0.08)' };
+        if (l.includes('oxygen') || l.includes('spo2')) return { icon: '️', color: 'info.main', bg: 'rgba(3,169,244,0.08)' };
+        if (l.includes('respiratory') || l.includes('resp')) return { icon: '', color: 'primary.main', bg: 'rgba(24,144,255,0.08)' };
+        return { icon: '', color: 'text.secondary', bg: 'action.hover' };
     };
 
     return (
@@ -264,12 +293,12 @@ const NurseDashboard = () => {
                                 <Card sx={{ width: '100%', maxWidth: 900 }}>
                                     <CardContent>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                            <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>⚡ Upcoming Tasks ({tasks.length})</Typography>
+                                            <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}> Upcoming Tasks ({tasks.length})</Typography>
                                             <Button size="small" startIcon={<RefreshIcon />} onClick={loadTasks}>Refresh</Button>
                                         </Box>
                                         <Grid container spacing={2} sx={{ maxHeight: 320, overflowY: 'auto' }}>
                                             {tasks.length === 0 ? (
-                                                <Grid size={12}><Box sx={{ py: 6, textAlign: 'center' }}><Typography sx={{ fontSize: '2.5rem', mb: 1 }}>🎉</Typography><Typography color="text.secondary">All caught up!</Typography></Box></Grid>
+                                                <Grid size={12}><Box sx={{ py: 6, textAlign: 'center' }}><Typography sx={{ fontSize: '2.5rem', mb: 1 }}></Typography><Typography color="text.secondary">All caught up!</Typography></Box></Grid>
                                             ) : tasks.map((task, i) => (
                                                 <Grid size={{ xs: 12, md: 6 }} key={`${task.task_id || task._id}-${i}`}>
                                                     <TaskCard task={task} onComplete={handleCompleteTask} />
@@ -281,20 +310,20 @@ const NurseDashboard = () => {
 
                                 {/* Quick Stats */}
                                 <Grid container spacing={2.5} sx={{ maxWidth: 900 }}>
-                                    <Grid size={{ xs: 12, md: 4 }}><StatCard title="Total Patients" value={stats.total_patients || 0} icon="👥" onClick={() => handleViewChange('patients')} /></Grid>
-                                    <Grid size={{ xs: 12, md: 4 }}><StatCard title="Total Handoffs" value={stats.total_handoffs || 0} icon="📋" onClick={() => handleViewChange('handoffs')} /></Grid>
-                                    <Grid size={{ xs: 12, md: 4 }}><StatCard title="Active Monitoring" value={stats.active_patients || 0} icon="💓" onClick={loadPatientsWithVitals} /></Grid>
+                                    <Grid size={{ xs: 12, md: 4 }}><StatCard title="Total Patients" value={stats.total_patients || 0} icon="" onClick={() => handleViewChange('patients')} /></Grid>
+                                    <Grid size={{ xs: 12, md: 4 }}><StatCard title="Total Handoffs" value={stats.total_handoffs || 0} icon="" onClick={() => handleViewChange('handoffs')} /></Grid>
+                                    <Grid size={{ xs: 12, md: 4 }}><StatCard title="Active Monitoring" value={stats.active_patients || 0} icon="" onClick={loadPatientsWithVitals} /></Grid>
                                 </Grid>
 
                                 {/* AI Suggestions */}
                                 <Box sx={{ width: '100%', maxWidth: 900 }}>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, textAlign: 'left' }}>✨ AI Suggestions</Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, textAlign: 'left' }}> AI Suggestions</Typography>
                                     <Grid container spacing={1.5}>
                                         {[
-                                            { icon: '🩺', text: 'Abnormal vitals check' },
-                                            { icon: '📝', text: 'Summarize recent handoffs' },
-                                            { icon: '💊', text: 'Medication review' },
-                                            { icon: '👥', text: 'Patient census overview' }
+                                            { icon: '', text: 'Abnormal vitals check' },
+                                            { icon: '', text: 'Summarize recent handoffs' },
+                                            { icon: '', text: 'Medication review' },
+                                            { icon: '', text: 'Patient census overview' }
                                         ].map((s, i) => (
                                             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
                                                 <Card variant="outlined" sx={{ cursor: 'pointer', '&:hover': { borderColor: 'primary.main', boxShadow: 2 }, transition: 'all 0.2s' }} onClick={() => setChatQuestion(s.text)}>
@@ -311,7 +340,7 @@ const NurseDashboard = () => {
                                 {/* Quick Actions */}
                                 <Stack direction="row" spacing={2}>
                                     <Button variant="contained" startIcon={<AddIcon />} onClick={() => setShowCreatePatient(true)}>Add Patient</Button>
-                                    <Button variant="outlined" onClick={() => { loadPatients(); setShowCreateHandoff(true); }}>🎤 Record Handoff</Button>
+                                    <Button variant="outlined" onClick={() => { loadPatients(); setShowCreateHandoff(true); }}> Record Handoff</Button>
                                 </Stack>
                             </Stack>
                         ) : (
@@ -323,7 +352,7 @@ const NurseDashboard = () => {
                                     {chatMessages.map((msg, idx) => (
                                         <Box key={idx} sx={{ display: 'flex', flexDirection: msg.type === 'user' ? 'row-reverse' : 'row', gap: 1.5, alignItems: 'flex-start' }}>
                                             <Box sx={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '1rem', bgcolor: msg.type === 'bot' ? 'primary.main' : 'action.hover', color: msg.type === 'bot' ? '#fff' : 'text.secondary' }}>
-                                                {msg.type === 'bot' ? '🤖' : (user.full_name || 'U')[0].toUpperCase()}
+                                                {msg.type === 'bot' ? '' : (user.full_name || 'U')[0].toUpperCase()}
                                             </Box>
                                             <Card sx={{ maxWidth: '85%', bgcolor: msg.type === 'user' ? 'primary.main' : 'background.paper', color: msg.type === 'user' ? '#fff' : 'text.primary', borderRadius: msg.type === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px' }}>
                                                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
@@ -334,7 +363,7 @@ const NurseDashboard = () => {
                                     ))}
                                     {chatLoading && (
                                         <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
-                                            <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>🤖</Box>
+                                            <Box sx={{ width: 36, height: 36, borderRadius: '50%', bgcolor: 'primary.main', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}></Box>
                                             <Card><CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}><CircularProgress size={18} /></CardContent></Card>
                                         </Box>
                                     )}
@@ -366,7 +395,7 @@ const NurseDashboard = () => {
             {/* ─── Patients View ─── */}
             {view === 'patients' && (
                 <Stack spacing={3}>
-                    <PageHeader title="Patients Directory" subtitle="Manage patient records and view history" actionLabel="➕ Add Patient" onAction={() => setShowCreatePatient(true)} />
+                    <PageHeader title="Patients Directory" subtitle="Manage patient records and view history" actionLabel=" Add Patient" onAction={() => setShowCreatePatient(true)} />
                     <TextField
                         fullWidth placeholder="Search by name, ID, or room number..." value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -378,7 +407,7 @@ const NurseDashboard = () => {
                     />
                     <Grid container spacing={2.5}>
                         {patients.length === 0 ? (
-                            <Grid item xs={12}><Box sx={{ textAlign: 'center', py: 10, border: '2px dashed', borderColor: 'divider', borderRadius: 3 }}><Typography sx={{ fontSize: '3rem', mb: 1 }}>🔍</Typography><Typography variant="h6" color="text.secondary">No patients found</Typography></Box></Grid>
+                            <Grid item xs={12}><Box sx={{ textAlign: 'center', py: 10, border: '2px dashed', borderColor: 'divider', borderRadius: 3 }}><Typography sx={{ fontSize: '3rem', mb: 1 }}></Typography><Typography variant="h6" color="text.secondary">No patients found</Typography></Box></Grid>
                         ) : patients.map(p => (
                             <Grid item key={p.patient_id}>
                                 <Card sx={{ width: 252.55, height: 222.81, display: 'flex', flexDirection: 'column', '&:hover': { boxShadow: 6, transform: 'translateY(-2px)' }, transition: 'all 0.2s' }}>
@@ -391,9 +420,9 @@ const NurseDashboard = () => {
                                             {p.room_number ? <Chip label={`Rm ${p.room_number}`} color="primary" size="small" variant="outlined" /> : <Chip label="Unassigned" size="small" />}
                                         </Box>
                                         <Stack spacing={0.5}>
-                                            <Typography variant="body2" color="text.secondary">🎂 {formatDate(p.date_of_birth)}{calculateAge(p.date_of_birth) !== null && <Typography component="span" variant="body2" color="primary.main" fontWeight={700}> ({calculateAge(p.date_of_birth)} yrs)</Typography>}</Typography>
-                                            <Typography variant="body2" color="text.secondary">⚧ {p.gender}</Typography>
-                                            <Typography variant="body2" color="text.secondary" noWrap>🏥 {p.diagnosis || 'No Diagnosis'}</Typography>
+                                            <Typography variant="body2" color="text.secondary"> {formatDate(p.date_of_birth)}{calculateAge(p.date_of_birth) !== null && <Typography component="span" variant="body2" color="primary.main" fontWeight={700}> ({calculateAge(p.date_of_birth)} yrs)</Typography>}</Typography>
+                                            <Typography variant="body2" color="text.secondary"> {p.gender}</Typography>
+                                            <Typography variant="body2" color="text.secondary" noWrap> {p.diagnosis || 'No Diagnosis'}</Typography>
                                         </Stack>
                                     </CardContent>
                                     <CardActions sx={{ mt: 'auto', borderTop: 1, borderColor: 'divider', px: 2, py: 1.5 }}>
@@ -410,9 +439,9 @@ const NurseDashboard = () => {
             {/* ─── Handoffs View (Timeline) ─── */}
             {view === 'handoffs' && (
                 <Stack spacing={3}>
-                    <PageHeader title="Shift Handoffs" subtitle="Timeline of all recorded patient handoffs" actionLabel="🎤 Record Handoff" onAction={() => { loadPatients(); setShowCreateHandoff(true); }} />
+                    <PageHeader title="Shift Handoffs" subtitle="Timeline of all recorded patient handoffs" actionLabel=" Record Handoff" onAction={() => { loadPatients(); setShowCreateHandoff(true); }} />
                     {handoffs.length === 0 ? (
-                        <Box sx={{ textAlign: 'center', py: 10, border: '2px dashed', borderColor: 'divider', borderRadius: 3 }}><Typography sx={{ fontSize: '3rem', mb: 1 }}>📝</Typography><Typography color="text.secondary">No handoff records found.</Typography></Box>
+                        <Box sx={{ textAlign: 'center', py: 10, border: '2px dashed', borderColor: 'divider', borderRadius: 3 }}><Typography sx={{ fontSize: '3rem', mb: 1 }}></Typography><Typography color="text.secondary">No handoff records found.</Typography></Box>
                     ) : (
                         <Stack spacing={2.5}>
                             {handoffs.map((h) => {
@@ -442,16 +471,16 @@ const NurseDashboard = () => {
                                             {h.structured_report?.vitals && (
                                                 <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1.5, mb: 2 }}>
                                                     <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                                                        <Typography>💓</Typography>
+                                                        <Typography></Typography>
                                                         <Typography variant="caption" fontWeight={700} color="primary.main" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>VITALS</Typography>
                                                     </Stack>
                                                     {typeof h.structured_report.vitals === 'string' ? (
                                                         <Typography variant="body2" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>{h.structured_report.vitals}</Typography>
                                                     ) : (
                                                         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                                                            {h.structured_report.vitals.heart_rate && <Chip size="small" label={`❤️ ${renderVitalValue(h.structured_report.vitals.heart_rate)}`} variant="outlined" />}
-                                                            {h.structured_report.vitals.blood_pressure && <Chip size="small" label={`🩸 ${renderVitalValue(h.structured_report.vitals.blood_pressure)}`} variant="outlined" />}
-                                                            {h.structured_report.vitals.temperature && <Chip size="small" label={`🌡 ${renderVitalValue(h.structured_report.vitals.temperature)}`} variant="outlined" />}
+                                                            {h.structured_report.vitals.heart_rate && <Chip size="small" label={`️ ${renderVitalValue(h.structured_report.vitals.heart_rate)}`} variant="outlined" />}
+                                                            {h.structured_report.vitals.blood_pressure && <Chip size="small" label={` ${renderVitalValue(h.structured_report.vitals.blood_pressure)}`} variant="outlined" />}
+                                                            {h.structured_report.vitals.temperature && <Chip size="small" label={` ${renderVitalValue(h.structured_report.vitals.temperature)}`} variant="outlined" />}
                                                         </Stack>
                                                     )}
                                                 </Box>
@@ -459,14 +488,14 @@ const NurseDashboard = () => {
                                             {/* Observation */}
                                             <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1.5 }}>
                                                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1, borderBottom: 1, borderColor: 'divider', pb: 1 }}>
-                                                    <Typography>📋</Typography>
+                                                    <Typography></Typography>
                                                     <Typography variant="caption" fontWeight={700} color="primary.main" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Handoff Report</Typography>
                                                 </Stack>
                                                 <Typography variant="body2" sx={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                     {(h.structured_report?.observation || h.structured_report?.Observation) || <em>{h.transcript || 'No additional notes recorded.'}</em>}
                                                 </Typography>
                                             </Box>
-                                            <Typography variant="body2" color="primary.main" fontWeight={700} sx={{ mt: 2 }}>View Full Report →</Typography>
+                                            <Typography variant="body2" color="primary.main" fontWeight={700} sx={{ mt: 2 }}>View Full Report </Typography>
                                         </CardContent>
                                     </Card>
                                 );
@@ -495,8 +524,8 @@ const NurseDashboard = () => {
                                 </Box>
                                 <Stack direction="row" spacing={1}>
                                     <StatusChip status={selectedPatient.room_number ? 'active' : 'discharged'} />
-                                    <Button variant="contained" size="small" onClick={() => setShowBookAppointment(true)}>📅 Book Appt</Button>
-                                    <Button variant="outlined" size="small" onClick={() => setShowEditPatient(true)}>✏️ Edit</Button>
+                                    <Button variant="contained" size="small" onClick={() => setShowBookAppointment(true)}> Book Appt</Button>
+                                    <Button variant="outlined" size="small" onClick={() => setShowEditPatient(true)}>️ Edit</Button>
                                 </Stack>
                             </Box>
                         </CardContent>
@@ -507,7 +536,7 @@ const NurseDashboard = () => {
                     {/* Latest Vitals */}
                     {patientHistory.length > 0 && patientHistory[patientHistory.length - 1].structured_report?.vitals && (
                         <Box>
-                            <Typography variant="h6" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>💓 Latest Vitals</Typography>
+                            <Typography variant="h6" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}> Latest Vitals</Typography>
                             <Grid container spacing={2}>
                                 {Object.entries(patientHistory[patientHistory.length - 1].structured_report.vitals).map(([key, value]) => {
                                     const style = getVitalStyle(key);
@@ -518,7 +547,7 @@ const NurseDashboard = () => {
                                                     <Typography sx={{ fontSize: '1.5rem', opacity: 0.8, mb: 0.5 }}>{style.icon}</Typography>
                                                     <Typography variant="h5" fontWeight={700} sx={{ color: style.color }}>{renderVitalValue(value)}</Typography>
                                                     <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>{key.replace(/_/g, ' ')}</Typography>
-                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, fontSize: '0.6rem' }}>🕒 {formatDate(patientHistory[patientHistory.length - 1].timestamp)}</Typography>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, fontSize: '0.6rem' }}> {formatDate(patientHistory[patientHistory.length - 1].timestamp)}</Typography>
                                                 </CardContent>
                                             </Card>
                                         </Grid>
@@ -530,7 +559,7 @@ const NurseDashboard = () => {
 
                     {/* Handoff History */}
                     <Box>
-                        <Typography variant="h6" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>📋 Handoff History</Typography>
+                        <Typography variant="h6" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}> Handoff History</Typography>
                         {patientHistory.length === 0 ? (
                             <Typography align="center" color="text.secondary" sx={{ py: 6 }}>No handoff history available.</Typography>
                         ) : (
@@ -543,14 +572,14 @@ const NurseDashboard = () => {
                                                 <Typography variant="body2" color="primary.main" sx={{ fontFamily: 'monospace' }}>{formatDate(h.timestamp)}</Typography>
                                             </Box>
                                             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-                                                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'action.hover', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>👩‍⚕️</Box>
+                                                <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'action.hover', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>‍️</Box>
                                                 <Typography variant="body2">{h.nurse_name}</Typography>
                                             </Stack>
                                             {h.structured_report?.vitals && (
                                                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
-                                                    <Chip size="small" label={`❤️ HR: ${renderVitalValue(h.structured_report.vitals.heart_rate)}`} variant="outlined" color="error" />
-                                                    <Chip size="small" label={`🩸 BP: ${renderVitalValue(h.structured_report.vitals.blood_pressure)}`} variant="outlined" color="secondary" />
-                                                    <Chip size="small" label={`🌡 Temp: ${renderVitalValue(h.structured_report.vitals.temperature)}`} variant="outlined" color="warning" />
+                                                    <Chip size="small" label={`️ HR: ${renderVitalValue(h.structured_report.vitals.heart_rate)}`} variant="outlined" color="error" />
+                                                    <Chip size="small" label={` BP: ${renderVitalValue(h.structured_report.vitals.blood_pressure)}`} variant="outlined" color="secondary" />
+                                                    <Chip size="small" label={` Temp: ${renderVitalValue(h.structured_report.vitals.temperature)}`} variant="outlined" color="warning" />
                                                 </Stack>
                                             )}
                                             <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1.5 }}>
@@ -623,7 +652,7 @@ const NurseDashboard = () => {
 
             {/* Task Rejection Modal */}
             <Dialog open={showRejectModal} onClose={() => setShowRejectModal(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>⚠️ Reject Task</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>️ Reject Task</DialogTitle>
                 <DialogContent>
                     {rejectingTask && (
                         <Box sx={{ mb: 2, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>

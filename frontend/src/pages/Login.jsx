@@ -4,6 +4,35 @@ import { API_BASE, setRoleAuth } from '../utils/api';
 import ThemeToggle from '../components/ThemeToggle';
 
 // MUI Components
+
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
+import AirOutlinedIcon from '@mui/icons-material/AirOutlined';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined';
+import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
+import WbTwilightOutlinedIcon from '@mui/icons-material/WbTwilightOutlined';
+import NightlightOutlinedIcon from '@mui/icons-material/NightlightOutlined';
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
+
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -231,7 +260,7 @@ const Login = () => {
 
             {/* Footer */}
             <Box sx={{ p: 4, textAlign: 'center', opacity: 0.4 }}>
-                <Typography variant="caption" sx={{ color: 'white' }}>© 2026 CortexCraft.AI • All Clinical Data Encrypted • Version 4.2.0-LTS</Typography>
+                <Typography variant="caption" sx={{ color: 'white' }}> 2026 CortexCraft.AI • All Clinical Data Encrypted • Version 4.2.0-LTS</Typography>
             </Box>
 
             {/* Role Login Dialog */}
@@ -283,7 +312,7 @@ const Login = () => {
                                 disabled={loading}
                                 sx={{ py: 1.5, borderRadius: 2, bgcolor: selectedRole?.color, '&:hover': { bgcolor: selectedRole?.color, opacity: 0.9 } }}
                             >
-                                {loading ? <CircularProgress size={24} color="inherit" /> : `Enter Workspace →`}
+                                {loading ? <CircularProgress size={24} color="inherit" /> : `Enter Workspace `}
                             </Button>
                         </Stack>
                     </Box>
@@ -359,4 +388,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Login;

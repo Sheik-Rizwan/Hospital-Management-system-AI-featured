@@ -82,7 +82,7 @@ class EmailService:
 
                 <!-- Header -->
                 <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 28px 24px; text-align: center;">
-                    <h1 style="color: #ffffff; margin: 0; font-size: 22px;">🏥 {HOSPITAL_NAME}</h1>
+                    <h1 style="color: #ffffff; margin: 0; font-size: 22px;"> {HOSPITAL_NAME}</h1>
                     <p style="color: #bfdbfe; margin: 6px 0 0; font-size: 14px;">Purchase Order Notification</p>
                 </div>
 

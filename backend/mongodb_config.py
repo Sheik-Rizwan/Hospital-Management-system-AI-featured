@@ -23,7 +23,7 @@ def _get_index_name(keys, kwargs):
 
 def _unset_null_field(collection, field):
     """
-    Convert documents where `field` is explicitly null  →  field is absent.
+    Convert documents where `field` is explicitly null    field is absent.
     Sparse unique indexes skip *missing* fields but NOT null ones, so this is
     required before building a sparse unique index on optional fields like email.
     """
@@ -55,7 +55,7 @@ def _safe_create_index(collection, keys, **kwargs):
     is_sparse_unique = kwargs.get('unique') and kwargs.get('sparse') and isinstance(keys, str)
 
     # Pre-emptively unset null values before building sparse unique indexes.
-    # This is the safe, correct fix: null → absent, so sparse index skips them.
+    # This is the safe, correct fix: null  absent, so sparse index skips them.
     if is_sparse_unique:
         _unset_null_field(collection, keys)
 
@@ -174,8 +174,8 @@ class MongoDatabase:
 
             # ─────────────────────────────────────────────────────────────
             #  TWO DATABASES
-            #  healthcare_db   → clinical / profile data (pre-existing)
-            #  nurse_handoff_db → operational / procurement / chat data
+            #  healthcare_db    clinical / profile data (pre-existing)
+            #  nurse_handoff_db  operational / procurement / chat data
             # ─────────────────────────────────────────────────────────────
             self.healthcare_db   = self.client['healthcare_db']
             self.db              = self.client['nurse_handoff_db']   # kept as self.db for backward-compat

@@ -3,6 +3,35 @@ import { API_BASE, getAuthHeaders, formatDate } from "../utils/api";
 import SocketChatRoom from "./SocketChatRoom";
 
 // MUI Components
+
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
+import AirOutlinedIcon from '@mui/icons-material/AirOutlined';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined';
+import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
+import WbTwilightOutlinedIcon from '@mui/icons-material/WbTwilightOutlined';
+import NightlightOutlinedIcon from '@mui/icons-material/NightlightOutlined';
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
+
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -16,7 +45,6 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import SendIcon from '@mui/icons-material/Send';
@@ -232,9 +260,9 @@ const ChatInterface = ({ showNotify, filterRole, userRole }) => {
           {conversations.length === 0 ? (
             <Grid item xs={12}>
               <Card variant="outlined" sx={{ py: 12, textAlign: 'center', bgcolor: 'action.hover', borderStyle: 'dashed' }}>
-                 <Typography variant="h2" sx={{ opacity: 0.1, mb: 2 }}>💬</Typography>
+                 <Typography variant="h2" sx={{ opacity: 0.1, mb: 2 }}></Typography>
                  <Typography variant="h6" color="text.secondary">No active conversations</Typography>
-                 <Button onClick={() => setTab("search")} sx={{ mt: 2 }}>Search for members →</Button>
+                 <Button onClick={() => setTab("search")} sx={{ mt: 2 }}>Search for members </Button>
               </Card>
             </Grid>
           ) : (
@@ -270,7 +298,7 @@ const ChatInterface = ({ showNotify, filterRole, userRole }) => {
         <Stack spacing={2}>
           {requests.length === 0 ? (
              <Card variant="outlined" sx={{ py: 12, textAlign: 'center', bgcolor: 'action.hover', borderStyle: 'dashed' }}>
-                <Typography variant="h2" sx={{ opacity: 0.1, mb: 2 }}>📤</Typography>
+                <Typography variant="h2" sx={{ opacity: 0.1, mb: 2 }}></Typography>
                 <Typography variant="h6" color="text.secondary">No sent requests</Typography>
              </Card>
           ) : (

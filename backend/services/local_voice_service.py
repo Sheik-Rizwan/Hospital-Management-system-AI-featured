@@ -85,7 +85,7 @@ class LocalVoiceService:
             model = self._get_stt_model()
             if model is None:
                 return None
-            logger.info(f"🎤 Local STT: processing {audio_file_path}")
+            logger.info(f" Local STT: processing {audio_file_path}")
             
             # Whisper handles multi-lingual detection automatically, but we can hint the language
             # Faster-whisper uses 2-letter codes.
@@ -98,7 +98,7 @@ class LocalVoiceService:
                 transcript += segment.text + " "
                 
             transcript = transcript.strip()
-            logger.info(f"✅ Local STT Result: '{transcript}'")
+            logger.info(f" Local STT Result: '{transcript}'")
             
             return {
                 'transcript': transcript,
@@ -106,7 +106,7 @@ class LocalVoiceService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Local STT exception: {e}")
+            logger.error(f" Local STT exception: {e}")
             import traceback
             logger.error(traceback.format_exc())
             return None
@@ -150,7 +150,7 @@ class LocalVoiceService:
             if not model:
                 return None
 
-            logger.info(f"🔊 Local TTS: '{text[:60]}...' lang={mms_code}")
+            logger.info(f" Local TTS: '{text[:60]}...' lang={mms_code}")
             
             # Tokenize input
             inputs = tokenizer(text, return_tensors="pt").to(self.device)
@@ -175,11 +175,11 @@ class LocalVoiceService:
             # Write as Ogg Opus (required by WhatsApp voice messages)
             sf.write(audio_path, audio_data, sample_rate, format='OGG', subtype='OPUS')
             
-            logger.info(f"✅ Local TTS saved: {audio_path}")
+            logger.info(f" Local TTS saved: {audio_path}")
             return audio_path
 
         except Exception as e:
-            logger.error(f"❌ Local TTS exception: {e}")
+            logger.error(f" Local TTS exception: {e}")
             import traceback
             logger.error(traceback.format_exc())
             return None

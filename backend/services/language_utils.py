@@ -88,29 +88,29 @@ def detect_language(text: str) -> str:
     # If any Indic script characters are found, prefer that language
     # (even a few Indic chars in mixed text indicate user's language preference)
     if max_indic_count >= 2:
-        logger.info(f"🌐 Detected language: {LANGUAGE_NAMES.get(max_indic_lang, max_indic_lang)} "
+        logger.info(f" Detected language: {LANGUAGE_NAMES.get(max_indic_lang, max_indic_lang)} "
                      f"({max_indic_count} chars)")
         return max_indic_lang
 
     # Check for Romanized Hindi patterns (transliterated)
     romanized_patterns = _detect_romanized_hindi(text)
     if romanized_patterns:
-        logger.info(f"🌐 Detected Romanized Hindi from patterns")
+        logger.info(f" Detected Romanized Hindi from patterns")
         return 'hi'
 
     # Check for Romanized Telugu patterns
     if _detect_romanized_telugu(text):
-        logger.info(f"🌐 Detected Romanized Telugu from patterns")
+        logger.info(f" Detected Romanized Telugu from patterns")
         return 'te'
 
     # Check for Romanized Kannada patterns
     if _detect_romanized_kannada(text):
-        logger.info(f"🌐 Detected Romanized Kannada from patterns")
+        logger.info(f" Detected Romanized Kannada from patterns")
         return 'kn'
 
     # Check for Romanized Tamil patterns
     if _detect_romanized_tamil(text):
-        logger.info(f"🌐 Detected Romanized Tamil from patterns")
+        logger.info(f" Detected Romanized Tamil from patterns")
         return 'ta'
 
     # Default to English

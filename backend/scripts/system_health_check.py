@@ -14,14 +14,14 @@ def check_system_health():
     
     print(f"\n1. Environment Variables:")
     if token and len(token) > 20:
-        print(colored(f"✅ WHATSAPP_TOKEN found (Starts with {token[:5]}...)", "green"))
+        print(colored(f" WHATSAPP_TOKEN found (Starts with {token[:5]}...)", "green"))
     else:
-        print(colored("❌ WHATSAPP_TOKEN missing or invalid", "red"))
+        print(colored(" WHATSAPP_TOKEN missing or invalid", "red"))
 
     if phone_id:
-        print(colored(f"✅ PHONE_NUMBER_ID found ({phone_id})", "green"))
+        print(colored(f" PHONE_NUMBER_ID found ({phone_id})", "green"))
     else:
-        print(colored("❌ PHONE_NUMBER_ID missing", "red"))
+        print(colored(" PHONE_NUMBER_ID missing", "red"))
 
     # 2. Check Database
     try:
@@ -33,21 +33,21 @@ def check_system_health():
         print(f"   - Active Doctors: {len(doctors)}")
         
         if len(doctors) == 0:
-             print(colored("   ⚠️  Warning: No active doctors found! Appointment flow will fail.", "yellow"))
+             print(colored("   ️  Warning: No active doctors found! Appointment flow will fail.", "yellow"))
         else:
-             print(colored("   ✅ Doctors exist.", "green"))
+             print(colored("    Doctors exist.", "green"))
 
         # Check Schedules
         schedules = list(db.doctor_schedules.find({'is_available': True}))
         print(f"   - Active Schedules: {len(schedules)}")
         
         if len(schedules) == 0:
-             print(colored("   ⚠️  Warning: No doctor schedules found! Doctors will appear unavailable.", "yellow"))
+             print(colored("   ️  Warning: No doctor schedules found! Doctors will appear unavailable.", "yellow"))
         else:
-             print(colored("   ✅ Schedules exist.", "green"))
+             print(colored("    Schedules exist.", "green"))
              
     except Exception as e:
-        print(colored(f"❌ Database Error: {e}", "red"))
+        print(colored(f" Database Error: {e}", "red"))
 
 if __name__ == "__main__":
     try:

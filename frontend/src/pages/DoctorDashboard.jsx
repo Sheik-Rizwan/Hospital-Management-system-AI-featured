@@ -64,20 +64,44 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { SparkLineChart } from '@mui/x-charts/SparkLineChart';
 
 // MUI Icons
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
+import AirOutlinedIcon from '@mui/icons-material/AirOutlined';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined';
+import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
+import WbTwilightOutlinedIcon from '@mui/icons-material/WbTwilightOutlined';
+import NightlightOutlinedIcon from '@mui/icons-material/NightlightOutlined';
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
+
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import LocalHospitalOutlinedIcon from '@mui/icons-material/LocalHospitalOutlined';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
-import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
@@ -228,11 +252,11 @@ const DoctorDashboard = () => {
     // Real-time socket events — mutate state directly, no re-fetching
     useRealtimeEvents({
         // Task events: re-fetch tasks/general area AND nurse assignments
-        'task_completed': (data) => { const msg = `✅ Task completed: ${data.description || 'A task'}`; showNotify(msg, 'success'); pushNotification(msg, 'success'); loadGeneralData(); loadNurseAssignments(); loadDashboardStats(); },
-        'task_rejected': (data) => { const msg = `❌ Task rejected by ${data.nurse_name}: ${data.reason}`; showNotify(msg, 'error'); pushNotification(msg, 'error'); loadGeneralData(); loadNurseAssignments(); loadDashboardStats(); },
+        'task_completed': (data) => { const msg = `Task completed: ${data.description || 'A task'}`; showNotify(msg, 'success'); pushNotification(msg, 'success'); loadGeneralData(); loadNurseAssignments(); loadDashboardStats(); },
+        'task_rejected': (data) => { const msg = `Task rejected by ${data.nurse_name}: ${data.reason}`; showNotify(msg, 'error'); pushNotification(msg, 'error'); loadGeneralData(); loadNurseAssignments(); loadDashboardStats(); },
         // Nurse status changed (online/offline/emergency)
         'nurse_status_changed': (data) => {
-            const emoji = data.status === 'emergency' ? '🚨' : data.status === 'offline' ? '🔴' : '🟢';
+            const emoji = '';
             const msg = `${emoji} Nurse ${data.nurse_name || ''} is now ${data.status}${data.reassigned_tasks ? ` (${data.reassigned_tasks} tasks reassigned)` : ''}`;
             showNotify(msg, data.status === 'emergency' ? 'error' : 'info');
             pushNotification(msg, data.status === 'emergency' ? 'error' : 'info');
@@ -241,7 +265,7 @@ const DoctorDashboard = () => {
         },
         // New appointment booked (WhatsApp / patient portal / nurse)
         'new_appointment': (data) => {
-            const msg = `📅 New appointment: ${data.patient_name || 'Patient'}${data.date ? ' on ' + data.date : ''}`;
+            const msg = `New appointment: ${data.patient_name || 'Patient'}${data.date ? ' on ' + data.date : ''}`;
             showNotify(msg, 'info');
             pushNotification(msg, 'info');
             loadAppointments();
@@ -264,7 +288,7 @@ const DoctorDashboard = () => {
         },
         // Inventory updated (consume / add / restock)
         'inventory_updated': (data) => {
-            showNotify(`📦 Inventory ${data.action || 'updated'}: ${data.name || 'item'}`, 'info');
+            showNotify(`Inventory ${data.action || 'updated'}: ${data.name || 'item'}`, 'info');
             setInventoryRefreshKey(k => k + 1);
         }
     }, null, null, 'doctor');
@@ -622,9 +646,9 @@ const DoctorDashboard = () => {
             const data = await res.json();
             if (data.success) {
                 showNotify(
-                    newStatus === 'approved' ? '✅ Appointment approved'
-                    : newStatus === 'rejected' ? '❌ Appointment rejected'
-                    : '✔️ Appointment marked complete',
+                    newStatus === 'approved' ? 'Appointment approved'
+                    : newStatus === 'rejected' ? 'Appointment rejected'
+                    : 'Appointment marked complete',
                     'success'
                 );
             } else {
@@ -706,11 +730,11 @@ const DoctorDashboard = () => {
     const buildSortedVitals = (v) => {
         if (!v) return [];
         const items = [
-            { key: 'heart_rate',      label: 'Heart Rate',       emoji: '❤️',  unit: 'bpm',  value: v.heart_rate,       type: 'heart_rate' },
-            { key: 'blood_pressure',  label: 'Blood Pressure',   emoji: '🩸',  unit: 'mmHg', value: v.blood_pressure,    type: 'blood_pressure' },
-            { key: 'temperature',     label: 'Temperature',      emoji: '🌡️', unit: '°C',   value: v.temperature,       type: 'temperature' },
-            { key: 'spo2',            label: 'SpO₂ / Lungs',     emoji: '🫁',  unit: '%',    value: v.oxygen_saturation || v.spo2, type: 'spo2' },
-            { key: 'respiratory_rate',label: 'Respiratory Rate', emoji: '💨',  unit: 'rpm',  value: v.respiratory_rate,  type: 'respiratory_rate' },
+            { key: 'heart_rate',      label: 'Heart Rate',       icon: <FavoriteBorderOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: 'middle', color: 'error.main' }}/>,  unit: 'bpm',  value: v.heart_rate,       type: 'heart_rate' },
+            { key: 'blood_pressure',  label: 'Blood Pressure',   icon: <WaterDropOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: 'middle', color: 'error.main' }}/>,  unit: 'mmHg', value: v.blood_pressure,    type: 'blood_pressure' },
+            { key: 'temperature',     label: 'Temperature',      icon: <DeviceThermostatOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: 'middle', color: 'warning.main' }}/>, unit: '°C',   value: v.temperature,       type: 'temperature' },
+            { key: 'spo2',            label: 'SpO₂ / Lungs',     icon: <AirOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: 'middle', color: 'info.main' }}/>,  unit: '%',    value: v.oxygen_saturation || v.spo2, type: 'spo2' },
+            { key: 'respiratory_rate',label: 'Respiratory Rate', icon: <AutoFixHighOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: 'middle', color: 'info.main' }}/>,  unit: 'rpm',  value: v.respiratory_rate,  type: 'respiratory_rate' },
         ];
         // Sort: abnormal first
         return items.sort((a, b) => {
@@ -728,7 +752,7 @@ const DoctorDashboard = () => {
             
             {handoffList.length === 0 ? (
                 <Paper sx={{ p: 6, textAlign: 'center', bgcolor: 'action.hover', borderRadius: 4 }}>
-                    <Typography sx={{ fontSize: 48, mb: 2 }}>📝</Typography>
+                    <AssignmentOutlinedIcon sx={{ fontSize: 48, mb: 2, color: "text.secondary" }} />
                     <Typography color="text.secondary">No observations recorded for this patient.</Typography>
                 </Paper>
             ) : (
@@ -785,9 +809,9 @@ const DoctorDashboard = () => {
                                             <Stack direction="row" spacing={1} sx={{ bgcolor: 'action.hover', p: 1, borderRadius: 2 }}>
                                                 {typeof h.structured_report.vitals !== 'string' && (
                                                     <>
-                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>❤️ {renderVitalValue(h.structured_report.vitals.heart_rate)}</Typography>
-                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>🩸 {renderVitalValue(h.structured_report.vitals.blood_pressure)}</Typography>
-                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}>🌡 {renderVitalValue(h.structured_report.vitals.temperature)}</Typography>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}><FavoriteBorderOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "bottom", color: "error.main" }} /> {renderVitalValue(h.structured_report.vitals.heart_rate)}</Typography>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}><WaterDropOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "bottom", color: "error.main" }} /> {renderVitalValue(h.structured_report.vitals.blood_pressure)}</Typography>
+                                                        <Typography variant="caption" sx={{ fontWeight: 700 }}><DeviceThermostatOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "bottom", color: "warning.main" }} /> {renderVitalValue(h.structured_report.vitals.temperature)}</Typography>
                                                     </>
                                                 )}
                                             </Stack>
@@ -805,7 +829,7 @@ const DoctorDashboard = () => {
                                         </Box>
 
                                         <Typography variant="caption" sx={{ textAlign: 'right', fontWeight: 700, color: 'primary.main', display: 'block' }}>
-                                            View Full Report →
+                                            View Full Report 
                                         </Typography>
                                     </Stack>
                                 </CardContent>
@@ -1165,7 +1189,7 @@ const DoctorDashboard = () => {
                                         <Card>
                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2.5, py: 2, borderBottom: 1, borderColor: 'divider' }}>
                                                 <Typography variant="subtitle1">Recent Handoffs</Typography>
-                                                <Button size="small" onClick={() => setView('handoffs')}>View All →</Button>
+                                                <Button size="small" onClick={() => setView('handoffs')}>View All </Button>
                                             </Box>
                                             <TableContainer>
                                                 <Table size="small">
@@ -1214,7 +1238,7 @@ const DoctorDashboard = () => {
                                         <Card sx={{ height: '100%' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2.5, py: 2, borderBottom: 1, borderColor: 'divider' }}>
                                                 <Typography variant="subtitle1">Today's Schedule</Typography>
-                                                <Button size="small" onClick={() => setView('appointments')}>View All →</Button>
+                                                <Button size="small" onClick={() => setView('appointments')}>View All </Button>
                                             </Box>
                                             <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
                                                 {todayAppts.length === 0 ? (
@@ -1288,9 +1312,9 @@ const DoctorDashboard = () => {
                             {/* Filter Tabs */}
                             <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 1 }}>
                                 {[
-                                    { key: 'pending', label: 'Pending', icon: '⏳', statuses: ['pending', 'pending_doctor_approval'] },
-                                    { key: 'confirmed', label: 'Confirmed', icon: '✅', statuses: ['approved', 'confirmed'] },
-                                    { key: 'history', label: 'History', icon: '📋', statuses: ['completed', 'rejected', 'cancelled'] }
+                                    { key: 'pending', label: 'Pending', icon: '', statuses: ['pending', 'pending_doctor_approval'] },
+                                    { key: 'confirmed', label: 'Confirmed', icon: <CheckCircleOutlinedIcon fontSize="small" />, statuses: ['approved', 'confirmed'] },
+                                    { key: 'history', label: 'History', icon: <AssignmentOutlinedIcon fontSize="small" />, statuses: ['completed', 'rejected', 'cancelled'] }
                                 ].map(({ key, label, icon, statuses }) => {
                                     const count = appointments.filter(a => statuses.includes(a.status)).length;
                                     return (
@@ -1322,7 +1346,7 @@ const DoctorDashboard = () => {
                                     return (
                                         <Box sx={{ py: 10, textAlign: 'center', opacity: 0.5 }}>
                                             <Typography variant="h1" sx={{ mb: 2 }}>
-                                                {apptTab === 'pending' ? '⏳' : apptTab === 'confirmed' ? '✅' : '📋'}
+                                                {apptTab === 'pending' ? <HourglassEmptyOutlinedIcon /> : apptTab === 'confirmed' ? <CheckCircleOutlinedIcon /> : <AssignmentOutlinedIcon />}
                                             </Typography>
                                             <Typography variant="h6">No {apptTab} requests found</Typography>
                                             <Typography variant="body2">New booking requests will appear here</Typography>
@@ -1348,22 +1372,22 @@ const DoctorDashboard = () => {
                                                             <Grid container spacing={2} sx={{ mt: 1 }}>
                                                                 <Grid item>
                                                                     <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                        📅 {apt.date}
+                                                                        <CalendarTodayOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {apt.date}
                                                                     </Typography>
                                                                 </Grid>
                                                                 <Grid item>
                                                                     <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                        ⏰ {apt.start_time} – {apt.end_time}
+                                                                         {apt.start_time} – {apt.end_time}
                                                                     </Typography>
                                                                 </Grid>
                                                                 {apt.service_name && (
-                                                                    <Grid item><Typography variant="body2" color="text.secondary">🏥 {apt.service_name}</Typography></Grid>
+                                                                    <Grid item><Typography variant="body2" color="text.secondary"><LocalHospitalOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {apt.service_name}</Typography></Grid>
                                                                 )}
                                                             </Grid>
 
                                                             {apt.notes && (
                                                                 <Box sx={{ mt: 2, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
-                                                                    <Typography variant="body2" color="text.secondary">📝 {apt.notes}</Typography>
+                                                                    <Typography variant="body2" color="text.secondary"><EditNoteOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {apt.notes}</Typography>
                                                                 </Box>
                                                             )}
                                                         </Box>
@@ -1385,7 +1409,7 @@ const DoctorDashboard = () => {
                                                     </Box>
                                                     {apt.rejection_reason && (
                                                         <Typography variant="caption" color="error" sx={{ mt: 2, display: 'block', pt: 1, borderTop: 1, borderColor: 'divider' }}>
-                                                            ❌ Reason: {apt.rejection_reason}
+                                                            <CancelOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle", color: "error.main" }} /> Reason: {apt.rejection_reason}
                                                         </Typography>
                                                     )}
                                                 </CardContent>
@@ -1484,7 +1508,7 @@ const DoctorDashboard = () => {
                                                     </Grid>
                                                 </Box>
                                                 <Box sx={{ mt: 'auto', pt: 1.5, borderTop: 1, borderColor: 'divider', textAlign: 'center' }}>
-                                                    <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>CLICK FOR DETAILED REPORT →</Typography>
+                                                    <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>CLICK FOR DETAILED REPORT </Typography>
                                                 </Box>
                                             </CardContent>
                                         </Card>
@@ -1550,7 +1574,7 @@ const DoctorDashboard = () => {
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: 1, borderColor: 'divider', pb: 3 }}>
                                                     <Box>
                                                         <Typography variant="h4" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                            <span>🏥</span> Care Plan: {selectedPatient.patient_name}
+                                                            <LocalHospitalOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: "middle" }} /> Care Plan: {selectedPatient.patient_name}
                                                         </Typography>
                                                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>Plan ID: {activeCarePlan.plan_id} • Updated: {formatDate(activeCarePlan.updated_at)}</Typography>
                                                     </Box>
@@ -1559,7 +1583,7 @@ const DoctorDashboard = () => {
 
                                                 <Box>
                                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                        <span>💊</span> Medications
+                                                        <MedicationOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: "middle" }} /> Medications
                                                     </Typography>
                                                     <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
                                                         <Table size="small">
@@ -1587,7 +1611,7 @@ const DoctorDashboard = () => {
 
                                                 <Box>
                                                     <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                        <span>🍽️</span> Meal Plan
+                                                        <RestaurantOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: "middle" }} /> Meal Plan
                                                     </Typography>
                                                     <Grid container spacing={2}>
                                                         {[
@@ -1616,7 +1640,7 @@ const DoctorDashboard = () => {
                                                     <Button
                                                         variant="contained"
                                                         onClick={() => { setShowCreatePlan(true); setPlanForm(prev => ({ ...prev, patient_id: selectedPatient.patient_id })); }}
-                                                        startIcon={<span>➕</span>}
+                                                        startIcon={<AddOutlinedIcon fontSize="small" />}
                                                         sx={{ borderRadius: 2, px: 3, py: 1.2, fontWeight: 700, boxShadow: 4 }}
                                                     >
                                                         Create New Care Plan
@@ -1625,7 +1649,7 @@ const DoctorDashboard = () => {
                                             </Stack>
                                         ) : (
                                             <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
-                                                <Typography variant="h1" sx={{ mb: 2 }}>📋</Typography>
+                                                <AssignmentOutlinedIcon sx={{ fontSize: 48, mb: 2, color: "text.secondary" }} />
                                                 <Typography variant="h5" sx={{ fontWeight: 700 }}>No Active Care Plan</Typography>
                                                 <Typography variant="body2" sx={{ mb: 3 }}>Create a care plan for this patient to see details here.</Typography>
                                                 <Button 
@@ -1639,7 +1663,7 @@ const DoctorDashboard = () => {
                                         )
                                     ) : (
                                         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
-                                            <Typography variant="h1" sx={{ mb: 2 }}>👈</Typography>
+                                            <ArrowBackOutlinedIcon sx={{ fontSize: 48, mb: 2, color: "text.secondary" }} />
                                             <Typography variant="h5" sx={{ fontWeight: 700 }}>Select a Patient</Typography>
                                             <Typography variant="body2">Choose a patient from the list to view their care plan.</Typography>
                                         </Box>
@@ -1672,7 +1696,7 @@ const DoctorDashboard = () => {
                                     <Button 
                                         variant="outlined" 
                                         onClick={() => setShowEditPatient(true)}
-                                        startIcon={<span>✏️</span>}
+                                        startIcon={<EditOutlinedIcon fontSize="small" />}
                                         sx={{ height: 'fit-content', borderRadius: 2 }}
                                     >
                                         Edit
@@ -1709,9 +1733,9 @@ const DoctorDashboard = () => {
                                                 }}
                                             >
                                                 {isAbnormal && (
-                                                    <Typography variant="caption" sx={{ position: 'absolute', top: 6, right: 8, color: 'error.main', fontWeight: 900, fontSize: '0.6rem' }}>⚠ ALERT</Typography>
+                                                    <Typography variant="caption" sx={{ position: 'absolute', top: 6, right: 8, color: 'error.main', fontWeight: 900, fontSize: '0.6rem' }}> ALERT</Typography>
                                                 )}
-                                                <Typography sx={{ fontSize: '1.5rem', mb: 0.5 }}>{vital.emoji}</Typography>
+                                                <Typography sx={{ fontSize: '1.5rem', mb: 0.5 }}>{vital.icon}</Typography>
                                                 <Typography variant="overline" color="text.secondary" sx={{ display: 'block', lineHeight: 1, mb: 1 }}>{vital.label}</Typography>
                                                 <Typography variant="h5" sx={{ fontFamily: 'monospace', fontWeight: 700, color: getVitalColor(vital.type, vital.value) }}>
                                                     {renderVitalValue(vital.value)}
@@ -1746,7 +1770,7 @@ const DoctorDashboard = () => {
                                             <List dense>
                                                 {selectedPatient.action_items.map((item, i) => (
                                                     <ListItem key={i} sx={{ px: 0 }}>
-                                                        <ListItemIcon sx={{ minWidth: 28, color: 'warning.main' }}>⚠</ListItemIcon>
+                                                        <ListItemIcon sx={{ minWidth: 28, color: 'warning.main' }}></ListItemIcon>
                                                         <ListItemText primary={item} primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }} />
                                                     </ListItem>
                                                 ))}
@@ -1768,7 +1792,7 @@ const DoctorDashboard = () => {
                             <PageHeader 
                                 title="Pending Tasks & AI Assignment" 
                                 actionLabel="Schedule Medication"
-                                actionIcon={<span>💊</span>}
+                                actionIcon={<MedicationOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: "middle" }} />}
                                 onAction={() => { setShowScheduledMed(true); loadUnassignedTasks(); }}
                             />
 
@@ -1914,7 +1938,7 @@ const DoctorDashboard = () => {
                             />
                             {nurseAssignments.length === 0 ? (
                                 <Box sx={{ py: 10, textAlign: 'center', opacity: 0.5 }}>
-                                    <Typography variant="h1" sx={{ mb: 2 }}>📭</Typography>
+                                    <InboxOutlinedIcon sx={{ fontSize: 48, mb: 2, color: "text.secondary" }} />
                                     <Typography variant="h6">No nurse assignment data available</Typography>
                                 </Box>
                             ) : (
@@ -1951,12 +1975,12 @@ const DoctorDashboard = () => {
                                                                     <Stack spacing={0.5}>
                                                                         {shift.patients?.map((patient, pidx) => (
                                                                             <Box key={pidx} sx={{ ml: 1 }}>
-                                                                                <Typography variant="body2" sx={{ fontWeight: 500 }}>👤 {patient.patient_name}</Typography>
+                                                                                <Typography variant="body2" sx={{ fontWeight: 500 }}><PersonOutlineOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {patient.patient_name}</Typography>
                                                                                 <Box sx={{ ml: 2 }}>
                                                                                     {patient.tasks?.slice(0, 3).map((task, tidx) => (
                                                                                         <Typography key={tidx} variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                                                             <Box component="span" sx={{ color: task.status === 'completed' ? 'success.main' : 'warning.main', fontWeight: 900 }}>
-                                                                                                {task.status === 'completed' ? '✓' : '○'}
+                                                                                                {task.status === 'completed' ? <CheckCircleOutlinedIcon fontSize="small" color="success" /> : <RadioButtonUncheckedOutlinedIcon fontSize="small" color="disabled" />}
                                                                                             </Box>
                                                                                             {task.description || task.task_type}
                                                                                         </Typography>
@@ -1979,7 +2003,7 @@ const DoctorDashboard = () => {
                                                     
                                                     <Box sx={{ mt: 2, pt: 1.5, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <Typography variant="caption" color="text.secondary">Total Handoffs: {nurse.total_handoffs}</Typography>
-                                                        <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>View details →</Typography>
+                                                        <Typography variant="caption" color="primary" sx={{ fontWeight: 600 }}>View details </Typography>
                                                     </Box>
                                                 </CardContent>
                                             </Card>
@@ -2045,14 +2069,14 @@ const DoctorDashboard = () => {
                                                 </Stack>
                                             ) : (
                                                 <Box sx={{ py: 10, textAlign: 'center', opacity: 0.5 }}>
-                                                    <Typography variant="h1" sx={{ mb: 2 }}>💊</Typography>
+                                                    <MedicationOutlinedIcon sx={{ fontSize: 48, mb: 2, color: "text.secondary" }} />
                                                     <Typography variant="h6">No medication history found</Typography>
                                                 </Box>
                                             )}
                                         </Paper>
                                     ) : (
                                         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.5, py: 10 }}>
-                                            <Typography variant="h1" sx={{ mb: 2 }}>👈</Typography>
+                                            <ArrowBackOutlinedIcon sx={{ fontSize: 48, mb: 2, color: "text.secondary" }} />
                                             <Typography variant="h6">Select a patient to view medication history</Typography>
                                         </Box>
                                     )}
@@ -2101,7 +2125,7 @@ const DoctorDashboard = () => {
                                                     </Box>
                                                 </Stack>
                                                 <Box sx={{ mt: 3, pt: 1.5, borderTop: 1, borderColor: 'divider', display: 'flex', justifyContent: 'flex-end' }}>
-                                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>VIEW DETAILS →</Typography>
+                                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>VIEW DETAILS </Typography>
                                                 </Box>
                                             </CardContent>
                                         </Card>
@@ -2152,9 +2176,9 @@ const DoctorDashboard = () => {
                             <Paper variant="outlined" sx={{ p: 0, borderRadius: 3, overflow: 'hidden' }}>
                                 <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', gap: 1 }}>
                                     {[
-                                        { key: 'completed', label: '✅ Completed', count: selectedNurseDetails.total_tasks_completed || 0 },
-                                        { key: 'pending', label: '⏳ Pending', count: selectedNurseDetails.pending_tasks || 0 },
-                                        { key: 'reassigned', label: '🔄 Reassigned', count: selectedNurseDetails.reassigned_tasks || 0 }
+                                        { key: 'completed', label: 'Completed', icon: <CheckCircleOutlinedIcon />, count: selectedNurseDetails.total_tasks_completed || 0 },
+                                        { key: 'pending', label: ' Pending', count: selectedNurseDetails.pending_tasks || 0 },
+                                        { key: 'reassigned', label: 'Reassigned', icon: <AutorenewOutlinedIcon />, count: selectedNurseDetails.reassigned_tasks || 0 }
                                     ].map(tab => (
                                         <Button 
                                             key={tab.key}
@@ -2175,7 +2199,7 @@ const DoctorDashboard = () => {
                                                 {selectedNurseDetails.recent_completed_tasks.map((task, idx) => (
                                                     <Box key={idx} sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                            <Typography sx={{ color: 'success.main', fontWeight: 900 }}>✓</Typography>
+                                                            <CheckCircleOutlinedIcon color="success" />
                                                             <Box>
                                                                 <Typography variant="body2" sx={{ fontWeight: 600 }}>{task.description || task.task_type}</Typography>
                                                                 {task.patient_name && <Typography variant="caption" color="text.secondary">Patient: {task.patient_name}</Typography>}
@@ -2213,7 +2237,7 @@ const DoctorDashboard = () => {
                                                 {selectedNurseDetails.recent_reassigned_tasks.map((task, idx) => (
                                                     <Box key={idx} sx={{ p: 1.5, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                            <Typography sx={{ color: 'primary.main' }}>🔄</Typography>
+                                                            <AutorenewOutlinedIcon color="primary" />
                                                             <Box>
                                                                 <Typography variant="body2" sx={{ fontWeight: 600 }}>{task.description || task.task_type}</Typography>
                                                                 {task.patient_name && <Typography variant="caption" color="text.secondary">Patient: {task.patient_name}</Typography>}
@@ -2428,7 +2452,7 @@ const DoctorDashboard = () => {
                         {/* Medications */}
                         <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
                             <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <span>💊</span> Medications
+                                <MedicationOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: "middle" }} /> Medications
                             </Typography>
                             {planForm.medications.map((m, i) => (
                                 <Stack key={i} direction="row" spacing={2} sx={{ mb: 2 }}>
@@ -2463,7 +2487,7 @@ const DoctorDashboard = () => {
                         {/* Meals */}
                         <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
                             <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <span>🍽️</span> Meal Plan
+                                <RestaurantOutlinedIcon fontSize="small" sx={{ mr: 1, verticalAlign: "middle" }} /> Meal Plan
                             </Typography>
                             <Stack spacing={2}>
                                 {[
@@ -2526,9 +2550,9 @@ const DoctorDashboard = () => {
                             <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>Shifts (when to administer)</Typography>
                             <Stack direction="row" spacing={2.5}>
                                 {[
-                                    { key: 'day', label: '☀️ Day', desc: '9am' },
-                                    { key: 'afternoon', label: '🌅 Afternoon', desc: '2pm' },
-                                    { key: 'night', label: '🌙 Night', desc: '9pm' }
+                                    { key: 'day', label: 'Day', icon: <WbSunnyOutlinedIcon />, desc: '9am' },
+                                    { key: 'afternoon', label: 'Afternoon', icon: <WbTwilightOutlinedIcon />, desc: '2pm' },
+                                    { key: 'night', label: 'Night', icon: <NightlightOutlinedIcon />, desc: '9pm' }
                                 ].map(s => (
                                     <FormControlLabel
                                         key={s.key}

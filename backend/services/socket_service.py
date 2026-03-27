@@ -190,7 +190,7 @@ def notify_vendor_request_update(doctor_id, vendor_id, request_data):
     })
 
 
-# ── Vendor ↔ Admin Events ──────────────────────────────────────
+# ── Vendor  Admin Events ──────────────────────────────────────
 
 def notify_new_rfq(vendor_ids, request_data):
     """Notify vendors about a new purchase request / RFQ."""
@@ -247,7 +247,7 @@ def notify_purchase_order_created(vendor_id, po_data):
     })
 
 
-# ── Doctor ↔ Nurse Events ──────────────────────────────────────
+# ── Doctor  Nurse Events ──────────────────────────────────────
 
 def notify_task_assigned(nurse_id, task_data):
     """Notify nurse about a new task assignment."""
@@ -307,7 +307,7 @@ def notify_appointment_status(user_id, appointment_data):
 
 def notify_new_appointment(doctor_id, appointment_data):
     """Notify doctor about a new appointment booking — includes full appointment dict."""
-    # Serialize: convert datetime → ISO string, ObjectId → str
+    # Serialize: convert datetime  ISO string, ObjectId  str
     safe = {}
     for k, v in (appointment_data or {}).items():
         if k == '_id':
@@ -360,7 +360,7 @@ def notify_procurement_updated(data, action='updated'):
 def notify_low_stock(item_data):
     """Notify admins about low inventory stock."""
     emit_to_role('super_admin', 'low_stock_alert', {
-        'message': f"⚠️ Low stock: {item_data.get('name', '')} ({item_data.get('current_quantity', 0)} remaining)",
+        'message': f"️ Low stock: {item_data.get('name', '')} ({item_data.get('current_quantity', 0)} remaining)",
         'item_id': item_data.get('item_id', ''),
         'name': item_data.get('name', ''),
         'current_quantity': item_data.get('current_quantity', 0),

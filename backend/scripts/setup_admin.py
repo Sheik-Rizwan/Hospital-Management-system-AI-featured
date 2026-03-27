@@ -11,7 +11,7 @@ def setup_default_accounts():
     """Create default Super Admin and Doctor accounts."""
     try:
         db = MongoDatabase()
-        print("✅ Connected to database")
+        print(" Connected to database")
         
         # Default Super Admin credentials
         admin_email = "admin@hospital.com"
@@ -20,7 +20,7 @@ def setup_default_accounts():
         # Check if admin already exists
         existing_admin = db.admins.find_one({'email': admin_email})
         if existing_admin:
-            print(f"ℹ️ Super Admin already exists: {admin_email}")
+            print(f"️ Super Admin already exists: {admin_email}")
         else:
             admin_data = {
                 'user_id': 'admin_001',
@@ -31,7 +31,7 @@ def setup_default_accounts():
             }
             admin = SuperAdmin.create(admin_data)
             db.create_user(admin)
-            print(f"✅ Super Admin created: {admin_email} / {admin_password}")
+            print(f" Super Admin created: {admin_email} / {admin_password}")
         
         # Default Doctor credentials
         doctor_email = "doctor@hospital.com"
@@ -40,7 +40,7 @@ def setup_default_accounts():
         # Check if doctor already exists
         existing_doctor = db.doctors.find_one({'email': doctor_email})
         if existing_doctor:
-            print(f"ℹ️ Doctor already exists: {doctor_email}")
+            print(f"️ Doctor already exists: {doctor_email}")
         else:
             doctor_data = {
                 'user_id': 'doctor_001',
@@ -54,7 +54,7 @@ def setup_default_accounts():
             }
             doctor = Doctor.create(doctor_data)
             db.create_user(doctor)
-            print(f"✅ Doctor created: {doctor_email} / {doctor_password}")
+            print(f" Doctor created: {doctor_email} / {doctor_password}")
         
         print("\n" + "="*50)
         print("DEFAULT CREDENTIALS:")
@@ -66,7 +66,7 @@ def setup_default_accounts():
         return True
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f" Error: {e}")
         return False
 
 

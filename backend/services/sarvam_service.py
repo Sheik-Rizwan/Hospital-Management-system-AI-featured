@@ -174,7 +174,7 @@ class SarvamService:
             for path in windows_ffmpeg_paths:
                 if os.path.exists(path):
                     ffmpeg_path = path
-                    logger.info(f"🎤 Found ffmpeg at: {ffmpeg_path}")
+                    logger.info(f" Found ffmpeg at: {ffmpeg_path}")
                     break
         if ffmpeg_path:
             try:
@@ -185,7 +185,7 @@ class SarvamService:
                 ]
                 result = subprocess.run(cmd, capture_output=True, timeout=30)
                 if result.returncode == 0 and os.path.exists(output_path):
-                    logger.info(f"✅ Audio converted via ffmpeg: {input_path} -> {output_path}")
+                    logger.info(f" Audio converted via ffmpeg: {input_path} -> {output_path}")
                     return output_path, True
             except Exception as e:
                 logger.warning(f"ffmpeg conversion failed: {e}")
@@ -197,7 +197,7 @@ class SarvamService:
             audio = audio.set_frame_rate(16000).set_channels(1)
             audio.export(output_path, format='wav')
             if os.path.exists(output_path):
-                logger.info(f"✅ Audio converted via pydub: {input_path} -> {output_path}")
+                logger.info(f" Audio converted via pydub: {input_path} -> {output_path}")
                 return output_path, True
         except ImportError:
             logger.debug("pydub not available")
@@ -226,14 +226,14 @@ class SarvamService:
                 data = data.mean(axis=1)  # Convert to mono
             sf.write(output_path, data.astype(np.float32), sr)
             if os.path.exists(output_path):
-                logger.info(f"✅ Audio converted via soundfile: {input_path} -> {output_path}")
+                logger.info(f" Audio converted via soundfile: {input_path} -> {output_path}")
                 return output_path, True
         except Exception as e:
             logger.warning(f"soundfile conversion failed: {e}")
 
         # Method 4: No conversion possible
-        logger.warning(f"⚠️ Audio conversion NOT possible. Install ffmpeg: winget install ffmpeg")
-        logger.warning(f"⚠️ Sending original OGG audio to Sarvam (may cause issues)")
+        logger.warning(f"️ Audio conversion NOT possible. Install ffmpeg: winget install ffmpeg")
+        logger.warning(f"️ Sending original OGG audio to Sarvam (may cause issues)")
         return input_path, False
 
     def speech_to_text(self, audio_file_path, language_code='en'):
@@ -250,14 +250,14 @@ class SarvamService:
         try:
             # Log file info for debugging
             file_size = os.path.getsize(audio_file_path)
-            logger.info(f"🎤 STT Input: {audio_file_path}, size={file_size} bytes, requested_lang={language_code}")
+            logger.info(f" STT Input: {audio_file_path}, size={file_size} bytes, requested_lang={language_code}")
 
             # Convert audio to WAV for better STT accuracy
             audio_to_use, was_converted = self._convert_audio_to_wav(audio_file_path)
             if was_converted:
                 converted_path = audio_to_use
                 converted_size = os.path.getsize(audio_to_use)
-                logger.info(f"🎤 Converted audio: {audio_to_use}, size={converted_size} bytes")
+                logger.info(f" Converted audio: {audio_to_use}, size={converted_size} bytes")
 
             # Determine MIME type
             mime_type = 'audio/wav' if audio_to_use.endswith('.wav') else 'audio/ogg'
@@ -274,8 +274,8 @@ class SarvamService:
                     'with_timestamps': 'false'
                 }
 
-                logger.info(f"🎤 Sarvam STT: POST {SARVAM_STT_URL}")
-                logger.info(f"🎤 Sarvam STT: file={audio_to_use}, lang={lang_code_full}, mime={mime_type}")
+                logger.info(f" Sarvam STT: POST {SARVAM_STT_URL}")
+                logger.info(f" Sarvam STT: file={audio_to_use}, lang={lang_code_full}, mime={mime_type}")
 
                 response = requests.post(
                     SARVAM_STT_URL,
@@ -285,23 +285,23 @@ class SarvamService:
                     timeout=30
                 )
 
-                logger.info(f"🎤 Sarvam STT: Response status={response.status_code}")
+                logger.info(f" Sarvam STT: Response status={response.status_code}")
 
                 if response.status_code == 200:
                     result = response.json()
                     transcript = result.get('transcript', '')
                     detected_lang = result.get('language_code', language_code)
-                    logger.info(f"🎤 Sarvam STT SUCCESS [{detected_lang}]: '{transcript}'")
+                    logger.info(f" Sarvam STT SUCCESS [{detected_lang}]: '{transcript}'")
                     return {
                         'transcript': transcript,
                         'language_code': detected_lang
                     }
                 else:
-                    logger.error(f"🎤 Sarvam STT FAILED {response.status_code}: {response.text[:500]}")
+                    logger.error(f" Sarvam STT FAILED {response.status_code}: {response.text[:500]}")
                     return None
 
         except Exception as e:
-            logger.error(f"🎤 Sarvam STT exception: {e}")
+            logger.error(f" Sarvam STT exception: {e}")
             import traceback
             logger.error(traceback.format_exc())
             return None

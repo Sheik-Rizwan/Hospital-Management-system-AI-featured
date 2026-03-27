@@ -4,6 +4,35 @@ import SocketChatRoom from '../components/SocketChatRoom';
 import { useSocket } from '../hooks/useSocket';
 
 // MUI Components
+
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
+import AirOutlinedIcon from '@mui/icons-material/AirOutlined';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined';
+import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
+import WbTwilightOutlinedIcon from '@mui/icons-material/WbTwilightOutlined';
+import NightlightOutlinedIcon from '@mui/icons-material/NightlightOutlined';
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
+
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -22,7 +51,6 @@ import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -84,8 +112,8 @@ const VendorRequests = ({ showNotify }) => {
             if (data.success) {
                 showNotify?.(
                     action === 'accept'
-                        ? '✅ Request accepted — chat room created!'
-                        : '❌ Request rejected.',
+                        ? ' Request accepted — chat room created!'
+                        : ' Request rejected.',
                     action === 'accept' ? 'success' : 'info'
                 );
                 await loadRequests();
@@ -191,10 +219,10 @@ const VendorRequests = ({ showNotify }) => {
             {/* Filter Tabs */}
             <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 1 }}>
                 {[
-                    { key: 'pending', label: 'Pending', icon: '⏳' },
-                    { key: 'accepted', label: 'Accepted', icon: '✅' },
-                    { key: 'rejected', label: 'Rejected', icon: '❌' },
-                    { key: 'all', label: 'All Requests', icon: '📋' }
+                    { key: 'pending', label: 'Pending', icon: '' },
+                    { key: 'accepted', label: 'Accepted', icon: <CheckCircleOutlinedIcon fontSize="small" /> },
+                    { key: 'rejected', label: 'Rejected', icon: '' },
+                    { key: 'all', label: 'All Requests', icon: <AssignmentOutlinedIcon fontSize="small" /> }
                 ].map((tab) => {
                     const count = tab.key === 'all' ? requests.length : requests.filter(r => r.status === tab.key).length;
                     return (
@@ -231,7 +259,7 @@ const VendorRequests = ({ showNotify }) => {
             ) : filtered.length === 0 ? (
                 <Card variant="outlined" sx={{ py: 12, textAlign: 'center', bgcolor: 'action.hover', borderStyle: 'dashed' }}>
                     <Typography variant="h2" sx={{ opacity: 0.2, mb: 2 }}>
-                        {activeTab === 'pending' ? '📭' : activeTab === 'accepted' ? '🤝' : '📋'}
+                        {activeTab === 'pending' ? '' : activeTab === 'accepted' ? '' : ''}
                     </Typography>
                     <Typography variant="h6" color="text.secondary">No {activeTab === 'all' ? '' : activeTab} requests</Typography>
                     <Typography variant="body2" color="text.disabled">Everythings clear!</Typography>

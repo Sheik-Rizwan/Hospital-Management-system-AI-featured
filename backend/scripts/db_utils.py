@@ -34,7 +34,7 @@ class DBUtils:
                 
             user = col.find_one(query)
             if user:
-                print(f"✅ Found user in '{role}' collection.")
+                print(f" Found user in '{role}' collection.")
                 print(f"   User ID: {user.get('user_id')}")
                 print(f"   Email: {user.get('email')}")
                 if role == 'patients':
@@ -46,28 +46,28 @@ class DBUtils:
                 break
         
         if not found:
-            print("❌ User NOT FOUND in any active collection.")
+            print(" User NOT FOUND in any active collection.")
             # Check legacy
             if 'users' in self.db.list_collection_names():
                 legacy = self.db.users.find_one({'$or': [{'user_id': identifier}, {'email': identifier}]})
                 if legacy:
-                    print(f"⚠️ User found in LEGACY 'users' collection. Migration might be needed.")
+                    print(f"️ User found in LEGACY 'users' collection. Migration might be needed.")
 
     def _check_password(self, user_doc, password):
         stored_hash = user_doc.get('password')
         if not stored_hash:
-            print("❌ User has no password field!")
+            print(" User has no password field!")
             return
 
         try:
             is_valid = User.check_password(stored_hash, password)
             if is_valid:
-                print("✅ Password validation SUCCESSFUL")
+                print(" Password validation SUCCESSFUL")
             else:
-                print("❌ Password validation FAILED (Hash mismatch)")
+                print(" Password validation FAILED (Hash mismatch)")
         except ValueError as e:
-            print(f"❌ Password validation ERROR: {e}")
-            print("⚠️ Stored password might be corrupted/plaintext.")
+            print(f" Password validation ERROR: {e}")
+            print("️ Stored password might be corrupted/plaintext.")
 
     def fix_user_password(self, identifier, new_password):
         """Fixes/Resets password for a user"""
@@ -84,11 +84,11 @@ class DBUtils:
                 
             result = col.update_one(query, {'$set': {'password': new_hash}})
             if result.matched_count > 0:
-                print(f"✅ Updated password in '{colName}' collection.")
+                print(f" Updated password in '{colName}' collection.")
                 updated = True
         
         if not updated:
-            print("❌ User not found.")
+            print(" User not found.")
 
     def list_active_collections(self):
         """Lists all collections currently in the database"""

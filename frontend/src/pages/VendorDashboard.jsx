@@ -9,6 +9,35 @@ import PageHeader from '../components/ui/PageHeader';
 import StatusChip from '../components/ui/StatusChip';
 import { jsPDF } from 'jspdf';
 
+
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
+import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
+import AirOutlinedIcon from '@mui/icons-material/AirOutlined';
+import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined';
+import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
+import WbTwilightOutlinedIcon from '@mui/icons-material/WbTwilightOutlined';
+import NightlightOutlinedIcon from '@mui/icons-material/NightlightOutlined';
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
+import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
+import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
+
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -66,10 +95,10 @@ const VendorDashboard = () => {
     };
 
     useRealtimeEvents({
-        'new_rfq': (data) => { showNotify(`📢 New RFQ: ${data.item_name}`, 'info'); loadData(); },
-        'new_rfq_broadcast': (data) => { showNotify('📢 A new purchase request has been posted', 'info'); loadData(); },
-        'new_purchase_order': (data) => { showNotify(`🎉 New PO: ${data.po_number}`, 'success'); loadData(); },
-        'vendor_approved': (data) => { showNotify('✅ Your vendor account has been approved!', 'success'); }
+        'new_rfq': (data) => { showNotify(` New RFQ: ${data.item_name}`, 'info'); loadData(); },
+        'new_rfq_broadcast': (data) => { showNotify(' A new purchase request has been posted', 'info'); loadData(); },
+        'new_purchase_order': (data) => { showNotify(` New PO: ${data.po_number}`, 'success'); loadData(); },
+        'vendor_approved': (data) => { showNotify('Your vendor account has been approved!', 'success'); }
     });
 
     const loadData = async () => {
@@ -180,10 +209,10 @@ const VendorDashboard = () => {
     };
 
     const sidebarItems = [
-        { id: 'orders', icon: '📦', label: 'My Orders' },
-        { id: 'quotations', icon: '📄', label: 'My Quotations' },
-        { id: 'requests', icon: '📢', label: 'Open Requests' },
-        { id: 'chat', icon: '💬', label: 'Doctor Chat' },
+        { id: 'orders', icon: <Inventory2OutlinedIcon fontSize="small" />, label: 'My Orders' },
+        { id: 'quotations', icon: '', label: 'My Quotations' },
+        { id: 'requests', icon: '', label: 'Open Requests' },
+        { id: 'chat', icon: <ChatBubbleOutlineIcon fontSize="small" />, label: 'Doctor Chat' },
     ];
 
     return (
@@ -230,7 +259,7 @@ const VendorDashboard = () => {
                                                 {order.status === 'shipped' && (
                                                     <Button size="small" variant="contained" color="success" onClick={() => handleStatusUpdate(order.po_id, 'delivered')}>Mark Delivered</Button>
                                                 )}
-                                                <Button size="small" variant="outlined" onClick={() => generateVendorPO(order.po_id)}>📄 PO</Button>
+                                                <Button size="small" variant="outlined" onClick={() => generateVendorPO(order.po_id)}> PO</Button>
                                             </Stack>
                                         </TableCell>
                                     </TableRow>

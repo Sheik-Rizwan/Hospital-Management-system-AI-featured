@@ -1,5 +1,5 @@
 # voice_booking_service.py — Bridges Sarvam AI tool calls to AppointmentService
-# Handles multilingual voice booking: STT → AI Conversation → Booking → TTS
+# Handles multilingual voice booking: STT  AI Conversation  Booking  TTS
 
 import os
 import logging
@@ -17,10 +17,10 @@ logger = logging.getLogger(__name__)
 class VoiceBookingService:
     """
     Orchestrates the full voice booking flow:
-      1. STT: audio → transcript (Sarvam primary, Groq fallback)
-      2. Conversation: transcript → AI reply with tool calling
+      1. STT: audio  transcript (Sarvam primary, Groq fallback)
+      2. Conversation: transcript  AI reply with tool calling
       3. Tool callbacks: check_availability / book_appointment
-      4. TTS: AI reply text → audio file
+      4. TTS: AI reply text  audio file
     """
 
     def __init__(self):
@@ -194,11 +194,11 @@ class VoiceBookingService:
         if self.sarvam.is_available():
             result = self.sarvam.speech_to_text(audio_file_path, language_code)
             if result and result.get('transcript'):
-                logger.info(f"✅ Sarvam STT success: '{result['transcript'][:60]}'")
+                logger.info(f" Sarvam STT success: '{result['transcript'][:60]}'")
                 return result
 
         # Fallback: Groq Whisper (in speech_to_text.py)
-        logger.warning("⚠️ Sarvam STT unavailable, falling back to Groq Whisper")
+        logger.warning("️ Sarvam STT unavailable, falling back to Groq Whisper")
         try:
             text = self.stt_fallback.transcribe_audio_file(
                 audio_file_path,
@@ -207,7 +207,7 @@ class VoiceBookingService:
             if text:
                 return {'transcript': text, 'language_code': language_code}
         except Exception as e:
-            logger.error(f"❌ Groq Whisper fallback failed: {e}")
+            logger.error(f" Groq Whisper fallback failed: {e}")
 
         return {'transcript': '', 'language_code': language_code, 'error': 'Transcription failed'}
 
@@ -236,7 +236,7 @@ class VoiceBookingService:
         Tool results are translated into the user's language.
         """
         def tool_callback(tool_name: str, args: dict) -> str:
-            logger.info(f"🔧 Voice tool call: {tool_name}({args})")
+            logger.info(f" Voice tool call: {tool_name}({args})")
 
             if tool_name == 'check_availability':
                 result = self._check_availability(args)
@@ -341,7 +341,7 @@ class VoiceBookingService:
             if patient:
                 return patient.get('patient_name', '') or patient.get('full_name', '') or ''
         except Exception as e:
-            logger.warning(f"⚠️ Could not fetch patient name for {patient_id}: {e}")
+            logger.warning(f"️ Could not fetch patient name for {patient_id}: {e}")
         return ''
 
     def _book_appointment(self, args: dict, patient_id: str) -> str:
@@ -434,7 +434,7 @@ class VoiceBookingService:
 
         try:
             new_appt = self.appt.book_appointment(appt_data)
-            logger.info(f"✅ Voice booking created: {new_appt.get('appointment_id')} for {patient_name}")
+            logger.info(f" Voice booking created: {new_appt.get('appointment_id')} for {patient_name}")
             # Include patient name in confirmation if available
             name_clause = f" for {patient_name}" if patient_name else ""
             return (
@@ -445,7 +445,7 @@ class VoiceBookingService:
         except ValueError as e:
             return f"Booking failed: {str(e)}. Please choose a different time slot."
         except Exception as e:
-            logger.error(f"❌ Voice booking error: {e}")
+            logger.error(f" Voice booking error: {e}")
             return "Something went wrong while booking. Please try again."
     
     # ═══════════════════════════════════════════

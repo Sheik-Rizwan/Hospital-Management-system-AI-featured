@@ -310,6 +310,18 @@ class AppointmentService:
 
         return free_slots
 
+    def get_all_date_slots(self, doctor_id, date_str):
+        """
+        Get ALL available time slots for a doctor on a date across all schedule blocks.
+        Collects free slots from every schedule entry and returns them sorted.
+        """
+        shifts = self.get_available_shifts(doctor_id, date_str)
+        all_slots = []
+        for s in shifts:
+            block_slots = self.get_shift_slots(doctor_id, date_str, s['start'], s['end'])
+            all_slots.extend(block_slots)
+        return all_slots
+
     def get_doctor_availability(self, doctor_id, date_str):
         """
         Get available time slots for a doctor on a specific date.

@@ -19,7 +19,7 @@ def seed():
 
     db.services.delete_many({})
     db.services.insert_many(services)
-    print(f"✅ Seeded {len(services)} services")
+    print(f" Seeded {len(services)} services")
 
     # ── Holidays 2026 ──
     holidays = [
@@ -37,7 +37,7 @@ def seed():
 
     db.holidays.delete_many({})
     db.holidays.insert_many(holidays)
-    print(f"✅ Seeded {len(holidays)} holidays")
+    print(f" Seeded {len(holidays)} holidays")
 
     # ── Link existing doctors to services (if any exist) ──
     doctors = list(db.doctors.find({'is_active': True}))
@@ -50,16 +50,16 @@ def seed():
                 {'user_id': doc['user_id']},
                 {'$set': {'service_id': svc['service_id']}}
             )
-            print(f"   Linked Dr. {doc.get('full_name')} → {svc['service_name']}")
+            print(f"   Linked Dr. {doc.get('full_name')}  {svc['service_name']}")
         else:
             # Default to General Consultation
             db.doctors.update_one(
                 {'user_id': doc['user_id']},
                 {'$set': {'service_id': 'SVC-001'}}
             )
-            print(f"   Linked Dr. {doc.get('full_name')} → General Consultation (default)")
+            print(f"   Linked Dr. {doc.get('full_name')}  General Consultation (default)")
 
-    print("\n🎉 Seeding complete!")
+    print("\n Seeding complete!")
 
 if __name__ == "__main__":
     seed()
