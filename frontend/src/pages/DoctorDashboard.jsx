@@ -256,8 +256,7 @@ const DoctorDashboard = () => {
         'task_rejected': (data) => { const msg = `Task rejected by ${data.nurse_name}: ${data.reason}`; showNotify(msg, 'error'); pushNotification(msg, 'error'); loadGeneralData(); loadNurseAssignments(); loadDashboardStats(); },
         // Nurse status changed (online/offline/emergency)
         'nurse_status_changed': (data) => {
-            const emoji = '';
-            const msg = `${emoji} Nurse ${data.nurse_name || ''} is now ${data.status}${data.reassigned_tasks ? ` (${data.reassigned_tasks} tasks reassigned)` : ''}`;
+            const msg = `Nurse ${data.nurse_name || ''} is now ${data.status}${data.reassigned_tasks ? ` (${data.reassigned_tasks} tasks reassigned)` : ''}`;
             showNotify(msg, data.status === 'emergency' ? 'error' : 'info');
             pushNotification(msg, data.status === 'emergency' ? 'error' : 'info');
             loadNurseAssignments();
@@ -903,6 +902,13 @@ const DoctorDashboard = () => {
         { key: 'appointments', label: 'Appointments', color: '#13c2c2', icon: <CalendarTodayOutlinedIcon />, nav: 'appointments' },
     ];
 
+    const getTimeGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return "Good morning";
+        if (hour < 18) return "Good afternoon";
+        return "Good evening";
+    };
+
     return (
         <Box sx={{ display: 'flex', height: '100vh', bgcolor: 'background.default' }}>
             {/* ======================== SIDEBAR ======================== */}
@@ -917,22 +923,43 @@ const DoctorDashboard = () => {
                         boxSizing: 'border-box',
                         transition: 'width 0.3s',
                         overflowX: 'hidden',
-                        bgcolor: 'background.paper'
+                        bgcolor:'background.paper'
                     }
                 }}
             >
                 {/* Logo / Brand */}
-                <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5, borderBottom: 1, borderColor: 'divider' }}>
-                    <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.lighter', color: 'primary.main' }}>
-                        <LocalHospitalOutlinedIcon fontSize="small" />
-                    </Avatar>
+                <Box sx={{ 
+                    px: sidebarCollapsed ? 1 : 2, 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                    gap: 1.5, 
+                    borderBottom: 1, 
+                    borderColor: 'divider',
+                    height: 64, // Explicitly match header height
+                    minHeight: 64,
+                    boxSizing: 'border-box'
+                }}>
                     {!sidebarCollapsed && (
-                        <Typography variant="subtitle1" noWrap sx={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
-                            MedCore AI
-                        </Typography>
+                        <>
+                            <Avatar sx={{ width: 36, height: 36, bgcolor: 'primary.lighter', color: 'primary.main', flexShrink: 0 }}>
+                                <LocalHospitalOutlinedIcon fontSize="small" />
+                            </Avatar>
+                            <Typography variant="subtitle1" noWrap sx={{ fontWeight: 700, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                MedCore AI 🩺
+                            </Typography>
+                        </>
                     )}
-                    <IconButton onClick={() => setSidebarCollapsed(!sidebarCollapsed)} size="small" sx={{ ml: 'auto', color: 'text.secondary' }}>
-                        {sidebarCollapsed ? <MenuIcon fontSize="small" /> : <MenuOpenIcon fontSize="small" />}
+                    <IconButton 
+                        onClick={() => setSidebarCollapsed(!sidebarCollapsed)} 
+                        size="small" 
+                        sx={{ 
+                            ml: sidebarCollapsed ? 0 : 'auto', 
+                            color: 'text.secondary',
+                            p: 1 // make touch area larger
+                        }}
+                    >
+                        <MenuOpenIcon />
                     </IconButton>
                 </Box>
 
@@ -990,8 +1017,8 @@ const DoctorDashboard = () => {
             {/* ======================== MAIN AREA ======================== */}
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 {/* ── TOP BAR ── */}
-                <AppBar position="static" color="inherit" sx={{ zIndex: 40 }}>
-                    <Toolbar sx={{ gap: 2 }}>
+                <AppBar position="static" color="inherit" sx={{ zIndex: 40, boxShadow: 'none', borderBottom: 1, borderColor: 'divider' }}>
+                    <Toolbar sx={{ gap: 2, minHeight: 64, height: 64, px: { xs: 2, sm: 3 } }}>
                         {/* Global Search */}
                         <Box sx={{ position: 'relative', flex: 1, maxWidth: 420 }}>
                             <OutlinedInput
@@ -1041,6 +1068,10 @@ const DoctorDashboard = () => {
                         </Box>
 
                         <Box sx={{ flex: 1 }} />
+                        
+                        <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary', mr: 2, display: { xs: 'none', md: 'block' } }}>
+                            {getTimeGreeting()}, Dr. {user?.full_name?.split(' ')[0] || ''}
+                        </Typography>
 
                         {/* Refresh */}
                         <Tooltip title="Refresh">
@@ -1138,7 +1169,7 @@ const DoctorDashboard = () => {
                             <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
                                 {/* Welcome */}
                                 <Box sx={{ mb: 3 }}>
-                                    <Typography variant="h4">Welcome back, Dr. {user?.full_name?.split(' ')[0] || ''}</Typography>
+                                    <Typography variant="h4">Dashboard Overview</Typography>
                                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>Here's what's happening today across your practice.</Typography>
                                 </Box>
 
@@ -1312,7 +1343,7 @@ const DoctorDashboard = () => {
                             {/* Filter Tabs */}
                             <Stack direction="row" spacing={1.5} sx={{ overflowX: 'auto', pb: 1 }}>
                                 {[
-                                    { key: 'pending', label: 'Pending', icon: '', statuses: ['pending', 'pending_doctor_approval'] },
+                                    { key: 'pending', label: 'Pending', icon: <HourglassEmptyOutlinedIcon fontSize="small" />, statuses: ['pending', 'pending_doctor_approval'] },
                                     { key: 'confirmed', label: 'Confirmed', icon: <CheckCircleOutlinedIcon fontSize="small" />, statuses: ['approved', 'confirmed'] },
                                     { key: 'history', label: 'History', icon: <AssignmentOutlinedIcon fontSize="small" />, statuses: ['completed', 'rejected', 'cancelled'] }
                                 ].map(({ key, label, icon, statuses }) => {

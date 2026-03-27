@@ -8,33 +8,16 @@ import PageHeader from '../components/ui/PageHeader';
 import StatusChip from '../components/ui/StatusChip';
 
 
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import WaterDropOutlinedIcon from '@mui/icons-material/WaterDropOutlined';
-import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
-import AirOutlinedIcon from '@mui/icons-material/AirOutlined';
-import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
-import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
-import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
-import RadioButtonUncheckedOutlinedIcon from '@mui/icons-material/RadioButtonUncheckedOutlined';
-import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
-import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
-import WbTwilightOutlinedIcon from '@mui/icons-material/WbTwilightOutlined';
-import NightlightOutlinedIcon from '@mui/icons-material/NightlightOutlined';
-import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
-import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
-import RestaurantOutlinedIcon from '@mui/icons-material/RestaurantOutlined';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined';
+import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import LocalHospitalOutlinedIcon from '@mui/icons-material/LocalHospitalOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -146,8 +129,8 @@ const PatientDashboard = () => {
 
     const sidebarItems = [
         { id: 'overview', icon: <AssignmentOutlinedIcon fontSize="small" />, label: 'Overview' },
-        { id: 'appointments', icon: '', label: 'Appointments' },
-        { id: 'history', icon: '', label: 'Care History' },
+        { id: 'appointments', icon: <CalendarTodayOutlinedIcon fontSize="small" />, label: 'Appointments' },
+        { id: 'history', icon: <AssignmentOutlinedIcon fontSize="small" />, label: 'Care History' },
     ];
 
     if (loading) {
@@ -229,15 +212,15 @@ const PatientDashboard = () => {
                             <Card sx={{ background: 'linear-gradient(135deg, #4f46e5, #2563eb)', color: '#fff' }}>
                                 <CardContent>
                                     <Typography variant="h6" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                         Upcoming Appointment
+                                        <CalendarTodayOutlinedIcon /> Upcoming Appointment
                                     </Typography>
                                     <Typography variant="h5" fontWeight={700}>
                                         {new Date(nextApt.date).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
                                     </Typography>
                                     <Typography variant="body1" sx={{ opacity: 0.9, mb: 2 }}>{nextApt.start_time} - {nextApt.end_time}</Typography>
                                     <Stack direction="row" spacing={1.5}>
-                                        <Box sx={{ bgcolor: 'rgba(255,255,255,0.15)', px: 2, py: 1, borderRadius: 1 }}>‍️ Dr. {nextApt.doctor_name}</Box>
-                                        <Box sx={{ bgcolor: 'rgba(255,255,255,0.15)', px: 2, py: 1, borderRadius: 1 }}> {nextApt.doctor_specialization || 'General'}</Box>
+                                        <Box sx={{ bgcolor: 'rgba(255,255,255,0.15)', px: 2, py: 1, borderRadius: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}><PersonOutlineOutlinedIcon fontSize="small" /> Dr. {nextApt.doctor_name}</Box>
+                                        <Box sx={{ bgcolor: 'rgba(255,255,255,0.15)', px: 2, py: 1, borderRadius: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}><LocalHospitalOutlinedIcon fontSize="small" /> {nextApt.doctor_specialization || 'General'}</Box>
                                     </Stack>
                                 </CardContent>
                             </Card>
@@ -247,7 +230,7 @@ const PatientDashboard = () => {
                     {/* Vitals */}
                     <Card>
                         <CardContent>
-                            <Typography variant="h5" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}> Latest Vitals</Typography>
+                            <Typography variant="h5" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}><FavoriteBorderOutlinedIcon /> Latest Vitals</Typography>
                             {info?.latest_vitals ? (
                                 <Grid container spacing={2}>
                                     <Grid size={{ xs: 6, md: 2.4 }}>{renderVitalTile('Heart Rate', info.latest_vitals.heart_rate, 'bpm', 'blue')}</Grid>
@@ -265,7 +248,7 @@ const PatientDashboard = () => {
                     {/* Chatbot */}
                     <Card>
                         <CardContent>
-                            <Typography variant="h5" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}> Ask About My Health</Typography>
+                            <Typography variant="h5" fontWeight={700} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}><ChatBubbleOutlineIcon /> Ask About My Health</Typography>
                             <Box component="form" onSubmit={handleChat} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 <TextField
                                     fullWidth
@@ -292,12 +275,12 @@ const PatientDashboard = () => {
                     <Card sx={{ background: 'linear-gradient(135deg, #22c55e, #14b8a6)', color: '#fff' }}>
                         <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                             <Box>
-                                <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}> Book an Appointment</Typography>
+                                <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}><EventNoteOutlinedIcon sx={{ mr: 0.5, verticalAlign: 'middle' }} /> Book an Appointment</Typography>
                                 <Typography sx={{ opacity: 0.9 }}>Schedule a visit with one of our doctors</Typography>
                             </Box>
                             <Button variant="contained" sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: '#fff', '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }}
                                 onClick={() => setShowBookAppointment(true)}>
-                                Find a Doctor 
+                                Find a Doctor
                             </Button>
                         </CardContent>
                     </Card>
@@ -305,7 +288,7 @@ const PatientDashboard = () => {
                     <PageHeader title="My Appointments" />
                     {appointments.length === 0 ? (
                         <Box sx={{ textAlign: 'center', py: 8 }}>
-                            <Typography sx={{ fontSize: '3rem', mb: 1 }}></Typography>
+                            <InboxOutlinedIcon sx={{ fontSize: 48, mb: 1, opacity: 0.3 }} />
                             <Typography color="text.secondary">No appointments yet. Book your first appointment above!</Typography>
                         </Box>
                     ) : (
@@ -319,9 +302,9 @@ const PatientDashboard = () => {
                                                 <Typography variant="caption" color="text.secondary">{apt.appointment_id}</Typography>
                                             </Stack>
                                             <Typography fontWeight={600}>Dr. {apt.doctor_name || 'Doctor'}</Typography>
-                                            <Typography variant="body2" color="text.secondary"><CalendarTodayOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {apt.date} |  {apt.start_time} - {apt.end_time}</Typography>
+                                            <Typography variant="body2" color="text.secondary"><CalendarTodayOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {apt.date} | <CalendarTodayOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {apt.start_time} - {apt.end_time}</Typography>
                                             {apt.notes && <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}><EditNoteOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {apt.notes}</Typography>}
-                                            {apt.rejection_reason && <Typography variant="body2" color="error.main" sx={{ mt: 0.5 }}> {apt.rejection_reason}</Typography>}
+                                            {apt.rejection_reason && <Typography variant="body2" color="error.main" sx={{ mt: 0.5 }}><WarningAmberOutlinedIcon fontSize="small" sx={{ mr: 0.5, verticalAlign: "middle" }} /> {apt.rejection_reason}</Typography>}
                                         </Box>
                                         {['pending', 'pending_doctor_approval', 'approved', 'confirmed'].includes(apt.status) && (
                                             <Button color="error" variant="outlined" size="small" onClick={() => handleCancelAppointment(apt.appointment_id)}>Cancel</Button>

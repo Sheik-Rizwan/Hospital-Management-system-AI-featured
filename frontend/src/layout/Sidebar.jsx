@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
+import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -32,12 +34,12 @@ export default function Sidebar({ items, title, activeId, onSelect, user, onLogo
                 )}
                 {user?.company_name && (
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        🏢 {user.company_name}
+                        <BusinessOutlinedIcon sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} /> {user.company_name}
                     </Typography>
                 )}
                 {user?.email && (
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        ✉️ {user.email}
+                        <MailOutlinedIcon sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} /> {user.email}
                     </Typography>
                 )}
             </Box>

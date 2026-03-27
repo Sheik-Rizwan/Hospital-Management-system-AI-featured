@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { API_BASE, getAuthHeaders } from '../utils/api';
+import SettingsVoiceOutlinedIcon from '@mui/icons-material/SettingsVoiceOutlined';
+import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined';
+import MicOutlinedIcon from '@mui/icons-material/MicOutlined';
+import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 
 /**
  * VoiceBooking — Multilingual voice-driven appointment booking.
@@ -8,10 +16,10 @@ import { API_BASE, getAuthHeaders } from '../utils/api';
  */
 
 const LANGUAGES = [
-  { code: 'en', label: 'English',  native: 'English',  flag: '', webSpeech: 'en-IN' },
-  { code: 'hi', label: 'Hindi',    native: 'हिन्दी',  flag: '', webSpeech: 'hi-IN' },
-  { code: 'te', label: 'Telugu',   native: 'తెలుగు',  flag: '', webSpeech: 'te-IN' },
-  { code: 'kn', label: 'Kannada',  native: 'ಕನ್ನಡ',  flag: '', webSpeech: 'kn-IN' },
+  { code: 'en', label: 'English',  native: 'English',  flag: <TranslateOutlinedIcon sx={{ fontSize: 16 }} />, webSpeech: 'en-IN' },
+  { code: 'hi', label: 'Hindi',    native: 'हिन्दी',  flag: <TranslateOutlinedIcon sx={{ fontSize: 16 }} />, webSpeech: 'hi-IN' },
+  { code: 'te', label: 'Telugu',   native: 'తెలుగు',  flag: <TranslateOutlinedIcon sx={{ fontSize: 16 }} />, webSpeech: 'te-IN' },
+  { code: 'kn', label: 'Kannada',  native: 'ಕನ್ನಡ',  flag: <TranslateOutlinedIcon sx={{ fontSize: 16 }} />, webSpeech: 'kn-IN' },
 ];
 
 const STATUS_LABELS = {
@@ -20,7 +28,7 @@ const STATUS_LABELS = {
   processing:  { text: 'Processing your speech…', color: '#f59e0b', pulse: true  },
   thinking:    { text: 'AI is thinking…',          color: '#3b82f6', pulse: true  },
   speaking:    { text: 'Playing response…',        color: '#10b981', pulse: true  },
-  confirmed:   { text: 'Booking confirmed! ',   color: '#10b981', pulse: false },
+  confirmed:   { text: 'Booking confirmed!',       color: '#10b981', pulse: false },
   error:       { text: 'Something went wrong',    color: '#ef4444', pulse: false },
 };
 
@@ -383,13 +391,13 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
               ...(useWebSpeech ? styles.toggleBtnActive : {}),
             }}
           >
-            {useWebSpeech ? '' : '️'}
+            {useWebSpeech ? <SettingsVoiceOutlinedIcon sx={{ fontSize: 18 }} /> : <CloudUploadOutlinedIcon sx={{ fontSize: 18 }} />}
           </button>
 
           {/* Stop speaking button */}
           {status === 'speaking' && (
             <button onClick={handleStopSpeaking} style={styles.stopBtn}>
-              ⏹ Stop
+              <StopCircleOutlinedIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} /> Stop
             </button>
           )}
 
@@ -404,9 +412,9 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
               ...(isBlocked || status === 'confirmed' || status === 'speaking' ? styles.micBtnDisabled : {}),
             }}
           >
-            {status === 'recording' ? '⏹' :
-             status === 'processing' || status === 'thinking' ? '' :
-             status === 'confirmed' ? '' : ''}
+            {status === 'recording' ? <StopCircleOutlinedIcon sx={{ fontSize: 28 }} /> :
+             status === 'processing' || status === 'thinking' ? <HourglassEmptyOutlinedIcon sx={{ fontSize: 28 }} /> :
+             status === 'confirmed' ? <CheckCircleOutlinedIcon sx={{ fontSize: 28 }} /> : <MicOutlinedIcon sx={{ fontSize: 28 }} />}
           </button>
 
           {/* Clear / Reset */}
@@ -416,7 +424,7 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
               title="Clear conversation and start over"
               style={styles.clearBtn}
             >
-              
+              <RefreshOutlinedIcon sx={{ fontSize: 20 }} />
             </button>
           )}
         </div>
@@ -424,8 +432,8 @@ const VoiceBooking = ({ onClose, onSuccess }) => {
         {/* Hint */}
         <p style={styles.hint}>
           {useWebSpeech
-            ? ' Browser STT — no upload needed, English often best'
-            : '️ Backend STT — supports Kannada, Telugu, Hindi, English clearly'}
+            ? <><SettingsVoiceOutlinedIcon sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} /> Browser STT — no upload needed, English often best</>
+            : <><CloudUploadOutlinedIcon sx={{ fontSize: 14, mr: 0.5, verticalAlign: 'middle' }} /> Backend STT — supports Kannada, Telugu, Hindi, English clearly</>}
         </p>
 
         {/* Hidden audio player */}
