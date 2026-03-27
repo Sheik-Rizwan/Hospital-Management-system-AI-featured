@@ -240,6 +240,10 @@ def doctor_signup():
         if existing:
             return jsonify({'success': False, 'error': 'Email already registered'}), 409
 
+        existing_license = db.doctors.find_one({'license_number': data.get('license_number', '').strip()})
+        if existing_license:
+            return jsonify({'success': False, 'error': 'Medical License Number already registered'}), 409
+
         user_id = f"doctor_{uuid.uuid4().hex[:8]}"
 
         doctor_data = {

@@ -36,7 +36,7 @@ INTENT_QUERY_SHIFT  = 'QUERY_DOCTOR_SHIFT'
 INTENT_NONE         = 'NONE'
 
 # Keyword patterns for intent detection — Multilingual
-# Supports: English, Hindi (Romanized + Devanagari), Telugu, Kannada, Urdu
+# Supports: English, Hindi (Romanized + Devanagari), Telugu, Kannada
 
 _BOOK_KEYWORDS = [
     # English
@@ -76,9 +76,6 @@ _BOOK_KEYWORDS = [
     r'\bappointment\s+(book|fix)\s+maadi\b',
     r'\b(book|fix)\s+maadkodi\b',
     r'\bdoctor\s+hatira\s+hogbeku\b',
-    # Urdu
-    r'اپائنٹمنٹ', r'بک\s+کر', r'ڈاکٹر\s+سے\s+ملنا', r'ڈاکٹر\s+چاہیے',
-    r'ملنا\s+ہے', r'دکھاؤ',
 ]
 _SLOT_KEYWORDS = [
     # English
@@ -93,8 +90,6 @@ _SLOT_KEYWORDS = [
     r'స్లాట్', r'సమయం', r'ఎన్ని\s+స్లాట్', r'టైమ్\s+చెప్పు',
     # Kannada
     r'ಸ್ಲಾಟ್', r'ಸಮಯ', r'ಎಷ್ಟು\s+ಸ್ಲಾಟ್', r'ಟೈಮ್\s+ಹೇಳಿ',
-    # Urdu
-    r'سلاٹ', r'وقت', r'کتنے\s+سلاٹ', r'ٹائم\s+بتاؤ',
 ]
 _DOC_KEYWORDS = [
     # English
@@ -110,8 +105,6 @@ _DOC_KEYWORDS = [
     r'ఏ\s+డాక్టర్', r'డాక్టర్\s+ఎవరు', r'డాక్టర్\s+చూపించు', r'డాక్టర్\s+లిస్ట్',
     # Kannada
     r'ಯಾವ\s+ಡಾಕ್ಟರ್', r'ಡಾಕ್ಟರ್\s+ಯಾರು', r'ಡಾಕ್ಟರ್\s+ತೋರಿಸಿ', r'ಡಾಕ್ಟರ್\s+ಪಟ್ಟಿ',
-    # Urdu
-    r'کون\s+سا\s+ڈاکٹر', r'ڈاکٹر\s+دکھاؤ', r'ڈاکٹر\s+بتاؤ', r'ڈاکٹر\s+کون',
 ]
 _SHIFT_KEYWORDS = [
     # English
@@ -131,13 +124,10 @@ _SHIFT_KEYWORDS = [
     # Kannada
     r'ಶಿಫ್ಟ್', r'ಡಾಕ್ಟರ್\s+ಯಾವಾಗ', r'ಬೆಳಿಗ್ಗೆ\s+ಶಿಫ್ಟ್', r'ಸಂಜೆ\s+ಶಿಫ್ಟ್',
     r'ಯಾವಾಗ\s+ಬರುತ್ತಾರೆ', r'ಟೈಮಿಂಗ್',
-    # Urdu
-    r'شفٹ', r'ڈاکٹر\s+کب', r'صبح\s+کی\s+شفٹ', r'شام\s+کی\s+شفٹ',
-    r'کب\s+آتے', r'ٹائمنگ',
 ]
 
 # Specialty aliases — maps common words to canonical specialty names
-# Multilingual: English, Hindi (Romanized + Devanagari), Telugu, Kannada, Urdu
+# Multilingual: English, Hindi (Romanized + Devanagari), Telugu, Kannada
 SPECIALTY_ALIASES = {
     # ── Cardiology ──
     'cardiology': 'Cardiology', 'cardiologist': 'Cardiology', 'heart': 'Cardiology',
@@ -149,8 +139,6 @@ SPECIALTY_ALIASES = {
     'గుండె': 'Cardiology', 'హృదయం': 'Cardiology',
     # Kannada
     'ಹೃದಯ': 'Cardiology', 'ಎದೆ': 'Cardiology',
-    # Urdu
-    'دل': 'Cardiology',
 
     # ── Orthopedics ──
     'orthopedics': 'Orthopedics', 'orthopaedics': 'Orthopedics', 'ortho': 'Orthopedics',
@@ -162,8 +150,6 @@ SPECIALTY_ALIASES = {
     'ఎముక': 'Orthopedics', 'కీళ్ళు': 'Orthopedics',
     # Kannada
     'ಮೂಳೆ': 'Orthopedics', 'ಕೀಲು': 'Orthopedics',
-    # Urdu
-    'ہڈی': 'Orthopedics', 'جوڑ': 'Orthopedics',
 
     # ── Dermatology ──
     'dermatology': 'Dermatology', 'dermatologist': 'Dermatology', 'skin': 'Dermatology',
@@ -174,8 +160,6 @@ SPECIALTY_ALIASES = {
     'చర్మం': 'Dermatology',
     # Kannada
     'ಚರ್ಮ': 'Dermatology',
-    # Urdu
-    'جلد': 'Dermatology',
 
     # ── Neurology ──
     'neurology': 'Neurology', 'neurologist': 'Neurology', 'brain': 'Neurology',
@@ -187,8 +171,6 @@ SPECIALTY_ALIASES = {
     'మెదడు': 'Neurology', 'నరాలు': 'Neurology',
     # Kannada
     'ಮಿದುಳು': 'Neurology', 'ನರ': 'Neurology',
-    # Urdu
-    'دماغ': 'Neurology', 'نس': 'Neurology',
 
     # ── Pediatrics ──
     'pediatrics': 'Pediatrics', 'paediatrics': 'Pediatrics', 'pediatrician': 'Pediatrics',
@@ -201,8 +183,6 @@ SPECIALTY_ALIASES = {
     'పిల్లలు': 'Pediatrics', 'బాబు': 'Pediatrics',
     # Kannada
     'ಮಕ್ಕಳ': 'Pediatrics', 'ಮಗು': 'Pediatrics',
-    # Urdu
-    'بچے': 'Pediatrics', 'بچوں': 'Pediatrics',
 
     # ── ENT ──
     'ent': 'ENT', 'ear': 'ENT', 'nose': 'ENT', 'throat': 'ENT',
@@ -213,8 +193,6 @@ SPECIALTY_ALIASES = {
     'చెవి': 'ENT', 'ముక్కు': 'ENT', 'గొంతు': 'ENT',
     # Kannada
     'ಕಿವಿ': 'ENT', 'ಮೂಗು': 'ENT', 'ಗಂಟಲು': 'ENT',
-    # Urdu
-    'کان': 'ENT', 'ناک': 'ENT', 'گلا': 'ENT',
 
     # ── Dentistry ──
     'dentistry': 'Dentistry', 'dentist': 'Dentistry', 'dental': 'Dentistry',
@@ -226,8 +204,6 @@ SPECIALTY_ALIASES = {
     'దంతాలు': 'Dentistry', 'పళ్ళు': 'Dentistry',
     # Kannada
     'ಹಲ್ಲು': 'Dentistry', 'ದಂತ': 'Dentistry',
-    # Urdu
-    'دانت': 'Dentistry',
 
     # ── General Medicine ──
     'general medicine': 'General Medicine',
@@ -239,8 +215,6 @@ SPECIALTY_ALIASES = {
     'జ్వరం': 'General Medicine', 'జలుబు': 'General Medicine',
     # Kannada
     'ಜ್ವರ': 'General Medicine', 'ನೆಗಡಿ': 'General Medicine',
-    # Urdu
-    'بخار': 'General Medicine', 'سردی': 'General Medicine',
 
     # ── General Consultation ──
     'general': 'General Consultation', 'general consultation': 'General Consultation',
@@ -252,8 +226,6 @@ SPECIALTY_ALIASES = {
     'సాధారణ సంప్రదింపు': 'General Consultation',
     # Kannada
     'ಸಾಮಾನ್ಯ ಸಮಾಲೋಚನೆ': 'General Consultation',
-    # Urdu
-    'عام مشورہ': 'General Consultation',
 
     # ── Gynecology ──
     'gynecology': 'Gynecology', 'gynaecology': 'Gynecology', 'gynecologist': 'Gynecology',
@@ -264,8 +236,6 @@ SPECIALTY_ALIASES = {
     'స్త్రీ వైద్యం': 'Gynecology', 'గర్భం': 'Gynecology',
     # Kannada
     'ಮಹಿಳಾ ವೈದ್ಯ': 'Gynecology', 'ಗರ್ಭ': 'Gynecology',
-    # Urdu
-    'خواتین': 'Gynecology', 'حمل': 'Gynecology',
 
     # ── Ophthalmology ──
     'ophthalmology': 'Ophthalmology', 'eye': 'Ophthalmology', 'eyes': 'Ophthalmology',
@@ -277,8 +247,6 @@ SPECIALTY_ALIASES = {
     'కంటి': 'Ophthalmology', 'కళ్ళు': 'Ophthalmology',
     # Kannada
     'ಕಣ್ಣು': 'Ophthalmology', 'ದೃಷ್ಟಿ': 'Ophthalmology',
-    # Urdu
-    'آنکھ': 'Ophthalmology', 'نظر': 'Ophthalmology',
 
     # ── Urology ──
     'urology': 'Urology', 'urologist': 'Urology',
@@ -288,8 +256,6 @@ SPECIALTY_ALIASES = {
     'మూత్రం': 'Urology',
     # Kannada
     'ಮೂತ್ರ': 'Urology',
-    # Urdu
-    'پیشاب': 'Urology', 'گردہ': 'Urology',
 
     # ── Psychiatry ──
     'psychiatry': 'Psychiatry', 'mental': 'Psychiatry', 'psychology': 'Psychiatry',
@@ -300,8 +266,6 @@ SPECIALTY_ALIASES = {
     'మానసిక': 'Psychiatry',
     # Kannada
     'ಮಾನಸಿಕ': 'Psychiatry',
-    # Urdu
-    'ذہنی': 'Psychiatry', 'نفسیاتی': 'Psychiatry',
 
     # ── Code-Mixed Specialty References (Hinglish/Kanglish/Telglish) ──
     # Hinglish
@@ -1019,7 +983,7 @@ class SmartBookingEngine:
         patient_id = patient['patient_id'] if patient else f"wa_{clean_phone}"
 
         try:
-            new_appt = self.appt.book_appointment({
+            appt_data = {
                 'patient_id': patient_id,
                 'patient_name': bk.get('patient_name', '?'),
                 'doctor_id': bk['doctor_id'],
@@ -1033,9 +997,23 @@ class SmartBookingEngine:
                 'booked_for': bk.get('booked_for', 'self'),
                 'created_by': 'whatsapp',
                 'created_by_id': sender_id
-            })
+            }
+            if bk.get('reschedule_old_appt_id'):
+                appt_data['notes'] = f"Rescheduled from {bk['reschedule_old_appt_id']}"
 
+            new_appt = self.appt.book_appointment(appt_data)
             appt_id = new_appt.get('appointment_id', '—')
+            
+            if bk.get('reschedule_old_appt_id'):
+                try:
+                    self.appt.cancel_appointment(
+                        bk['reschedule_old_appt_id'], 
+                        patient_id, 
+                        'patient', 
+                        f"Cancelled by patient for rescheduling to {appt_id}"
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to cancel old appointment during reschedule: {e}")
             from services.appointment_service import AppointmentService
             fmt = AppointmentService.format_time_ampm
             confirm_msg = (
@@ -1366,7 +1344,7 @@ class SmartBookingEngine:
 
     def _match_period(self, text, available_times):
         """Match 'morning'/'afternoon'/'evening'/'night' to first available slot.
-        Supports multilingual period words (Hindi, Telugu, Kannada, Urdu)."""
+        Supports multilingual period words (Hindi, Telugu, Kannada)."""
         from services.booking_utils import MORNING_WORDS, AFTERNOON_WORDS, EVENING_WORDS, NIGHT_WORDS
         t = text.lower().strip()
         if any(w in t for w in MORNING_WORDS):
@@ -1406,7 +1384,7 @@ class SmartBookingEngine:
 def _parse_date(text):
     """
     Parse natural language date to YYYY-MM-DD — Multilingual.
-    Supports English, Hindi (Romanized + Devanagari), Telugu, Kannada, Urdu.
+    Supports English, Hindi (Romanized + Devanagari), Telugu, Kannada.
     Handles: today, tomorrow, day after tomorrow, weekday names,
     month+day ('feb 27', '27th feb'), ordinals ('27th'), relative ('in 3 days').
     Returns None if unparseable.
@@ -1449,7 +1427,7 @@ def _parse_date(text):
     # Word-number based "teen din baad" etc.
     for word, num in NUMBER_WORDS.items():
         if word in t:
-            day_words = ['din', 'days', 'day', 'दिन', 'రోజు', 'రోజుల', 'ದಿನ', 'ದಿನಗಳ', 'دن']
+            day_words = ['din', 'days', 'day', 'दिन', 'రోజు', 'రోజుల', 'ದಿನ', 'ದಿನಗಳ']
             for dw in day_words:
                 if dw in t:
                     return (today + timedelta(days=num)).strftime('%Y-%m-%d')
@@ -1464,7 +1442,7 @@ def _parse_date(text):
                 days_ahead = 7
             return (today + timedelta(days=days_ahead)).strftime('%Y-%m-%d')
 
-    # Multilingual day names (Hindi, Telugu, Kannada, Urdu)
+    # Multilingual day names (Hindi, Telugu, Kannada)
     for day_word, weekday_idx in MULTILINGUAL_DAY_NAMES.items():
         if day_word in t:
             days_ahead = (weekday_idx - today.weekday()) % 7

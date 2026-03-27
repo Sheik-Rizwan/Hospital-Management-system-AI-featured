@@ -1,5 +1,5 @@
 # language_utils.py — Auto-detect language from text using Unicode script analysis
-# Supports: Hindi (hi), Telugu (te), Kannada (kn), Tamil (ta), Urdu (ur), English (en)
+# Supports: Hindi (hi), Telugu (te), Kannada (kn), Tamil (ta), English (en)
 
 import logging
 import re
@@ -21,12 +21,6 @@ SCRIPT_RANGES = {
     'ta': [  # Tamil
         (0x0B80, 0x0BFF),  # Tamil
     ],
-    'ur': [  # Urdu (Arabic script)
-        (0x0600, 0x06FF),  # Arabic
-        (0x0750, 0x077F),  # Arabic Supplement
-        (0xFB50, 0xFDFF),  # Arabic Presentation Forms-A
-        (0xFE70, 0xFEFF),  # Arabic Presentation Forms-B
-    ],
 }
 
 # Language display names
@@ -36,7 +30,6 @@ LANGUAGE_NAMES = {
     'te': 'Telugu',
     'kn': 'Kannada',
     'ta': 'Tamil',
-    'ur': 'Urdu',
 }
 
 
@@ -73,7 +66,7 @@ def detect_language(text: str) -> str:
     """
     Detect the primary language of the given text using Unicode script analysis.
 
-    Returns: 'hi', 'te', 'kn', 'ur', or 'en' (default).
+    Returns: 'hi', 'te', 'kn', or 'en' (default).
 
     Logic:
     - Count characters in each Unicode script block.
@@ -99,10 +92,10 @@ def detect_language(text: str) -> str:
                      f"({max_indic_count} chars)")
         return max_indic_lang
 
-    # Check for Romanized Hindi/Urdu patterns (transliterated)
+    # Check for Romanized Hindi patterns (transliterated)
     romanized_patterns = _detect_romanized_hindi(text)
     if romanized_patterns:
-        logger.info(f"🌐 Detected Romanized Hindi/Urdu from patterns")
+        logger.info(f"🌐 Detected Romanized Hindi from patterns")
         return 'hi'
 
     # Check for Romanized Telugu patterns

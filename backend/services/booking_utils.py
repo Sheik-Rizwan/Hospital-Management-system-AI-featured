@@ -37,12 +37,9 @@ MULTILINGUAL_DAY_NAMES = {
     # Kannada
     'ಸೋಮವಾರ': 0, 'ಮಂಗಳವಾರ': 1, 'ಬುಧವಾರ': 2, 'ಗುರುವಾರ': 3,
     'ಶುಕ್ರವಾರ': 4, 'ಶನಿವಾರ': 5, 'ಭಾನುವಾರ': 6,
-    # Urdu
-    'پیر': 0, 'منگل': 1, 'بدھ': 2, 'جمعرات': 3,
-    'جمعہ': 4, 'ہفتہ': 5, 'اتوار': 6,
 }
 
-# Hindi/Urdu/Kannada/Telugu relative words — expanded multilingual
+# Hindi/Kannada/Telugu relative words — expanded multilingual
 TODAY_WORDS = [
     'today', 'aaj',
     # Hindi (Devanagari)
@@ -51,8 +48,6 @@ TODAY_WORDS = [
     'ఈ రోజు', 'ఈరోజు', 'నేడు',
     # Kannada
     'ಇಂದು', 'ಈ ದಿನ',
-    # Urdu
-    'آج',
 ]
 TOMORROW_WORDS = [
     'tomorrow', 'kal', 'kl',
@@ -62,8 +57,6 @@ TOMORROW_WORDS = [
     'రేపు',
     # Kannada
     'ನಾಳೆ',
-    # Urdu
-    'کل',
 ]
 DAY_AFTER_WORDS = [
     'day after tomorrow', 'parson', 'parso', 'parsu', 'narsu',
@@ -73,8 +66,6 @@ DAY_AFTER_WORDS = [
     'ఎల్లుండి',
     # Kannada
     'ನಾಡಿದ್ದು',
-    # Urdu
-    'پرسوں',
 ]
 
 # Multilingual "next" words (e.g., "agle somvaar" = next Monday)
@@ -86,8 +77,6 @@ NEXT_WORDS = [
     'వచ్చే', 'తర్వాత',
     # Kannada
     'ಮುಂದಿನ',
-    # Urdu
-    'اگلے', 'آنے والے',
 ]
 
 # Multilingual "in N days" patterns
@@ -97,7 +86,6 @@ IN_N_DAYS_PATTERNS = [
     r'(\d+)\s+दिन\s+(बाद|में)',                   # Hindi Devanagari
     r'(\d+)\s+రోజుల\s+తర్వాత',                   # Telugu
     r'(\d+)\s+ದಿನಗಳ\s+ನಂತರ',                    # Kannada
-    r'(\d+)\s+دن\s+بعد',                         # Urdu
 ]
 
 # Multilingual number words (for "teen din baad" = 3 days later)
@@ -124,9 +112,6 @@ NUMBER_WORDS = {
     # Kannada (Script)
     'ಒಂದು': 1, 'ಎರಡು': 2, 'ಮೂರು': 3, 'ನಾಲ್ಕು': 4, 'ಐದು': 5,
     'ಆರು': 6, 'ಏಳು': 7, 'ಎಂಟು': 8, 'ಒಂಬತ್ತು': 9, 'ಹತ್ತು': 10,
-    # Urdu
-    'ایک': 1, 'دو': 2, 'تین': 3, 'چار': 4, 'پانچ': 5,
-    'چھ': 6, 'سات': 7, 'آٹھ': 8, 'نو': 9, 'دس': 10,
 }
 
 # Multilingual shift/period words
@@ -135,7 +120,6 @@ MORNING_WORDS = [
     'सुबह', 'सवेरे',           # Hindi
     'ఉదయం', 'పొద్దున',         # Telugu
     'ಬೆಳಿಗ್ಗೆ', 'ಮುಂಜಾನೆ',     # Kannada
-    'صبح',                     # Urdu
     # Code-mixed (Hinglish/Kanglish/Telglish)
     'subah wala', 'morning ka', 'morning wala', 'morning wali',
     'beligge slot', 'udayam slot', 'morning lo', 'morning alli',
@@ -145,7 +129,6 @@ AFTERNOON_WORDS = [
     'दोपहर',                    # Hindi
     'మధ్యాహ్నం',                # Telugu
     'ಮಧ್ಯಾಹ್ನ',                 # Kannada
-    'دوپہر',                    # Urdu
     # Code-mixed
     'dopahar wala', 'afternoon ka', 'afternoon wala',
     'madhyahnam slot', 'madhyahna slot',
@@ -155,7 +138,6 @@ EVENING_WORDS = [
     'शाम',                      # Hindi
     'సాయంత్రం',                 # Telugu
     'ಸಂಜೆ',                     # Kannada
-    'شام',                      # Urdu
     # Code-mixed
     'sham wala', 'sham ka', 'evening ka', 'evening wala', 'evening wali',
     'sanje slot', 'sayantram slot', 'evening lo', 'evening alli',
@@ -165,7 +147,6 @@ NIGHT_WORDS = [
     'रात',                       # Hindi
     'రాత్రి',                    # Telugu
     'ರಾತ್ರಿ',                    # Kannada
-    'رات',                       # Urdu
     # Code-mixed
     'raat wala', 'raat ka', 'night ka', 'night wala', 'night wali',
     'raatri slot', 'night lo', 'night alli',
@@ -175,7 +156,7 @@ NIGHT_WORDS = [
 def resolve_date(text: str, today: date = None) -> tuple:
     """
     Parse natural language date text into YYYY-MM-DD.
-    Supports English, Hindi, Telugu, Kannada, Urdu in both native script and Romanized form.
+    Supports English, Hindi, Telugu, Kannada in both native script and Romanized form.
     Rejects past dates and 'today' (same-day bookings not allowed).
 
     Returns: (date_str: str | None, error_msg: str | None)
@@ -218,7 +199,7 @@ def resolve_date(text: str, today: date = None) -> tuple:
     for word, num in NUMBER_WORDS.items():
         if word in text_lower:
             # Check if followed by "din/days/रोजु/ದಿನ" type words
-            day_words = ['din', 'days', 'day', 'दिन', 'రోజు', 'రోజుల', 'ದಿನ', 'ದಿನಗಳ', 'دن']
+            day_words = ['din', 'days', 'day', 'दिन', 'రోజు', 'రోజుల', 'ದಿನ', 'ದಿನಗಳ']
             for dw in day_words:
                 if dw in text_lower:
                     d = today + timedelta(days=num)
@@ -234,7 +215,7 @@ def resolve_date(text: str, today: date = None) -> tuple:
             d = today + timedelta(days=days_ahead)
             return _validate_future(d, today)
 
-    # Multilingual day names (Hindi, Telugu, Kannada, Urdu)
+    # Multilingual day names (Hindi, Telugu, Kannada)
     for day_word, weekday_idx in MULTILINGUAL_DAY_NAMES.items():
         if day_word in text_lower:
             days_ahead = (weekday_idx - today.weekday()) % 7

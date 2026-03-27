@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
-import { API_BASE } from '../utils/api';
+import { API_BASE, SPECIALIZATIONS } from '../utils/api';
 
 // MUI Components
 import Box from '@mui/material/Box';
@@ -15,6 +15,10 @@ import Link from '@mui/material/Link';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Avatar from '@mui/material/Avatar';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 
 // Icons
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
@@ -127,25 +131,37 @@ const DoctorSignup = () => {
 
                     <Box component="form" onSubmit={handleSubmit} noValidate>
                         <Grid container spacing={2.5}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField fullWidth label="Full Name" name="full_name" value={formData.full_name} onChange={handleChange} required />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField fullWidth label="Email Address" name="email" type="email" value={formData.email} onChange={handleChange} required />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField fullWidth label="Specialty" name="specialty" placeholder="e.g. Cardiology" value={formData.specialty} onChange={handleChange} required />
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <FormControl fullWidth required>
+                                    <InputLabel>Specialty</InputLabel>
+                                    <Select
+                                        name="specialty"
+                                        value={formData.specialty}
+                                        label="Specialty"
+                                        onChange={handleChange}
+                                    >
+                                        {SPECIALIZATIONS.map(spec => (
+                                            <MenuItem key={spec} value={spec}>{spec}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField fullWidth label="Medical License #" name="license_number" value={formData.license_number} onChange={handleChange} required />
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid size={{ xs: 12 }}>
                                 <TextField fullWidth label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField fullWidth label="Password" name="password" type="password" value={formData.password} onChange={handleChange} required autoComplete="new-password" />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField fullWidth label="Confirm Password" name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} required autoComplete="new-password" />
                             </Grid>
                         </Grid>

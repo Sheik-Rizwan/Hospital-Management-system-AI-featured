@@ -101,6 +101,39 @@ class AIService:
                         "required": ["patient_name", "doctor_name", "date", "time"]
                     }
                 }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "list_my_appointments",
+                    "description": "Get a list of the user's active appointments. Call this whenever the user asks to check, cancel, or reschedule an appointment.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {},
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "cancel_appointment",
+                    "description": "Cancel an existing appointment. YOU MUST ALWAYS call list_my_appointments first to get the correct appointment_id. Call this if the user asks to cancel, or BEFORE booking a new appointment if they ask to reschedule.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "appointment_id": {
+                                "type": "string",
+                                "description": "The exact appointment ID from list_my_appointments (e.g. 'APT-12345678')."
+                            },
+                            "reason": {
+                                "type": "string",
+                                "description": "Reason for cancellation, e.g. 'Cancelled by patient for rescheduling'"
+                            }
+                        },
+                        "required": ["appointment_id"]
+                    }
+                }
             }
         ]
         
@@ -121,6 +154,13 @@ CORE RULES:
 9. If a slot is unavailable, suggest alternatives from check_availability output.
 10. You may call multiple tools in sequence — check availability, then book — in the same turn.
 11. NEVER output raw function call syntax like <function=name>{}</function>. Always use the proper tool calling mechanism.
+12. IF RESCHEDULING: 
+    - A reschedule means cancelling the old appointment and booking a new one.
+    - FIRST, call `list_my_appointments` to find their active appointments.
+    - If they have multiple, ask the user WHICH appointment they want to reschedule.
+    - Gather the new Date/Time and check availability.
+    - Once the new slot is agreed upon, call `cancel_appointment` with the old appointment ID and reason "Cancelled by patient for rescheduling".
+    - THEN call `book_appointment` for the new slot.
 
 SLOT-FILLING RULES — Collect these 5 fields before booking:
 1. Patient name — use registered name from context if booking for self. Only ask if booking for someone else.
@@ -154,7 +194,7 @@ MANDATORY CONFIRMATION: Before calling book_appointment, you MUST read all detai
 
 VOICE NOTES: If this is a voice conversation, avoid markdown symbols (* # etc). Speak naturally.
 
-MULTILINGUAL: Detect the user's language from their message. If the user writes in Hindi, Telugu, Kannada, or Urdu, respond in THAT SAME language. Keep doctor names, dates (YYYY-MM-DD), times (HH:MM), and appointment IDs in English, but write all conversational text in the user's language. If the user writes in English, respond in English. If Romanized Hindi (e.g. 'mujhe appointment chahiye'), respond in Hindi script.
+MULTILINGUAL: Detect the user's language from their message. If the user writes in Hindi, Telugu, or Kannada, respond in THAT SAME language. Keep doctor names, dates (YYYY-MM-DD), times (HH:MM), and appointment IDs in English, but write all conversational text in the user's language. If the user writes in English, respond in English. If Romanized Hindi (e.g. 'mujhe appointment chahiye'), respond in Hindi script.
 
 CODE-MIXED LANGUAGE (very common in India — handle naturally):
 - HINGLISH (Hindi + English): If user says "appointment book karo kal 10 baje", respond in same mixed style: "Dr. Sharma ka appointment kal 10 AM pe book karte hain."

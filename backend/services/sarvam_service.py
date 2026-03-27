@@ -40,7 +40,6 @@ except ImportError:
     SARVAM_SUPPORTED_LANGUAGES = {
         'te': {'name': 'Telugu', 'tts_code': 'te-IN', 'display': 'తెలుగు'},
         'hi': {'name': 'Hindi', 'tts_code': 'hi-IN', 'display': 'हिन्दी'},
-        'ur': {'name': 'Urdu', 'tts_code': 'ur-IN', 'display': 'اردو'},
         'kn': {'name': 'Kannada', 'tts_code': 'kn-IN', 'display': 'ಕನ್ನಡ'},
         'ta': {'name': 'Tamil', 'tts_code': 'ta-IN', 'display': 'தமிழ்'},
         'en': {'name': 'English', 'tts_code': 'en-IN', 'display': 'English'},
@@ -61,7 +60,6 @@ class SarvamService:
         'kn': 'vidya',
         'te': 'manisha',
         'ta': 'anushka',
-        'ur': 'anushka',
     }
 
     TTS_MODEL = os.getenv('SARVAM_TTS_MODEL', 'bulbul:v2')
@@ -127,14 +125,13 @@ class SarvamService:
         """
         text = user_input.lower().strip()
 
-        number_map = {'1': 'te', '2': 'hi', '3': 'ur', '4': 'kn', '5': 'ta', '6': 'en'}
+        number_map = {'1': 'te', '2': 'hi', '3': 'kn', '4': 'ta', '5': 'en'}
         if text in number_map:
             return number_map[text]
 
         language_aliases = {
             'te': ['telugu', 'తెలుగు', 'telgu', 'telugu language'],
             'hi': ['hindi', 'हिन्दी', 'हिंदी', 'hindi language'],
-            'ur': ['urdu', 'اردو', 'urdu language'],
             'kn': ['kannada', 'ಕನ್ನಡ', 'kannad', 'kannada language'],
             'ta': ['tamil', 'தமிழ்', 'thamizh', 'tamil language'],
             'en': ['english', 'eng', 'inglis', 'inglish', 'english language'],

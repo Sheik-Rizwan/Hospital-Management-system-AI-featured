@@ -38,18 +38,17 @@ except ImportError:
 # ═══════════════════════════════════════════
 
 # Only these 6 languages are trained/supported
-TRAINED_LANGUAGES = {'te', 'hi', 'en', 'ta', 'kn', 'ur'}
+TRAINED_LANGUAGES = {'te', 'hi', 'en', 'ta', 'kn'}
 
 # Unicode ranges for supported scripts
 # Telugu: 0C00-0C7F, Hindi/Devanagari: 0900-097F, Tamil: 0B80-0BFF
-# Kannada: 0C80-0CFF, Urdu/Arabic: 0600-06FF (subset), English/Latin: 0000-007F
+# Kannada: 0C80-0CFF, English/Latin: 0000-007F
 SUPPORTED_SCRIPT_RANGES = [
     (0x0000, 0x007F),   # Basic Latin (English)
     (0x0900, 0x097F),   # Devanagari (Hindi)
     (0x0B80, 0x0BFF),   # Tamil
     (0x0C00, 0x0C7F),   # Telugu
     (0x0C80, 0x0CFF),   # Kannada
-    (0x0600, 0x06FF),   # Arabic script (Urdu)
     (0x0020, 0x0040),   # Basic punctuation and digits
     (0x005B, 0x0060),   # More punctuation
     (0x007B, 0x007E),   # Braces, etc.
@@ -251,6 +250,7 @@ STATE_SELECT_TIME       = 'SELECT_TIME'
 STATE_CONFIRM           = 'CONFIRM'
 STATE_CHAT              = 'CHAT'
 STATE_VOICE_CHAT        = 'VOICE_CHAT'         # NEW: Sarvam voice AI chat
+STATE_RESCHEDULE        = 'RESCHEDULE'          # Reschedule appointment flow
 
 # Voice command mapping
 VOICE_COMMANDS = {
@@ -453,6 +453,18 @@ class WhatsAppService:
     def _process_state(self, sender_id, state, input_text, session):
         data = session.get('data', {})
 
+        # ── GLOBAL MENU INTERCEPTS ──
+        # If the user taps a button/list item from the main menu, handle it immediately
+        # regardless of their current state (e.g., they might be in CHAT or CONFIRM)
+        global_actions = {
+            'book_appointment', 'check_appointments', 'menu_more',
+            'reschedule_appointment', 'list_services', 'voice_booking'
+        }
+        if input_text.strip().lower() in global_actions:
+            self._transition_to(sender_id, STATE_MENU, clear_data=True)
+            self._handle_menu(sender_id, input_text)
+            return
+
         # ── INIT ──
         if state == STATE_INIT:
             self._transition_to(sender_id, STATE_MENU, clear_data=True)
@@ -486,6 +498,11 @@ class WhatsAppService:
         # ── AUTOMATION MENU ──
         if state == STATE_MENU:
             self._handle_menu(sender_id, input_text)
+            return
+
+        # ── RESCHEDULE ──
+        if state == STATE_RESCHEDULE:
+            self._handle_reschedule_selection(sender_id, input_text, data)
             return
 
         if state == STATE_BOOKING_FOR:
@@ -1255,6 +1272,24 @@ class WhatsAppService:
             )
         elif action == 'check_appointments':
             self._check_appointments(sender_id)
+        elif action == 'menu_more':
+            # Step 3: User tapped "More Options" → send full list
+            items = [
+                ("book_appointment", "📅 Book Appointment", "Book a new appointment"),
+                ("check_appointments", "🔍 Check Appointments", "View upcoming appointments"),
+                ("reschedule_appointment", "🔄 Reschedule", "Modify your current booking"),
+                ("list_services", "🏥 Services", "Browse available services"),
+                ("voice_booking", "🎤 Voice Booking", "Book via voice in your language"),
+            ]
+            self.notifier.send_whatsapp_list(
+                sender_id,
+                "👋 How can I help you today?",
+                items,
+                title="All Options",
+                button_text="See all options"
+            )
+        elif action == 'reschedule_appointment':
+            self._start_reschedule(sender_id)
         elif action == 'list_services':
             self._list_services(sender_id)
         elif action in ['voice_booking', 'voice', 'call']:
@@ -1262,7 +1297,7 @@ class WhatsAppService:
         else:
             # Route freeform text / non-English to AI chat for intelligent handling
             detected_lang = detect_language(input_text)
-            is_freeform = len(input_text.strip()) > 5 and not action.startswith(('book_', 'check_', 'list_'))
+            is_freeform = len(input_text.strip()) > 5 and not action.startswith(('book_', 'check_', 'list_', 'menu_', 'reschedule_'))
 
             if detected_lang != 'en' or is_freeform:
                 # Switch to AI chat mode and process the message there
@@ -1328,31 +1363,47 @@ class WhatsAppService:
             self._send_main_menu(sender_id)
             return
 
-        items = []
-        for svc in services[:10]:
-            items.append((
-                f"svc_{svc['service_id']}",
-                svc['service_name'][:24],
-                f"{svc.get('duration_minutes', 30)} min"
-            ))
-
-        self.notifier.send_whatsapp_list(
+        # Step 1: Show top 2 services as buttons + "See all options"
+        top_services = services[:2]
+        btn_titles = [svc['service_name'][:20] for svc in top_services] + ["See all options"]
+        btn_ids = [f"svc_{svc['service_id']}" for svc in top_services] + ["svc_more"]
+        self.notifier.send_whatsapp_buttons(
             sender_id,
             "🏥 Select a Service:",
-            items,
-            title="Services",
-            button_text="View Services"
+            btn_titles[:3],
+            btn_ids[:3]
         )
 
     def _handle_service_selection(self, sender_id, selection_id):
+        # Step 2: User tapped "See all options" → send full service list
+        if selection_id == 'svc_more':
+            services = self.appt_service.get_services()
+            if not services:
+                self.notifier.send_whatsapp_text(sender_id, "No services available.")
+                return
+            items = []
+            for svc in services[:10]:
+                items.append((
+                    f"svc_{svc['service_id']}",
+                    svc['service_name'][:24],
+                    svc.get('category', '')
+                ))
+            self.notifier.send_whatsapp_list(
+                sender_id,
+                "🏥 Select a Service:",
+                items,
+                title="All Services",
+                button_text="View Services"
+            )
+            return
+
         service_id = None
         
-        # Check if it's a list selection
+        # Check if it's a list/button selection
         if selection_id.startswith('svc_'):
             service_id = selection_id.replace('svc_', '', 1)
         else:
             # Try to match text input to a service name
-            # Remove punctuation and extra spaces
             import string
             input_clean = selection_id.translate(str.maketrans('', '', string.punctuation)).strip().lower()
             
@@ -1399,21 +1450,69 @@ class WhatsAppService:
     # ═══════════════════════════════════════════
 
     def _send_doctor_list(self, sender_id, doctors):
-        items = []
-        for doc in doctors[:10]:
-            name_clean = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
-            doc_label = f"Dr. {name_clean}"
-            spec = doc.get('specialization', '')
-            items.append((f"doc_{doc['user_id']}", doc_label[:24], spec[:72]))
-
-        self.notifier.send_whatsapp_list(
-            sender_id,
-            "👨‍⚕️ Select a Doctor:",
-            items,
-            title="Doctors"
-        )
+        if len(doctors) <= 2:
+            # 2 or fewer doctors — show as buttons directly (no "See all" needed)
+            btn_titles = []
+            btn_ids = []
+            for doc in doctors:
+                name_clean = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
+                btn_titles.append(f"Dr. {name_clean}"[:20])
+                btn_ids.append(f"doc_{doc['user_id']}")
+            self.notifier.send_whatsapp_buttons(
+                sender_id,
+                "👨‍⚕️ Select a Doctor:",
+                btn_titles,
+                btn_ids
+            )
+        else:
+            # Step 1: Show top 2 doctors as buttons + "See all options"
+            top_docs = doctors[:2]
+            btn_titles = []
+            btn_ids = []
+            for doc in top_docs:
+                name_clean = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
+                btn_titles.append(f"Dr. {name_clean}"[:20])
+                btn_ids.append(f"doc_{doc['user_id']}")
+            btn_titles.append("See all options")
+            btn_ids.append("doc_more")
+            self.notifier.send_whatsapp_buttons(
+                sender_id,
+                "👨‍⚕️ Select a Doctor:",
+                btn_titles[:3],
+                btn_ids[:3]
+            )
+            # Store the full doctor list in session for the doc_more handler
+            doc_ids = [doc['user_id'] for doc in doctors[:10]]
+            self._transition_to(sender_id, STATE_SELECT_DOCTOR, {'_pending_doctor_ids': doc_ids})
 
     def _handle_doctor_selection(self, sender_id, selection_id, data=None):
+        # Step 2: User tapped "See all options" → send full doctor list
+        if selection_id == 'doc_more':
+            data = data or {}
+            service_id = data.get('service_id')
+            pending_ids = data.get('_pending_doctor_ids', [])
+            if service_id:
+                doctors = self.appt_service.get_doctors_by_service(service_id)
+            elif pending_ids:
+                doctors = [self.appt_service.get_doctor_by_id(did) for did in pending_ids]
+                doctors = [d for d in doctors if d]  # filter None
+            else:
+                doctors = self.appt_service.get_active_doctors()
+            items = []
+            for doc in doctors[:10]:
+                name_clean = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
+                doc_label = f"Dr. {name_clean}"
+                spec = doc.get('specialization', '')
+                items.append((f"doc_{doc['user_id']}", doc_label[:24], spec[:72]))
+            self.notifier.send_whatsapp_list(
+                sender_id,
+                "👨‍⚕️ Select a Doctor:",
+                items,
+                title="All Doctors",
+                button_text="Select"
+            )
+            return
+
         doctor_id = None
         
         if selection_id.startswith('doc_'):
@@ -1900,7 +1999,7 @@ class WhatsAppService:
         patient_name = data.get('patient_name', patient.get('patient_name', '?') if patient else '?')
 
         try:
-            new_appt = self.appt_service.book_appointment({
+            appt_data = {
                 'patient_id': patient_id,
                 'patient_name': patient_name,
                 'doctor_id': data['doctor_id'],
@@ -1914,9 +2013,24 @@ class WhatsAppService:
                 'booked_for': data.get('booked_for', 'self'),
                 'created_by': 'whatsapp',
                 'created_by_id': sender_id
-            })
+            }
+            if data.get('reschedule_old_appt_id'):
+                appt_data['notes'] = f"Rescheduled from {data['reschedule_old_appt_id']}"
+
+            new_appt = self.appt_service.book_appointment(appt_data)
 
             appt_id = new_appt.get('appointment_id', '—')
+            
+            if data.get('reschedule_old_appt_id'):
+                try:
+                    self.appt_service.cancel_appointment(
+                        data['reschedule_old_appt_id'], 
+                        patient_id, 
+                        'patient', 
+                        f"Cancelled by patient for rescheduling to {appt_id}"
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to cancel old appointment during reschedule: {e}")
 
             confirm_msg = (
                 f"✅ *Appointment Booked!*\n\n"
@@ -1987,29 +2101,91 @@ class WhatsAppService:
 
         msg = "*🏥 Our Services:*\n\n"
         for i, svc in enumerate(services, 1):
-            msg += f"{i}. {svc['service_name']} ({svc.get('duration_minutes', 30)} min)\n"
+            msg += f"{i}. {svc['service_name']}\n"
 
         self.notifier.send_whatsapp_text(sender_id, msg)
         self._send_main_menu(sender_id)
+
+    # ═══════════════════════════════════════════
+    #  RESCHEDULE APPOINTMENT
+    # ═══════════════════════════════════════════
+
+    def _start_reschedule(self, sender_id):
+        """Show the patient's active appointments so they can pick one to reschedule."""
+        clean_phone = sender_id.replace('+', '').replace(' ', '')
+        patient = self.patient_service.get_patient_by_phone(clean_phone)
+
+        if not patient:
+            self.notifier.send_whatsapp_text(sender_id, "No patient record found.")
+            self._send_main_menu(sender_id)
+            return
+
+        appts = self.appt_service.get_patient_appointments(patient['patient_id'])
+        # Only show pending/confirmed (reschedule-able) appointments
+        active = [a for a in appts if a.get('status') in ('pending_doctor_approval', 'confirmed')]
+
+        if not active:
+            self.notifier.send_whatsapp_text(sender_id, "📭 No active appointments to reschedule.")
+            self._send_main_menu(sender_id)
+            return
+
+        self._transition_to(sender_id, STATE_RESCHEDULE, clear_data=True)
+
+        items = []
+        for a in active[:10]:
+            appt_id = a['appointment_id']
+            display = f"Dr. {a.get('doctor_name', '?')}"[:24]
+            desc = f"{a['date']} {self._format_time_display(a['start_time'])}"[:72]
+            items.append((f"resched_{appt_id}", display, desc))
+
+        self.notifier.send_whatsapp_list(
+            sender_id,
+            "🔄 *Reschedule Appointment*\n\nSelect the appointment you want to modify:",
+            items,
+            title="Your Appointments",
+            button_text="Select"
+        )
+
+    def _handle_reschedule_selection(self, sender_id, input_text, data):
+        """Handle user picking an appointment to reschedule."""
+        if not input_text.startswith('resched_'):
+            self.notifier.send_whatsapp_text(sender_id, "Please select an appointment from the list.")
+            self._start_reschedule(sender_id)
+            return
+
+        appt_id = input_text.replace('resched_', '', 1)
+
+        # Look up the appointment
+        clean_phone = sender_id.replace('+', '').replace(' ', '')
+        patient = self.patient_service.get_patient_by_phone(clean_phone)
+        user_id = patient.get('user_id', '') if patient else ''
+
+        self.notifier.send_whatsapp_text(
+            sender_id,
+            f"🔄 You selected to reschedule appointment *{appt_id}*.\n\n"
+            "Let's book a new slot first. When confirmed, your old appointment will be cancelled."
+        )
+
+        # Redirect into booking flow
+        patient_name = patient.get('patient_name', 'You') if patient else 'You'
+        self._transition_to(sender_id, STATE_SELECT_SERVICE, {
+            'booked_for': 'self',
+            'patient_name': patient_name,
+            'reschedule_old_appt_id': appt_id
+        })
+        self._send_service_list(sender_id)
 
     # ═══════════════════════════════════════════
     #  MAIN MENU
     # ═══════════════════════════════════════════
 
     def _send_main_menu(self, sender_id):
-        # Use list message to fit 4+ options (buttons limited to 3)
-        items = [
-            ("book_appointment", "📅 Book Appointment", "Book a new appointment"),
-            ("check_appointments", "🔍 Check Appointments", "View upcoming appointments"),
-            ("list_services", "🏥 Services", "Browse available services"),
-            ("voice_booking", "🎤 Voice Booking", "Book via voice in your language"),
-        ]
-        self.notifier.send_whatsapp_list(
+        # Step 1: Show top 2 actions as buttons + "More Options"
+        self.notifier.send_whatsapp_buttons(
             sender_id,
             "👋 How can I help you today?",
-            items,
-            title="Menu Options",
-            button_text="Select Option"
+            ["📅 Book Appointment", "🔍 Check Appts", "More Options"],
+            ["book_appointment", "check_appointments", "menu_more"]
         )
 
     # ═══════════════════════════════════════════
@@ -2065,7 +2241,7 @@ class WhatsAppService:
             services = self.appt_service.get_services()
             service_names = [s['service_name'] for s in services]
             
-            # Fetch doctor context if applicable (for Urdu/Hindi/Arabic matching)
+            # Fetch doctor context if applicable (for Hindi matching)
             session = self._get_session(sender_id)
             current_state = session.get('state')
             session_data = session.get('data', {})
@@ -2246,31 +2422,13 @@ class WhatsAppService:
         """Start the voice booking flow by asking for language selection."""
         self._transition_to(sender_id, STATE_LANG_SELECT, clear_data=True)
 
-        # Send language selection as a WhatsApp list
-        lang_items = [
-            ("lang_te", "తెలుగు (Telugu)", "Speak in Telugu"),
-            ("lang_hi", "हिन्दी (Hindi)", "Speak in Hindi"),
-            ("lang_ur", "اردو (Urdu)", "Speak in Urdu"),
-            ("lang_kn", "ಕನ್ನಡ (Kannada)", "Speak in Kannada"),
-            ("lang_ta", "தமிழ் (Tamil)", "Speak in Tamil"),
-            ("lang_en", "English", "Speak in English"),
-        ]
-
-        self.notifier.send_whatsapp_list(
+        # Step 1: Show English & Hindi as buttons + "Other Languages"
+        self.notifier.send_whatsapp_buttons(
             sender_id,
             "🌐 *Select Your Preferred Language*\n\n"
-            "Please choose the language you'd like to use for voice booking.\n\n"
-            "Available languages:\n"
-            "1️⃣ తెలుగు (Telugu)\n"
-            "2️⃣ हिन्दी (Hindi)\n"
-            "3️⃣ اردو (Urdu)\n"
-            "4️⃣ ಕನ್ನಡ (Kannada)\n"
-            "5️⃣ தமிழ் (Tamil)\n"
-            "6️⃣ English\n\n"
-            "_You can also type the language name or number._",
-            lang_items,
-            title="Languages",
-            button_text="Choose Language"
+            "Choose a language for voice booking:",
+            ["English", "हिन्दी (Hindi)", "Other Languages"],
+            ["lang_en", "lang_hi", "lang_more"]
         )
 
         # Also send a TTS audio of the language selection prompt (in English)
@@ -2284,7 +2442,26 @@ class WhatsAppService:
         """Handle user's language selection input."""
         text = input_text.strip()
 
-        # Check if it's a list selection (e.g. 'lang_te')
+        # Step 2: User tapped "Other Languages" → send full language list
+        if text == 'lang_more':
+            lang_items = [
+                ("lang_te", "తెలుగు (Telugu)", "Speak in Telugu"),
+                ("lang_hi", "हिन्दी (Hindi)", "Speak in Hindi"),
+                ("lang_kn", "ಕನ್ನಡ (Kannada)", "Speak in Kannada"),
+                ("lang_ta", "தமிழ் (Tamil)", "Speak in Tamil"),
+                ("lang_en", "English", "Speak in English"),
+            ]
+            self.notifier.send_whatsapp_list(
+                sender_id,
+                "🌐 *Select Your Preferred Language*\n\n"
+                "Choose the language you'd like to use for voice booking:",
+                lang_items,
+                title="All Languages",
+                button_text="Choose Language"
+            )
+            return
+
+        # Check if it's a list/button selection (e.g. 'lang_te')
         if text.startswith('lang_'):
             lang_code = text.replace('lang_', '')
         else:
@@ -2462,8 +2639,7 @@ class WhatsAppService:
                             "• Hindi (हिंदी)\n"
                             "• English\n"
                             "• Tamil (தமிழ்)\n"
-                            "• Kannada (ಕನ್ನಡ)\n"
-                            "• Urdu (اردو)\n\n"
+                            "• Kannada (ಕನ್ನಡ)\n\n"
                             "Please speak clearly in one of these languages.\n"
                             "कृपया इन भाषाओं में से किसी एक में स्पष्ट बोलें।"
                         )
@@ -2704,15 +2880,14 @@ class WhatsAppService:
             if not is_valid:
                 logger.warning(f"⚠️ INVALID TRANSCRIPT in VOICE_CHAT: {issue} - '{transcript[:60]}'")
                 _lang_not_detected = {
-                    'te': '⚠️ భాష గుర్తించబడలేదు. దయచేసి తెలుగు, హిందీ, ఇంగ్లీష్, తమిళం, కన్నడ లేదా ఉర్దూలో మాట్లాడండి.',
-                    'hi': '⚠️ भाषा पहचान नहीं हुई। कृपया हिंदी, अंग्रेजी, तेलुगु, तमिल, कन्नड़ या उर्दू में बोलें।',
-                    'ta': '⚠️ மொழி கண்டறியப்படவில்லை. தயவுசெய்து தமிழ், இந்தி, ஆங்கிலம், தெலுங்கு, கன்னடம் அல்லது உருது பேசுங்கள்.',
-                    'kn': '⚠️ ಭಾಷೆ ಪತ್ತೆಯಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಕನ್ನಡ, ಹಿಂದಿ, ಇಂಗ್ಲಿಷ್, ತೆಲುಗು, ತಮಿಳು ಅಥವಾ ಉರ್ದುವಿನಲ್ಲಿ ಮಾತನಾಡಿ.',
-                    'ur': '⚠️ زبان پہچان نہیں ہوئی۔ براہ کرم ہندی، انگریزی، تیلگو، تامل، کنڑ یا اردو میں بولیں۔'
+                    'te': '⚠️ భాష గుర్తించబడలేదు. దయచేసి తెలుగు, హిందీ, ఇంగ్లీష్, తమిళం లేదా కన్నడలో మాట్లాడండి.',
+                    'hi': '⚠️ भाषा पहचान नहीं हुई। कृपया हिंदी, अंग्रेजी, तेलुगु, तमिल या कन्नड़ में बोलें।',
+                    'ta': '⚠️ மொழி கண்டறியப்படவில்லை. தயவுசெய்து தமிழ், இந்தி, ஆங்கிலம், தெலுங்கு அல்லது கன்னடம் பேசுங்கள்.',
+                    'kn': '⚠️ ಭಾಷೆ ಪತ್ತೆಯಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಕನ್ನಡ, ಹಿಂದಿ, ಇಂಗ್ಲಿಷ್, ತೆಲುಗು ಅಥವಾ ತಮಿಳುನಲ್ಲಿ ಮಾತನಾಡಿ.',
                 }
                 self.notifier.send_whatsapp_text(
                     sender_id,
-                    _lang_not_detected.get(lang_code, "⚠️ Language not detected. Please speak in Telugu, Hindi, English, Tamil, Kannada, or Urdu.")
+                    _lang_not_detected.get(lang_code, "⚠️ Language not detected. Please speak in Telugu, Hindi, English, Tamil, or Kannada.")
                 )
                 return
 
@@ -3424,6 +3599,38 @@ class WhatsAppService:
                 else:
                     return _translate("FAILED to book. There was a conflict or error. Ask user to try another time.")
 
+            elif tool_name == "list_my_appointments":
+                clean_phone = sender_id.replace('+', '').replace(' ', '')
+                patient_rec = self.patient_service.get_patient_by_phone(clean_phone)
+                if not patient_rec:
+                    return _translate("User has no patient record. They have no appointments.")
+                appts = self.appt_service.get_patient_appointments(patient_rec['patient_id'])
+                active = [a for a in appts if a.get('status') in ('pending_doctor_approval', 'confirmed')]
+                if not active:
+                    return _translate("User has no active appointments.")
+                
+                result = "Active appointments:\n"
+                for a in active:
+                    doc_name = a.get('doctor_name', '?')
+                    result += f"- ID: {a['appointment_id']}, Date: {a['date']} {self._format_time_display(a['start_time'])}, Doctor: Dr. {doc_name}\n"
+                return result
+
+            elif tool_name == "cancel_appointment":
+                appt_id = tool_args.get("appointment_id", "")
+                reason = tool_args.get("reason", "Cancelled by user via AI")
+                if not appt_id or appt_id.lower() == 'auto':
+                    return _translate("You must provide a specific appointment_id to cancel.")
+
+                clean_phone = sender_id.replace('+', '').replace(' ', '')
+                patient_rec = self.patient_service.get_patient_by_phone(clean_phone)
+                patient_id = patient_rec['patient_id'] if patient_rec else ''
+
+                try:
+                    self.appt_service.cancel_appointment(appt_id, patient_id, 'patient', reason)
+                    return _translate(f"SUCCESS. Appointment {appt_id} was cancelled successfully. Tell the user it is done.")
+                except Exception as e:
+                    return _translate(f"FAILED to cancel. Error: {str(e)}")
+
             elif tool_name == "save_temporary_details":
                 patient_name = tool_args.get('patient_name', '').strip()
                 date_val = tool_args.get('date', '').strip()
@@ -3733,8 +3940,6 @@ class WhatsAppService:
             'avunu', 'kaadu', 'repu', 'eeroju', 'udayam', 'sayantram',
             # Kannada
             'haudu', 'illa', 'naale', 'beligge', 'sanje',
-            # Urdu
-            'jee', 'naheen',
         }
         if t_lower.strip() in short_valid:
             return False

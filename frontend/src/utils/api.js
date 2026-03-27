@@ -4,6 +4,28 @@ import { io } from 'socket.io-client';
 export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
+// Shared specialization list for doctor signup and booking flows
+export const SPECIALIZATIONS = [
+    'General Consultation',
+    'Cardiology',
+    'Dermatology',
+    'Orthopedics',
+    'Pediatrics',
+    'Dental General Consultation',
+    'Root Canal Specialist',
+    'Dental Surgeon',
+    'Pedodontist',
+    'Periodontist',
+    'Orthodontist',
+    'Neurology',
+    'Gynecology',
+    'ENT',
+    'Ophthalmology',
+    'Urology',
+    'Psychiatry',
+    'General Medicine',
+];
+
 // ============ Role-Specific Auth Helpers ============
 
 /**

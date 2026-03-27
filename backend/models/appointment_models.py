@@ -35,7 +35,7 @@ class Appointment:
     @staticmethod
     def to_dict(appointment_data: Dict) -> Dict:
         """Convert appointment data to dict for API response."""
-        return {
+        result = {
             'appointment_id': appointment_data.get('appointment_id'),
             'patient_id': appointment_data.get('patient_id'),
             'patient_name': appointment_data.get('patient_name', ''),
@@ -53,11 +53,16 @@ class Appointment:
             'created_by': appointment_data.get('created_by'),
             'created_by_id': appointment_data.get('created_by_id', ''),
             'created_at': appointment_data.get('created_at').isoformat() if hasattr(appointment_data.get('created_at', ''), 'isoformat') else str(appointment_data.get('created_at', '')),
-            'updated_at': appointment_data.get('updated_at').isoformat() if hasattr(appointment_data.get('updated_at', ''), 'isoformat') else str(appointment_data.get('updated_at', '')),
-            # Populated fields (joined from other collections)
-            'doctor_name': appointment_data.get('doctor_name', ''),
-            'doctor_specialization': appointment_data.get('doctor_specialization', '')
+            'updated_at': appointment_data.get('updated_at').isoformat() if hasattr(appointment_data.get('updated_at', ''), 'isoformat') else str(appointment_data.get('updated_at', ''))
         }
+        
+        # Populated fields (joined from other collections) - only set if they exist and are non-empty
+        if appointment_data.get('doctor_name'):
+            result['doctor_name'] = appointment_data.get('doctor_name')
+        if appointment_data.get('doctor_specialization'):
+            result['doctor_specialization'] = appointment_data.get('doctor_specialization')
+            
+        return result
 
 
 class DoctorSchedule:

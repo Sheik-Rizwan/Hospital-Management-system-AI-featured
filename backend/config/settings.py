@@ -27,7 +27,6 @@ SARVAM_MODEL = os.getenv('SARVAM_MODEL', 'sarvam-30b')
 SARVAM_SUPPORTED_LANGUAGES = {
     'te': {'name': 'Telugu', 'tts_code': 'te-IN', 'display': 'తెలుగు'},
     'hi': {'name': 'Hindi', 'tts_code': 'hi-IN', 'display': 'हिन्दी'},
-    'ur': {'name': 'Urdu', 'tts_code': 'ur-IN', 'display': 'اردو'},
     'kn': {'name': 'Kannada', 'tts_code': 'kn-IN', 'display': 'ಕನ್ನಡ'},
     'ta': {'name': 'Tamil', 'tts_code': 'ta-IN', 'display': 'தமிழ்'},
     'en': {'name': 'English', 'tts_code': 'en-IN', 'display': 'English'},

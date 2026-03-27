@@ -26,7 +26,6 @@ MULTILINGUAL SUPPORT — You MUST handle these languages fluently:
 - Telugu (తెలు): Respond in Telugu script when user speaks Telugu. Example: "నమస్కారం! మీ అపాయింట్‌మెంట్ బుక్ చేయడంలో నేను సహాయం చేయగలను."
 - Kannada (ಕನ್ನಡ): Respond in Kannada script when user speaks Kannada. Example: "ನಮಸ್ಕಾರ! ನಿಮ್ಮ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಮಾಡಲು ನಾನು ಸಹಾಯ ಮಾಡಬಹುದು."
 - Tamil (தமிழ்): Respond in Tamil script when user speaks Tamil. Example: "வணக்கம்! உங்கள் அப்பாயிண்ட்மென்ட் புக் செய்ய நான் உதவி செய்யலாம்."
-- Urdu (اردو): Respond in Urdu script when user speaks Urdu. Example: "السلام علیکم! آپ کی اپائنٹمنٹ بک کرنے میں مدد کروں؟"
 
 LANGUAGE DETECTION HINTS:
 - If user says "kal", "karna", "chahiye", "hai", "aaj", "doctor se milna" → they are speaking Hindi. Respond in Hindi.
@@ -34,7 +33,6 @@ LANGUAGE DETECTION HINTS:
 - If user uses Telugu script (తెలుగు) → respond in Telugu.
 - If user uses Kannada script (ಕನ್ನಡ) → respond in Kannada.
 - If user uses Tamil script (தமிழ்) → respond in Tamil.
-- If user uses Arabic/Urdu script (اردو) → respond in Urdu.
 - If user mixes English and another language (like Hinglish), respond in the SAME mixed style.
 
 CODE-MIXED LANGUAGE (Hinglish/Telglish/Kanglish) — Very common in India. Handle these naturally:
@@ -84,7 +82,6 @@ SLOT-FILLING RULES — Collect these 5 fields before booking:
    - Telugu: "రేపు" = tomorrow, "ఎల్లుండి" = day after, "సోమవారం" = Monday
    - Kannada: "ನಾಳೆ" = tomorrow, "ನಾಡಿದ್ದು" = day after, "ಸೋಮವಾರ" = Monday
    - Tamil: "நாளை" = tomorrow, "நாளை மறுநாள்" = day after, "திங்கள்" = Monday
-   - Urdu: "کل" = tomorrow, "پرسوں" = day after
    If user says today in any language, say 'Same-day bookings are not available, please choose from tomorrow onwards' IN THEIR LANGUAGE.
 5. Time — CRITICAL TIME RULES (convert spoken times to 24-hour HH:MM BEFORE calling any tool):
    - 'X and a half' = X:30 (e.g. '6 and a half' = '6:30', '9 and a half' = '9:30').
@@ -115,9 +112,9 @@ MISSING FIELDS: If the user provides all fields except one, ASK for that specifi
 
 # Language selection prompts for different languages
 LANGUAGE_SELECTION_TEXTS = {
-    'en': "Welcome! Please select your preferred language:\n1. Telugu (తెలుగు)\n2. Hindi (हिन्दी)\n3. Urdu (اردو)\n4. Kannada (ಕನ್ನಡ)\n5. Tamil (தமிழ்)\n6. English\n\nPlease say or type the language name or number.",
-    'hi': "नमस्ते! कृपया अपनी पसंदीदा भाषा चुनें:\n1. తెలుగు (Telugu)\n2. हिन्दी (Hindi)\n3. اردو (Urdu)\n4. ಕನ್ನಡ (Kannada)\n5. தமிழ் (Tamil)\n6. English",
-    'te': "స్వాగతం! దయచేసి మీ భాషను ఎంచుకోండి:\n1. తెలుగు (Telugu)\n2. हिन्दी (Hindi)\n3. اردو (Urdu)\n4. ಕನ್ನಡ (Kannada)\n5. தமிழ் (Tamil)\n6. English",
+    'en': "Welcome! Please select your preferred language:\n1. Telugu (తెలుగు)\n2. Hindi (हिन्दी)\n3. Kannada (ಕನ್ನಡ)\n4. Tamil (தமிழ்)\n5. English\n\nPlease say or type the language name or number.",
+    'hi': "नमस्ते! कृपया अपनी पसंदीदा भाषा चुनें:\n1. తెలుగు (Telugu)\n2. हिन्दी (Hindi)\n3. ಕನ್ನಡ (Kannada)\n4. தமிழ் (Tamil)\n5. English",
+    'te': "స్వాగతం! దయచేసి మీ భాషను ఎంచుకోండి:\n1. తెలుగు (Telugu)\n2. हिन्दी (Hindi)\n3. ಕನ್ನಡ (Kannada)\n4. தமிழ் (Tamil)\n5. English",
 }
 
 LANGUAGE_SELECTION_TTS = (
@@ -125,10 +122,9 @@ LANGUAGE_SELECTION_TTS = (
     "Please select your preferred language. "
     "For Telugu, press 1 or say Telugu. "
     "For Hindi, press 2 or say Hindi. "
-    "For Urdu, press 3 or say Urdu. "
-    "For Kannada, press 4 or say Kannada. "
-    "For Tamil, press 5 or say Tamil. "
-    "For English, press 6 or say English."
+    "For Kannada, press 3 or say Kannada. "
+    "For Tamil, press 4 or say Tamil. "
+    "For English, press 5 or say English."
 )
 
 # Empty response recovery prompts

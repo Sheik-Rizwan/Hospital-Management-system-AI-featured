@@ -16,12 +16,41 @@ class AppointmentService:
     #  SERVICES
     # ═══════════════════════════════════════════
 
+    def get_dynamic_specializations(self):
+        """Builds a map of dynamic service_id -> specialization from active doctors."""
+        doctors = list(self.mongo.doctors.find({'is_active': True}, {'_id': 0, 'specialization': 1}))
+        specs = {}
+        for doc in doctors:
+            spec = doc.get('specialization', '').strip()
+            if not spec:
+                spec = 'General'
+            safe_id = f"dyn_{spec.lower().replace(' ', '_').replace('&', 'and')}"
+            if safe_id not in specs:
+                specs[safe_id] = spec
+        return specs
+
     def get_services(self):
-        """Get all available services."""
-        return list(self.db.services.find({}, {'_id': 0}))
+        """Get all available services dynamically based on active doctors."""
+        specs = self.get_dynamic_specializations()
+        services = []
+        for safe_id, spec_name in sorted(specs.items(), key=lambda x: x[1]):
+            services.append({
+                'service_id': safe_id,
+                'service_name': spec_name,
+                'category': 'Consultation'
+            })
+        return services
 
     def get_service_by_id(self, service_id):
-        """Get a single service by ID."""
+        """Get a single service by ID, supporting dynamic doctor-derived IDs."""
+        if service_id and str(service_id).startswith('dyn_'):
+            specs = self.get_dynamic_specializations()
+            if service_id in specs:
+                return {
+                    'service_id': service_id,
+                    'service_name': specs[service_id],
+                    'category': 'Consultation'
+                }
         return self.db.services.find_one({'service_id': service_id}, {'_id': 0})
 
     # ═══════════════════════════════════════════
@@ -55,15 +84,20 @@ class AppointmentService:
         Get active doctors linked to a specific service.
         Prioritizes SPECIALIZATION matching to ensure doctors appear in the correct category.
         """
-        # 1. Get the service details to find the service name (e.g., "Cardiology")
-        service = self.db.services.find_one({'service_id': service_id})
-        if not service:
-            return []
+        # 1. Resolve service name dynamically or from DB
+        service_name = ''
+        if service_id and str(service_id).startswith('dyn_'):
+            specs = self.get_dynamic_specializations()
+            service_name = specs.get(service_id, '')
+        else:
+            service = self.db.services.find_one({'service_id': service_id})
+            if service:
+                service_name = service.get('service_name', '')
 
-        service_name = service.get('service_name', '')
+        if not service_name:
+            return []
         
         # 2. Find doctors where specialization matches the service name (case-insensitive)
-        # We also support mapped service_id as a fallback
         import re as _re
         safe_name = _re.escape(service_name.strip())
         query = {
@@ -74,8 +108,7 @@ class AppointmentService:
             ]
         }
         
-        doctors = list(self.mongo.doctors.find(query, {'_id': 0, 'password': 0}))
-        return doctors
+        return list(self.mongo.doctors.find(query, {'_id': 0, 'password': 0}))
 
     def get_doctor_by_id(self, doctor_id):
         """Get specific doctor details."""
@@ -484,21 +517,31 @@ class AppointmentService:
             return True
         return False
 
-    def cancel_appointment(self, appointment_id, user_id, role):
+    def cancel_appointment(self, appointment_id, user_id, role, reason="User requested cancellation"):
         """Cancel an appointment."""
         appt = self.db.appointments.find_one({'appointment_id': appointment_id})
         if not appt:
             raise ValueError("Appointment not found")
 
-        if appt['status'] not in ['pending', 'approved']:
+        # Allow cancellation for pending, approved, confirmed types
+        if appt['status'] not in ['pending', 'approved', 'pending_doctor_approval', 'confirmed']:
             raise ValueError(f"Cannot cancel appointment with status {appt['status']}")
 
         self.db.appointments.update_one(
             {'appointment_id': appointment_id},
-            {'$set': {'status': 'cancelled', 'updated_at': datetime.now()}}
+            {'$set': {'status': 'cancelled', 'updated_at': datetime.now(), 'rejection_reason': reason}}
         )
 
-        self.log_action(appointment_id, 'cancelled', user_id, role, "User requested cancellation")
+        self.log_action(appointment_id, 'cancelled', user_id, role, reason)
+        
+        # Notify doctor dashboard in real-time
+        from services.socket_service import notify_appointment_status_update
+        try:
+            notify_appointment_status_update(appt['doctor_id'], appointment_id, 'cancelled')
+        except Exception as e:
+            from logger_config import logger
+            logger.warning(f"Socket cancellation notify failed (non-critical): {e}")
+            
         return True
 
     def get_patient_appointments(self, patient_id):
