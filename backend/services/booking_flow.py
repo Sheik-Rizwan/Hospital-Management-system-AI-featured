@@ -634,15 +634,24 @@ class SmartBookingEngine:
             # Try to get from registered profile
             clean_phone = sender_id.replace('+', '').replace(' ', '')
             patient = self.patient.get_patient_by_phone(clean_phone)
-            if patient and patient.get('patient_name'):
+            
+            # Check for generic/placeholder names
+            def is_dummy_name(name):
+                if not name: return True
+                nl = name.lower()
+                return 'test whatsapp user' in nl or 'whatsapp user' in nl or 'test user' in nl or nl in ['guest', 'you', 'test', 'unknown']
+
+            if patient and patient.get('patient_name') and not is_dummy_name(patient['patient_name']):
                 bk['patient_name'] = patient['patient_name']
                 bk['booked_for'] = 'self'
                 # Continue
                 return self._advance_booking(sender_id, bk)
             else:
                 bk['booking_state'] = BK_COLLECT_NAME
+                if patient:
+                    bk['_updating_own_name'] = True
                 self.sm.transition_to(sender_id, bk)
-                self.notify.send_whatsapp_text(sender_id, "What is the *patient's name*?")
+                self.notify.send_whatsapp_text(sender_id, "What is your *Full Name*?")
                 return
 
         # ── ALL READY  BOOK ──
@@ -701,8 +710,8 @@ class SmartBookingEngine:
             return self._advance_booking(sender_id, data)
 
         # No match
+        self.notify.send_whatsapp_text(sender_id, "Invalid selection. Please choose a valid doctor from the options.")
         doctors = self.appt.get_active_doctors()
-        self._send_missing_doctor_two_step_messages(sender_id, doctors, text)
         if doctors:
             self._show_doctor_list_grouped(sender_id, doctors)
 
@@ -840,8 +849,29 @@ class SmartBookingEngine:
         if len(name) < 2:
             self.notify.send_whatsapp_text(sender_id, "Please enter a valid name.")
             return
+
         data['patient_name'] = name
-        data['booked_for'] = 'other'
+        
+        # Determine if they are booking for themselves based on the flag
+        if data.get('_updating_own_name'):
+            data['booked_for'] = 'self'
+            clean_phone = sender_id.replace('+', '').replace(' ', '')
+            patient = self.patient.get_patient_by_phone(clean_phone)
+            if patient:
+                # Save the new name permanently so it only asks once
+                self.patient.db.patients.update_one(
+                    {'phone': clean_phone},
+                    {'$set': {'patient_name': name}}
+                )
+                from mongodb_config import MongoDatabase
+                MongoDatabase().db.wa_users.update_one(
+                    {'phone': clean_phone},
+                    {'$set': {'name': name}}
+                )
+            del data['_updating_own_name']
+        else:
+            data['booked_for'] = 'other'
+
         # Persist name selection before advancing
         self.sm.transition_to(sender_id, data)
         self._advance_booking(sender_id, data)

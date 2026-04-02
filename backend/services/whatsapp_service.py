@@ -1323,6 +1323,17 @@ class WhatsAppService:
             clean_phone = sender_id.replace('+', '').replace(' ', '')
             patient = self.patient_service.get_patient_by_phone(clean_phone)
             patient_name = patient.get('patient_name', 'You') if patient else 'You'
+            
+            def is_dummy_name(name):
+                if not name: return True
+                nl = name.lower()
+                return 'test whatsapp user' in nl or 'whatsapp user' in nl or 'test user' in nl or nl in ['guest', 'you', 'test', 'unknown']
+
+            if is_dummy_name(patient_name):
+                # Prompt for real name instead of skipping
+                self._transition_to(sender_id, STATE_GUEST_NAME, {'updating_own_name': True})
+                self.notifier.send_whatsapp_text(sender_id, "What is your *Full Name*?")
+                return
 
             self._transition_to(sender_id, STATE_SELECT_SERVICE, {
                 'booked_for': 'self',
@@ -1331,7 +1342,7 @@ class WhatsAppService:
             self._send_service_list(sender_id)
 
         elif text == 'book_other' or any(w in text for w in ['other', 'someone', 'else']):
-            self._transition_to(sender_id, STATE_GUEST_NAME)
+            self._transition_to(sender_id, STATE_GUEST_NAME, {'updating_own_name': False})
             self.notifier.send_whatsapp_text(sender_id, "Please enter the *Patient's Full Name*:")
 
         else:
@@ -1344,11 +1355,30 @@ class WhatsAppService:
             )
 
     def _handle_guest_name(self, sender_id, patient_name):
+        session = self._get_session(sender_id)
+        data = session.get('data', {})
+        updating_own_name = data.get('updating_own_name', False)
+
+        if updating_own_name:
+            booked_for = 'self'
+            clean_phone = sender_id.replace('+', '').replace(' ', '')
+            self.patient_service.db.patients.update_one(
+                {'phone': clean_phone},
+                {'$set': {'patient_name': patient_name}}
+            )
+            self.db.wa_users.update_one(
+                {'phone': clean_phone},
+                {'$set': {'name': patient_name}}
+            )
+            self.notifier.send_whatsapp_text(sender_id, f" Name updated to: *{patient_name}*")
+        else:
+            booked_for = 'other'
+            self.notifier.send_whatsapp_text(sender_id, f" Booking for: *{patient_name}*")
+
         self._transition_to(sender_id, STATE_SELECT_SERVICE, {
-            'booked_for': 'other',
+            'booked_for': booked_for,
             'patient_name': patient_name
         })
-        self.notifier.send_whatsapp_text(sender_id, f" Booking for: *{patient_name}*")
         self._send_service_list(sender_id)
 
     # ═══════════════════════════════════════════
@@ -1539,22 +1569,29 @@ class WhatsAppService:
                 doctor_id = matched['user_id']
 
         if not doctor_id:
-            requested_name = str(selection_id or '').strip()
-            all_doctors = self.appt_service.get_active_doctors()
-            self._send_missing_doctor_two_step_messages(sender_id, all_doctors, requested_name)
+            self.notifier.send_whatsapp_text(sender_id, "Invalid selection. Please tap or select a valid option from the list.")
+            
             # Re-send the doctor list so the user can try again
             service_id = (data or {}).get('service_id')
             if service_id:
                 doctors = self.appt_service.get_doctors_by_service(service_id)
-                if doctors:
-                    self._send_doctor_list(sender_id, doctors)
+            else:
+                doctors = self.appt_service.get_active_doctors()
+            if doctors:
+                self._send_doctor_list(sender_id, doctors)
             return
 
         doctor = self.appt_service.get_doctor_by_id(doctor_id)
 
         if not doctor:
-            all_doctors = self.appt_service.get_active_doctors()
-            self._send_missing_doctor_two_step_messages(sender_id, all_doctors)
+            self.notifier.send_whatsapp_text(sender_id, "Doctor not found. Please tap or select a valid option from the list.")
+            service_id = (data or {}).get('service_id')
+            if service_id:
+                doctors = self.appt_service.get_doctors_by_service(service_id)
+            else:
+                doctors = self.appt_service.get_active_doctors()
+            if doctors:
+                self._send_doctor_list(sender_id, doctors)
             return
 
         self._transition_to(sender_id, STATE_SELECT_DATE, {
@@ -1888,16 +1925,25 @@ class WhatsAppService:
             # Try to extract hour (and optional minutes) from input
             matched_time = None
 
-            # Pattern: "7:30 am", "7:30 pm", "7:30"
-            m = re.search(r'(\d{1,2})\s*[:.]\s*(\d{2})\s*(am|pm|a\.m|p\.m)?', text_clean)
-            if m:
-                hour, minute = int(m.group(1)), int(m.group(2))
-                period = (m.group(3) or '').replace('.', '')
-                if period == 'pm' and hour != 12:
-                    hour += 12
-                elif period == 'am' and hour == 12:
-                    hour = 0
-                matched_time = f"{hour:02d}:{minute:02d}"
+            # First, check if input is a slot number (1-index based) matching the presented list
+            num_match = re.match(r'^\s*(\d{1,2})\s*$', text_clean)
+            if num_match:
+                idx = int(num_match.group(1)) - 1
+                if 0 <= idx < len(free_times):
+                    matched_time = free_times[idx]
+                    input_text = f"time_{matched_time}"
+            
+            if not matched_time:
+                # Pattern: "7:30 am", "7:30 pm", "7:30"
+                m = re.search(r'(\d{1,2})\s*[:.]\s*(\d{2})\s*(am|pm|a\.m|p\.m)?', text_clean)
+                if m:
+                    hour, minute = int(m.group(1)), int(m.group(2))
+                    period = (m.group(3) or '').replace('.', '')
+                    if period == 'pm' and hour != 12:
+                        hour += 12
+                    elif period == 'am' and hour == 12:
+                        hour = 0
+                    matched_time = f"{hour:02d}:{minute:02d}"
 
             # Pattern: "7 am", "7am", "7 pm", "7pm", or just "7"
             if not matched_time:
@@ -1927,13 +1973,13 @@ class WhatsAppService:
 
             if matched_time and matched_time in free_times:
                 input_text = f"time_{matched_time}"
-                logger.info(f" Fuzzy matched time '{text_clean}'  {matched_time}")
-            elif matched_time:
+                logger.info(f" Fuzzy matched time '{text_clean}' -> {matched_time}")
+            elif matched_time and not input_text.startswith('time_'):
                 # Try closest match (e.g. user says "7" but slot is "07:00")
                 closest = next((t for t in free_times if t.startswith(matched_time[:2] + ':')), None)
                 if closest:
                     input_text = f"time_{closest}"
-                    logger.info(f" Closest time match '{text_clean}'  {closest}")
+                    logger.info(f" Closest time match '{text_clean}' -> {closest}")
 
             if not input_text.startswith('time_'):
                 self.notifier.send_whatsapp_text(sender_id, "Invalid selection. Please pick a time slot.")
