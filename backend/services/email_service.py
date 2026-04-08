@@ -140,3 +140,106 @@ class EmailService:
         """
 
         return EmailService.send_email(vendor_email, subject, html_body)
+
+    @staticmethod
+    def send_appointment_confirmation(to_email, patient_name, doctor_name, date, time, appointment_id):
+        """
+        Send appointment confirmation email after doctor approval.
+        Returns True on success, False on failure.
+        """
+        subject = f"✅ Appointment Confirmed — {date} at {time}"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"></head>
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #f3f4f6;">
+            <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+                <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 28px 24px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 22px;">✅ Appointment Confirmed</h1>
+                    <p style="color: #d1fae5; margin: 6px 0 0; font-size: 14px;">{HOSPITAL_NAME}</p>
+                </div>
+
+                <div style="padding: 28px 24px;">
+                    <p style="font-size: 16px; color: #1f2937;">Dear <strong>{patient_name}</strong>,</p>
+
+                    <p style="font-size: 15px; color: #374151; line-height: 1.6;">
+                        Your appointment has been <strong style="color: #059669;">confirmed</strong>. Here are the details:
+                    </p>
+
+                    <div style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 14px 18px; border-radius: 4px; margin: 18px 0;">
+                        <p style="margin: 4px 0; color: #065f46;"><strong>🆔 Appointment ID:</strong> {appointment_id}</p>
+                        <p style="margin: 4px 0; color: #065f46;"><strong>👨‍⚕️ Doctor:</strong> Dr. {doctor_name}</p>
+                        <p style="margin: 4px 0; color: #065f46;"><strong>📅 Date:</strong> {date}</p>
+                        <p style="margin: 4px 0; color: #065f46;"><strong>🕐 Time:</strong> {time}</p>
+                    </div>
+
+                    <p style="font-size: 14px; color: #6b7280; line-height: 1.6;">
+                        Please arrive <strong>10 minutes early</strong>. If you need to reschedule, contact us via WhatsApp or phone.
+                    </p>
+                </div>
+
+                <div style="background: #f9fafb; padding: 16px 24px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                        This is an automated notification from {HOSPITAL_NAME}.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        return EmailService.send_email(to_email, subject, html_body)
+
+    @staticmethod
+    def send_appointment_reminder(to_email, patient_name, doctor_name, date, time, appointment_id):
+        """
+        Send appointment reminder email (e.g., 24 hours before).
+        Returns True on success, False on failure.
+        """
+        subject = f"⏰ Appointment Reminder — Tomorrow at {time}"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"></head>
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #f3f4f6;">
+            <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+
+                <div style="background: linear-gradient(135deg, #d97706, #f59e0b); padding: 28px 24px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 22px;">⏰ Appointment Reminder</h1>
+                    <p style="color: #fef3c7; margin: 6px 0 0; font-size: 14px;">{HOSPITAL_NAME}</p>
+                </div>
+
+                <div style="padding: 28px 24px;">
+                    <p style="font-size: 16px; color: #1f2937;">Dear <strong>{patient_name}</strong>,</p>
+
+                    <p style="font-size: 15px; color: #374151; line-height: 1.6;">
+                        This is a friendly reminder about your upcoming appointment:
+                    </p>
+
+                    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 4px; margin: 18px 0;">
+                        <p style="margin: 4px 0; color: #92400e;"><strong>🆔 Appointment ID:</strong> {appointment_id}</p>
+                        <p style="margin: 4px 0; color: #92400e;"><strong>👨‍⚕️ Doctor:</strong> Dr. {doctor_name}</p>
+                        <p style="margin: 4px 0; color: #92400e;"><strong>📅 Date:</strong> {date}</p>
+                        <p style="margin: 4px 0; color: #92400e;"><strong>🕐 Time:</strong> {time}</p>
+                    </div>
+
+                    <p style="font-size: 14px; color: #6b7280; line-height: 1.6;">
+                        Please arrive <strong>10 minutes early</strong>. If you cannot attend, please cancel or reschedule in advance.
+                    </p>
+                </div>
+
+                <div style="background: #f9fafb; padding: 16px 24px; text-align: center; border-top: 1px solid #e5e7eb;">
+                    <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                        This is an automated reminder from {HOSPITAL_NAME}.
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        return EmailService.send_email(to_email, subject, html_body)
+

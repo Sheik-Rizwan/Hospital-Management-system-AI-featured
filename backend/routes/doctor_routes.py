@@ -993,44 +993,107 @@ def update_appointment_status(appointment_id):
             'completed': 'Appointment marked as completed'
         }
 
-        # ── Send WhatsApp Notification ──
+        # ── Send Notifications on Approval/Rejection ──
         try:
-            # Fetch patient info — try patients collection directly
+            # Fetch patient info
             patient = db.patients.find_one({'patient_id': appointment['patient_id']})
-            
+
             # Get doctor info
-            doctor = db.doctors.find_one({'user_id': doctor_id}, {'full_name': 1, '_id': 0})
+            doctor = db.doctors.find_one({'user_id': doctor_id}, {'full_name': 1, 'email': 1, '_id': 0})
             doctor_name = doctor.get('full_name', '') if doctor else ''
-            
-            if patient and patient.get('phone'):
-                patient_phone = patient['phone']
-                patient_name = patient.get('patient_name', 'Patient')
-                
-                if new_status == 'approved':
+
+            patient_phone = patient.get('phone', '') if patient else ''
+            patient_name = patient.get('patient_name', 'Patient') if patient else 'Patient'
+            patient_email = patient.get('email', '') if patient else ''
+            doctor_email = doctor.get('email', '') if doctor else ''
+
+            appt_date = appointment.get('date', '')
+            appt_time = appointment.get('start_time', '')
+
+            if new_status == 'approved':
+                # 1. WhatsApp Notification
+                if patient_phone:
                     NotificationService.notify_appointment_approved(
-                        patient_phone,
-                        patient_name,
-                        appointment.get('date', ''),
-                        appointment.get('start_time', ''),
-                        doctor_name
+                        patient_phone, patient_name, appt_date, appt_time, doctor_name
                     )
                     logger.info(f"WhatsApp approval sent to {patient_phone}")
-                    
-                elif new_status == 'rejected':
+
+                # 2. Google Calendar — sync confirmed appointment
+                try:
+                    from services.google_calendar_service import GoogleCalendarService
+                    gcal = GoogleCalendarService()
+                    if gcal.is_available():
+                        calendar_event_id = gcal.add_appointment_event({
+                            'appointment_id': appointment_id,
+                            'patient_name': patient_name,
+                            'doctor_name': doctor_name,
+                            'date': appt_date,
+                            'start_time': appt_time,
+                            'end_time': appointment.get('end_time', ''),
+                        })
+                        if calendar_event_id:
+                            db.appointments.update_one(
+                                {'appointment_id': appointment_id},
+                                {'$set': {'calendar_event_id': calendar_event_id}}
+                            )
+                            logger.info(f"Google Calendar event created: {calendar_event_id}")
+                except Exception as cal_err:
+                    logger.warning(f"Google Calendar sync failed (non-critical): {cal_err}")
+
+                # 3. Email Notification — send to patient and doctor if emails exist
+                try:
+                    from services.email_service import EmailService
+                    if patient_email:
+                        EmailService.send_appointment_confirmation(
+                            patient_email, patient_name, doctor_name,
+                            appt_date, appt_time, appointment_id
+                        )
+                        logger.info(f"Confirmation email sent to patient: {patient_email}")
+                    if doctor_email:
+                        EmailService.send_appointment_confirmation(
+                            doctor_email, patient_name, doctor_name,
+                            appt_date, appt_time, appointment_id
+                        )
+                        logger.info(f"Confirmation email sent to doctor: {doctor_email}")
+                except Exception as email_err:
+                    logger.warning(f"Email notification failed (non-critical): {email_err}")
+
+                # 4. Outbound Voice Call — auto-call patient with Ritu
+                try:
+                    import requests as _requests
+                    public_url = os.environ.get('PUBLIC_BASE_URL', '')
+                    if public_url and patient_phone:
+                        from services.appointment_service import AppointmentService
+                        spoken_time = AppointmentService.format_time_ampm(appt_time)
+                        _requests.post(
+                            f"{public_url}/api/voice/outbound",
+                            json={
+                                'phone': patient_phone,
+                                'patient_name': patient_name,
+                                'doctor_name': doctor_name,
+                                'date': appt_date,
+                                'time': spoken_time,
+                                'appointment_id': appointment_id,
+                            },
+                            timeout=10
+                        )
+                        logger.info(f"Outbound voice call triggered to {patient_phone}")
+                except Exception as call_err:
+                    logger.warning(f"Outbound voice call failed (non-critical): {call_err}")
+
+            elif new_status == 'rejected':
+                if patient_phone:
                     NotificationService.notify_appointment_rejected(
-                        patient_phone,
-                        patient_name,
-                        appointment.get('date', ''),
-                        appointment.get('start_time', ''),
-                        doctor_name,
-                        data.get('rejection_reason', 'Not specified')
+                        patient_phone, patient_name, appt_date, appt_time,
+                        doctor_name, data.get('rejection_reason', 'Not specified')
                     )
                     logger.info(f"WhatsApp rejection sent to {patient_phone}")
-            else:
+
+            if not patient_phone:
                 logger.warning(f"No phone found for patient {appointment['patient_id']}")
-                
+
         except Exception as notify_error:
-            logger.error(f"Failed to send WhatsApp notification: {notify_error}", exc_info=True)
+            logger.error(f"Failed to send notifications: {notify_error}", exc_info=True)
         
         # Real-time: Notify the nurse/booker about appointment status
         try:

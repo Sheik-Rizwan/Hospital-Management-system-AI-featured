@@ -21,6 +21,8 @@ from services.sarvam_prompts import (
     EMPTY_RESPONSE_RETRY_PROMPT,
     FINAL_SYNTHESIS_PROMPT,
     EMPTY_FINAL_SYNTHESIS_PROMPT,
+    VOICE_BOT_PROMPT,
+    OUTBOUND_APPROVAL_PROMPT,
 )
 
 try:
@@ -55,24 +57,28 @@ class SarvamService:
 
     # TTS configuration
     LANGUAGE_SPEAKERS = {
-        'hi': 'manisha',
-        'en': 'anushka',
-        'kn': 'vidya',
-        'te': 'manisha',
-        'ta': 'anushka',
+        'hi': 'ritu',
+        'en': 'ritu',
+        'kn': 'ritu',
+        'te': 'ritu',
+        'ta': 'ritu',
     }
 
-    TTS_MODEL = os.getenv('SARVAM_TTS_MODEL', 'bulbul:v2')
+    TTS_MODEL = os.getenv('SARVAM_TTS_MODEL', 'bulbul:v3')
     MODEL_ALLOWED_SPEAKERS = {
-        'bulbul:v2': {'anushka', 'abhilash', 'manisha', 'vidya', 'arya', 'karun', 'hitesh'}
+        'bulbul:v2': {'anushka', 'abhilash', 'manisha', 'vidya', 'arya', 'karun', 'hitesh'},
+        'bulbul:v3': {'ritu', 'amol', 'kook', 'lisa', 'diya', 'amartya', 'neel', 'priya'},
     }
     LEGACY_SPEAKER_COMPAT_MAP = {
-        'simran': 'anushka',
-        'ritu': 'manisha',
-        'ishita': 'vidya',
+        'simran': 'ritu',
+        'anushka': 'ritu',
+        'manisha': 'ritu',
+        'ishita': 'ritu',
+        'vidya': 'ritu',
     }
     DEFAULT_MODEL_SPEAKER = {
-        'bulbul:v2': 'anushka'
+        'bulbul:v2': 'anushka',
+        'bulbul:v3': 'ritu',
     }
 
     def __init__(self):
@@ -959,6 +965,58 @@ class SarvamService:
         except Exception as e:
             logger.warning(f"Tool result translation failed, returning English: {e}")
             return text
+
+    def text_to_speech_raw(self, text, language_code='en', speaker=None):
+        """
+        Convert text to speech and return raw base64 audio bytes.
+        Unlike text_to_speech(), this does NOT save to disk — designed for streaming to Twilio.
+        Returns: base64 encoded audio string, or None on failure.
+        """
+        if not self.api_key:
+            logger.error("Sarvam API key not configured")
+            return None
+
+        tts_model = self.TTS_MODEL
+        speaker = self._resolve_tts_speaker(language_code=language_code, speaker=speaker, model_name=tts_model)
+
+        try:
+            lang_info = self.supported_languages.get(language_code, {})
+            target_lang = lang_info.get('tts_code', 'en-IN')
+
+            payload = {
+                "inputs": [text],
+                "target_language_code": target_lang,
+                "speaker": speaker,
+                "model": tts_model,
+                "pitch": 0,
+                "pace": 1.0,
+                "loudness": 1.5,
+                "enable_preprocessing": True
+            }
+
+            logger.info(f"Sarvam TTS Raw: '{text[:60]}...' lang={target_lang} speaker={speaker}")
+
+            response = requests.post(
+                SARVAM_TTS_URL,
+                headers=self._get_headers(),
+                json=payload,
+                timeout=30
+            )
+
+            if response.status_code == 200:
+                result = response.json()
+                audios = result.get('audios', [])
+                if audios and audios[0]:
+                    return audios[0]  # Return base64 string directly
+                logger.error("Sarvam TTS Raw: No audio in response")
+                return None
+            else:
+                logger.error(f"Sarvam TTS Raw error {response.status_code}: {response.text}")
+                return None
+
+        except Exception as e:
+            logger.error(f"Sarvam TTS Raw exception: {e}")
+            return None
 
     # ═══════════════════════════════════════════
     #  UTILITY

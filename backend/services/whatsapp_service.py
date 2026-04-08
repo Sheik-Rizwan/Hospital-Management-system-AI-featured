@@ -19,6 +19,7 @@ from logger_config import logger
 from services.booking_flow import SmartBookingEngine, BK_IDLE
 from services.booking_utils import resolve_date, resolve_time, resolve_ambiguous_time, validate_booking_date, get_doctor_weekly_schedule
 from services.language_utils import detect_language, get_language_name, get_response_language_instruction
+from services.localization_service import LocalizationService
 
 # Lazy import to avoid circular deps with Flask app context
 def _notify_doctor_new_appointment(doctor_id, appointment_data):
@@ -1263,12 +1264,12 @@ class WhatsAppService:
         action = input_text.strip().lower()
 
         if action == 'book_appointment':
-            self._transition_to(sender_id, STATE_BOOKING_FOR, clear_data=True)
+            self._transition_to(sender_id, STATE_LANG_SELECT, {'flow_type': 'text_booking'}, clear_data=True)
             self.notifier.send_whatsapp_buttons(
                 sender_id,
-                "Who is this appointment for?",
-                ["Myself", "Someone Else"],
-                ["book_self", "book_other"]
+                " *Select Your Preferred Language*\n\nChoose a language:",
+                ["English", "हिन्दी (Hindi)", "Other Languages"],
+                ["lang_en", "lang_hi", "lang_more"]
             )
         elif action == 'check_appointments':
             self._check_appointments(sender_id)
@@ -1329,10 +1330,12 @@ class WhatsAppService:
                 nl = name.lower()
                 return 'test whatsapp user' in nl or 'whatsapp user' in nl or 'test user' in nl or nl in ['guest', 'you', 'test', 'unknown']
 
-            if is_dummy_name(patient_name):
-                # Prompt for real name instead of skipping
+                session = self._get_session(sender_id)
+                lang = session.get('data', {}).get('language', 'en')
+                ask_name = LocalizationService.get('ask_own_name', lang)
+                
                 self._transition_to(sender_id, STATE_GUEST_NAME, {'updating_own_name': True})
-                self.notifier.send_whatsapp_text(sender_id, "What is your *Full Name*?")
+                self.notifier.send_whatsapp_text(sender_id, ask_name)
                 return
 
             self._transition_to(sender_id, STATE_SELECT_SERVICE, {
@@ -1342,15 +1345,25 @@ class WhatsAppService:
             self._send_service_list(sender_id)
 
         elif text == 'book_other' or any(w in text for w in ['other', 'someone', 'else']):
+            session = self._get_session(sender_id)
+            lang = session.get('data', {}).get('language', 'en')
+            ask_name = LocalizationService.get('ask_patient_name', lang)
+            
             self._transition_to(sender_id, STATE_GUEST_NAME, {'updating_own_name': False})
-            self.notifier.send_whatsapp_text(sender_id, "Please enter the *Patient's Full Name*:")
+            self.notifier.send_whatsapp_text(sender_id, ask_name)
 
         else:
+            session = self._get_session(sender_id)
+            lang = session.get('data', {}).get('language', 'en')
+            book_who = LocalizationService.get('book_who', lang)
+            btn_myself = LocalizationService.get('btn_myself', lang)
+            btn_someone_else = LocalizationService.get('btn_someone_else', lang)
+            
             self.notifier.send_whatsapp_text(sender_id, "Please select *Myself* or *Someone Else*.")
             self.notifier.send_whatsapp_buttons(
                 sender_id,
-                "Who is this appointment for?",
-                ["Myself", "Someone Else"],
+                book_who,
+                [btn_myself[:20], btn_someone_else[:20]],
                 ["book_self", "book_other"]
             )
 
@@ -1386,44 +1399,60 @@ class WhatsAppService:
     # ═══════════════════════════════════════════
 
     def _send_service_list(self, sender_id):
+        session = self._get_session(sender_id)
+        lang = session.get('data', {}).get('language', 'en')
+        no_services = LocalizationService.get('no_services', lang)
+        see_all_options = LocalizationService.get('see_all_options', lang)
+        select_service = LocalizationService.get('select_service', lang)
+        
         services = self.appt_service.get_services()
         if not services:
-            self.notifier.send_whatsapp_text(sender_id, "No services available at the moment.")
+            self.notifier.send_whatsapp_text(sender_id, no_services)
             self._transition_to(sender_id, STATE_MENU, clear_data=True)
             self._send_main_menu(sender_id)
             return
 
         # Step 1: Show top 2 services as buttons + "See all options"
         top_services = services[:2]
-        btn_titles = [svc['service_name'][:20] for svc in top_services] + ["See all options"]
+        btn_titles = [LocalizationService.get_bilingual_name(svc['service_name'], lang)[:20] for svc in top_services] + [see_all_options[:20]]
         btn_ids = [f"svc_{svc['service_id']}" for svc in top_services] + ["svc_more"]
         self.notifier.send_whatsapp_buttons(
             sender_id,
-            " Select a Service:",
+            f" {select_service}",
             btn_titles[:3],
             btn_ids[:3]
         )
 
     def _handle_service_selection(self, sender_id, selection_id):
+        session = self._get_session(sender_id)
+        lang = session.get('data', {}).get('language', 'en')
+        
         # Step 2: User tapped "See all options"  send full service list
         if selection_id == 'svc_more':
             services = self.appt_service.get_services()
             if not services:
-                self.notifier.send_whatsapp_text(sender_id, "No services available.")
+                no_services = LocalizationService.get('no_services', lang)
+                self.notifier.send_whatsapp_text(sender_id, no_services)
                 return
             items = []
             for svc in services[:10]:
+                svc_bilingual = LocalizationService.get_bilingual_name(svc['service_name'], lang)
                 items.append((
                     f"svc_{svc['service_id']}",
-                    svc['service_name'][:24],
+                    svc_bilingual[:24],
                     svc.get('category', '')
                 ))
+                
+            select_service = LocalizationService.get('select_service', lang)
+            all_services = LocalizationService.get('all_services', lang)
+            view_services = LocalizationService.get('view_services', lang)
+            
             self.notifier.send_whatsapp_list(
                 sender_id,
-                " Select a Service:",
+                f" {select_service}",
                 items,
-                title="All Services",
-                button_text="View Services"
+                title=all_services[:24],
+                button_text=view_services[:20]
             )
             return
 
@@ -1448,7 +1477,8 @@ class WhatsAppService:
                 service_id = matched['service_id']
         
         if not service_id:
-            self.notifier.send_whatsapp_text(sender_id, "Invalid selection. Please pick from the list.")
+            invalid_selection = LocalizationService.get('invalid_selection', lang)
+            self.notifier.send_whatsapp_text(sender_id, invalid_selection)
             self._send_service_list(sender_id)
             return
 
@@ -1462,9 +1492,10 @@ class WhatsAppService:
         doctors = self.appt_service.get_doctors_by_service(service_id)
 
         if not doctors:
+            no_doctors_service = LocalizationService.get('no_doctors_service', lang)
             self.notifier.send_whatsapp_text(
                 sender_id,
-                f"No doctors available for *{service['service_name']}*. Please try another service."
+                f"*{service['service_name']}* - {no_doctors_service}"
             )
             self._send_service_list(sender_id)
             return
@@ -1480,17 +1511,23 @@ class WhatsAppService:
     # ═══════════════════════════════════════════
 
     def _send_doctor_list(self, sender_id, doctors):
+        session = self._get_session(sender_id)
+        lang = session.get('data', {}).get('language', 'en')
+        select_doctor = LocalizationService.get('select_doctor', lang)
+        see_all_options = LocalizationService.get('see_all_options', lang)
+        
         if len(doctors) <= 2:
             # 2 or fewer doctors — show as buttons directly (no "See all" needed)
             btn_titles = []
             btn_ids = []
             for doc in doctors:
                 name_clean = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
-                btn_titles.append(f"Dr. {name_clean}"[:20])
+                dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang)
+                btn_titles.append(dr_bilingual[:20])
                 btn_ids.append(f"doc_{doc['user_id']}")
             self.notifier.send_whatsapp_buttons(
                 sender_id,
-                "‍️ Select a Doctor:",
+                f"‍️ {select_doctor}",
                 btn_titles,
                 btn_ids
             )
@@ -1501,13 +1538,14 @@ class WhatsAppService:
             btn_ids = []
             for doc in top_docs:
                 name_clean = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
-                btn_titles.append(f"Dr. {name_clean}"[:20])
+                dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang)
+                btn_titles.append(dr_bilingual[:20])
                 btn_ids.append(f"doc_{doc['user_id']}")
-            btn_titles.append("See all options")
+            btn_titles.append(see_all_options[:20])
             btn_ids.append("doc_more")
             self.notifier.send_whatsapp_buttons(
                 sender_id,
-                "‍️ Select a Doctor:",
+                f"‍️ {select_doctor}",
                 btn_titles[:3],
                 btn_ids[:3]
             )
@@ -1516,6 +1554,9 @@ class WhatsAppService:
             self._transition_to(sender_id, STATE_SELECT_DOCTOR, {'_pending_doctor_ids': doc_ids})
 
     def _handle_doctor_selection(self, sender_id, selection_id, data=None):
+        session = self._get_session(sender_id)
+        lang = session.get('data', {}).get('language', 'en')
+        
         # Step 2: User tapped "See all options"  send full doctor list
         if selection_id == 'doc_more':
             data = data or {}
@@ -1531,15 +1572,21 @@ class WhatsAppService:
             items = []
             for doc in doctors[:10]:
                 name_clean = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
-                doc_label = f"Dr. {name_clean}"
+                dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang)
                 spec = doc.get('specialization', '')
-                items.append((f"doc_{doc['user_id']}", doc_label[:24], spec[:72]))
+                spec_bilingual = LocalizationService.get_bilingual_name(spec, lang)
+                items.append((f"doc_{doc['user_id']}", dr_bilingual[:24], spec_bilingual[:72]))
+                
+            select_doctor = LocalizationService.get('select_doctor', lang)
+            all_doctors = LocalizationService.get('all_doctors', lang)
+            select_btn = LocalizationService.get('select', lang)
+            
             self.notifier.send_whatsapp_list(
                 sender_id,
-                "‍️ Select a Doctor:",
+                f"‍️ {select_doctor}",
                 items,
-                title="All Doctors",
-                button_text="Select"
+                title=all_doctors[:24],
+                button_text=select_btn[:20]
             )
             return
 
@@ -1606,12 +1653,16 @@ class WhatsAppService:
     # ═══════════════════════════════════════════
 
     def _send_available_dates(self, sender_id, doctor_id, doctor_name):
+        session = self._get_session(sender_id)
+        lang = session.get('data', {}).get('language', 'en')
+        
         available = self.appt_service.get_doctor_available_dates(doctor_id, num_dates=10)
 
         if not available:
+            no_dates = LocalizationService.get('no_dates_doctor', lang)
             self.notifier.send_whatsapp_text(
                 sender_id,
-                f"No available dates for Dr. {doctor_name}. Please try another doctor."
+                f"Dr. {doctor_name} - {no_dates}"
             )
             self._transition_to(sender_id, STATE_MENU, clear_data=True)
             self._send_main_menu(sender_id)
@@ -1625,11 +1676,14 @@ class WhatsAppService:
                 d['date']
             ))
 
+        select_date = LocalizationService.get('select_date', lang)
+        available_dates = LocalizationService.get('available_dates', lang)
+
         self.notifier.send_whatsapp_list(
             sender_id,
-            f" Dr. {doctor_name}\nSelect an available date:",
+            f" Dr. {doctor_name}\n{select_date}",
             items,
-            title="Available Dates"
+            title=available_dates[:24]
         )
 
     def _parse_natural_date(self, text):
@@ -2014,18 +2068,25 @@ class WhatsAppService:
         patient_name = data.get('patient_name', 'You')
         booked_for = data.get('booked_for', 'self')
 
+        lang = data.get('language', 'en')
+        confirm_title = LocalizationService.get('confirm_title', lang)
+        confirm_prompt = LocalizationService.get('confirm_prompt', lang)
+        btn_confirm = LocalizationService.get('btn_confirm', lang)
+        btn_cancel = LocalizationService.get('btn_cancel', lang)
+
+        svc_bilingual = LocalizationService.get_bilingual_name(data.get('service_name', '—'), lang)
+        dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {data.get('doctor_name', '—')}", lang)
+
         summary = (
-            f"* Confirm Booking?*\n\n"
+            f" {confirm_title}\n\n"
+            f"{confirm_prompt}\n"
             f" Patient: {patient_name}\n"
-            f" Service: {data.get('service_name', '—')}\n"
-            f"‍️ Doctor: Dr. {data.get('doctor_name', '—')}\n"
-            f" Specialization: {data.get('doctor_specialization', 'General')}\n"
+            f" Service: {svc_bilingual}\n"
+            f"‍️ Doctor: {dr_bilingual}\n"
             f" Date: {data['date']}\n"
-            f" Shift: {data.get('shift', '—')}\n"
-            f" Time: {self._format_time_display(time_str)} – {self._format_time_display(end_time)}\n\n"
-            f"_Please arrive 10 minutes early._"
+            f" Time: {self._format_time_display(time_str)} – {self._format_time_display(end_time)}"
         )
-        self.notifier.send_whatsapp_buttons(sender_id, summary, [" Confirm", " Cancel"], ["confirm_yes", "confirm_no"])
+        self.notifier.send_whatsapp_buttons(sender_id, summary, [btn_confirm[:20], btn_cancel[:20]], ["confirm_yes", "confirm_no"])
 
     # ═══════════════════════════════════════════
     #  CONFIRMATION
@@ -2097,18 +2158,18 @@ class WhatsAppService:
                 except Exception as e:
                     logger.warning(f"Failed to cancel old appointment during reschedule: {e}")
 
+            lang = data.get('language', 'en')
+            booking_success = LocalizationService.get('booking_success', lang)
+            
+            dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {data.get('doctor_name', '—')}", lang)
+            
             confirm_msg = (
-                f" *Appointment Booked!*\n\n"
+                f" {booking_success} {patient_name}\n\n"
                 f"🆔 ID: {appt_id}\n"
-                f" Patient: {patient_name}\n"
-                f" Service: {data.get('service_name', '—')}\n"
-                f"‍️ Doctor: Dr. {data.get('doctor_name', '—')}\n"
-                f" Specialization: {data.get('doctor_specialization', 'General')}\n"
+                f"‍️ Doctor: {dr_bilingual}\n"
                 f" Date: {data['date']}\n"
-                f" Shift: {data.get('shift', '—')}\n"
                 f" Time: {self._format_time_display(data['time'])} – {self._format_time_display(data.get('end_time', ''))}\n\n"
-                f" Status: Pending Doctor Approval\n"
-                f"_You will receive a notification once confirmed._"
+                f" Status: Pending Doctor Approval"
             )
             self.notifier.send_whatsapp_text(sender_id, confirm_msg)
             # Notify doctor in real-time via socket so dashboard updates instantly
@@ -2119,7 +2180,8 @@ class WhatsAppService:
             self.notifier.send_whatsapp_text(sender_id, f" Booking Failed: {str(e)}")
 
         self._transition_to(sender_id, STATE_MENU, clear_data=True)
-        self._send_main_menu(sender_id)
+        # Note: Deliberately skipped self._send_main_menu(sender_id) here so the 
+        # menu doesn't immediately prompt again after booking confirmation.
 
     # ═══════════════════════════════════════════
     #  CHECK APPOINTMENTS
@@ -2548,34 +2610,54 @@ class WhatsAppService:
         lang_name = lang_info['name']
         lang_display = lang_info['display']
 
-        # Save language selection and transition to voice chat
-        self._transition_to(sender_id, STATE_VOICE_CHAT, {
-            'language': lang_code,
-            'messages': []
-        })
+        session = self._get_session(sender_id)
+        session_data = session.get('data', {})
+        flow_type = session_data.get('flow_type', 'voice_booking')
 
-        # Send confirmation
-        confirm_msg = (
-            f" Language set to *{lang_display} ({lang_name})*\n\n"
-            f" You can now send voice notes or type in {lang_name} to book appointments.\n\n"
-            f"_Send a voice note or type your request to get started!_"
-        )
-        self.notifier.send_whatsapp_text(sender_id, confirm_msg)
-
-        # Send TTS greeting in chosen language
-        if self.sarvam and self.sarvam.is_available():
-            greetings = {
-                'te': "నమస్కారం! హాస్పిటల్ అపాయింట్మెంట్ బుకింగ్ సర్వీస్‌కి స్వాగతం. మీకు ఎలా సహాయం చేయగలను?",
-                'hi': "नमस्ते! हॉस्पिटल अपॉइंटमेंट बुकिंग सर्विस में आपका स्वागत है। मैं आपकी कैसे मदद कर सकता हूं?",
-                'ur': "السلام علیکم! ہسپتال اپائنٹمنٹ بکنگ سروس میں خوش آمدید۔ میں آپ کی کیسے مدد کر سکتا ہوں؟",
-                'kn': "ನಮಸ್ಕಾರ! ಆಸ್ಪತ್ರೆ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕಿಂಗ್ ಸೇವೆಗೆ ಸ್ವಾಗತ. ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
-                'ta': "வணக்கம்! மருத்துவமனை அப்பாயிண்ட்மென்ட் புக்கிங் சேவைக்கு வரவேற்கிறேன். நான் உங்களுக்கு எப்படி உதவி செய்யலாம்?",
-                'en': "Welcome to the hospital appointment booking service. How can I help you today?",
-            }
-            greeting = greetings.get(lang_code, greetings['en'])
-            audio_path = self.sarvam.text_to_speech(greeting, lang_code)
-            if audio_path:
-                self._send_whatsapp_audio(sender_id, audio_path)
+        if flow_type == 'text_booking':
+            self._transition_to(sender_id, STATE_BOOKING_FOR, {'language': lang_code}, clear_data=True)
+            self.notifier.send_whatsapp_text(
+                sender_id, f" Language set to *{lang_display} ({lang_name})*"
+            )
+            book_who = LocalizationService.get('book_who', lang_code)
+            btn_myself = LocalizationService.get('btn_myself', lang_code)
+            btn_someone_else = LocalizationService.get('btn_someone_else', lang_code)
+            
+            self.notifier.send_whatsapp_buttons(
+                sender_id,
+                book_who,
+                [btn_myself[:20], btn_someone_else[:20]],
+                ["book_self", "book_other"]
+            )
+        else:
+            # Save language selection and transition to voice chat
+            self._transition_to(sender_id, STATE_VOICE_CHAT, {
+                'language': lang_code,
+                'messages': []
+            })
+            
+            # Send confirmation
+            confirm_msg = (
+                f" Language set to *{lang_display} ({lang_name})*\n\n"
+                f" You can now send voice notes or type in {lang_name} to book appointments.\n\n"
+                f"_Send a voice note or type your request to get started!_"
+            )
+            self.notifier.send_whatsapp_text(sender_id, confirm_msg)
+            
+            # Send TTS greeting in chosen language
+            if self.sarvam and self.sarvam.is_available():
+                greetings = {
+                    'te': "నమస్కారం! హాస్పిటల్ అపాయింట్మెంట్ బుకింగ్ సర్వీస్‌కి స్వాగతం. మీకు ఎలా సహాయం చేయగలను?",
+                    'hi': "नमस्ते! हॉस्पिटल अपॉइंटमेंट बुकिंग सर्विस में आपका स्वागत है। मैं आपकी कैसे मदद कर सकता हूं?",
+                    'ur': "السلام علیکم! ہسپتال اپائنٹمنٹ بکنگ سروس میں خوش آمدید۔ میں آپ کی کیسے مدد کر سکتا ہوں؟",
+                    'kn': "ನಮಸ್ಕಾರ! ಆಸ್ಪತ್ರೆ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕಿಂಗ್ ಸೇವೆಗೆ ಸ್ವಾಗತ. ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
+                    'ta': "வணக்கம்! மருத்துவமனை அப்பாயிண்ட்மென்ட் புக்கிங் சேவைக்கு வரவேற்கிறேன். நான் உங்களுக்கு எப்படி உதவி செய்யலாம்?",
+                    'en': "Welcome to the hospital appointment booking service. How can I help you today?",
+                }
+                greeting = greetings.get(lang_code, greetings['en'])
+                audio_path = self.sarvam.text_to_speech(greeting, lang_code)
+                if audio_path:
+                    self._send_whatsapp_audio(sender_id, audio_path)
 
     # ═══════════════════════════════════════════
     #  SARVAM VOICE PROCESSING (Audio Messages)

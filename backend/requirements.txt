@@ -26,3 +26,11 @@ torch==2.10.0
 PyAudio==0.2.14
 # Audio format conversion
 pydub==0.25.1
+# Real-Time Voice Bot (Twilio + WebSocket)
+flask-sock==0.7.0
+twilio==9.6.2
+# Google Calendar API
+google-api-python-client==2.166.0
+google-auth==2.40.1
+# Background Scheduler
+APScheduler==3.11.0

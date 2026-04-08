@@ -13,6 +13,7 @@
 import re
 from datetime import datetime, timedelta
 from logger_config import logger
+from services.localization_service import LocalizationService
 
 # ═══════════════════════════════════════════
 #  CONSTANTS
@@ -456,6 +457,7 @@ class SmartBookingEngine:
             'booked_for': current_data.get('booked_for'),
             'service_id': current_data.get('service_id'),
             'service_name': current_data.get('service_name'),
+            'language': current_data.get('language', 'en'),
         }
 
         # ── Resolve doctor from entities ──
@@ -880,35 +882,50 @@ class SmartBookingEngine:
     #  DISPLAY HELPERS
     # ───────────────────────────────────────
 
+    def _get_lang(self, sender_id):
+        from mongodb_config import MongoDatabase
+        s = MongoDatabase().db.whatsapp_sessions.find_one({'sender_id': sender_id})
+        return s.get('data', {}).get('language', 'en') if s else 'en'
+
     def _show_doctor_list(self, sender_id, doctors, specialty_label=None):
         """Send a WhatsApp list of doctors."""
+        lang = self._get_lang(sender_id)
+        select_doctor = LocalizationService.get('select_doctor', lang)
+        
         items = []
         for doc in doctors[:10]:
             name = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
+            dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {name}", lang)
             spec = doc.get('specialization', '')
+            spec_bilingual = LocalizationService.get_bilingual_name(spec, lang)
             items.append((
                 f"doc_{doc['user_id']}",
-                f"Dr. {name}"[:24],
-                spec[:72]
+                dr_bilingual[:24],
+                spec_bilingual[:72]
             ))
 
-        header = f"‍️ Doctors in *{specialty_label}*:" if specialty_label else "‍️ Choose a doctor:"
+        header = f"‍️ Doctors in *{specialty_label}*:" if specialty_label else f"‍️ {select_doctor}"
         self.notify.send_whatsapp_list(
-            sender_id, header, items, title="Doctors", button_text="Choose Doctor"
+            sender_id, header, items, title="Doctors", button_text=LocalizationService.get('select', lang)[:20]
         )
 
     def _show_doctor_list_grouped(self, sender_id, doctors):
         """Show all doctors grouped by specialty as a text message + list."""
+        lang = self._get_lang(sender_id)
+        select_doctor = LocalizationService.get('select_doctor', lang)
+        
         groups = {}
         for d in doctors:
             spec = d.get('specialization', 'Other')
             groups.setdefault(spec, []).append(d)
 
-        msg = "‍️ *Our Doctors:*\n\n"
+        msg = f"‍️ *Our Doctors:*\n\n"
         for spec, docs in sorted(groups.items()):
-            msg += f"*{spec}*\n"
+            spec_bilingual = LocalizationService.get_bilingual_name(spec, lang)
+            msg += f"*{spec_bilingual}*\n"
             for d in docs:
-                msg += f"  • Dr. {d['full_name']}\n"
+                dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {d['full_name']}", lang)
+                msg += f"  • {dr_bilingual}\n"
             msg += "\n"
         msg += "Reply with a *doctor name* or *specialty* to continue."
 
@@ -917,22 +934,27 @@ class SmartBookingEngine:
         # Also send interactive list
         items = []
         for d in doctors[:10]:
+            dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {d['full_name']}", lang)
+            spec_bilingual = LocalizationService.get_bilingual_name(d.get('specialization', 'Other'), lang)
             items.append((
                 f"doc_{d['user_id']}",
-                f"Dr. {d['full_name']}"[:24],
-                d.get('specialization', '')[:72]
+                dr_bilingual[:24],
+                spec_bilingual[:72]
             ))
         self.notify.send_whatsapp_list(
-            sender_id, "Select a doctor:", items, title="Doctors", button_text="Choose Doctor"
+            sender_id, f"{select_doctor}", items, title="Doctors", button_text=LocalizationService.get('select', lang)[:20]
         )
 
     def _show_available_dates(self, sender_id, doctor_id, doctor_name):
         """Show upcoming available dates for a doctor."""
+        lang = self._get_lang(sender_id)
         available = self.appt.get_doctor_available_dates(doctor_id, num_dates=10)
+        
         if not available:
+            no_dates = LocalizationService.get('no_dates_doctor', lang)
             self.notify.send_whatsapp_text(
                 sender_id,
-                f"Dr. {doctor_name} has no upcoming available dates."
+                f"Dr. {doctor_name} - {no_dates}"
             )
             return
 
@@ -942,11 +964,13 @@ class SmartBookingEngine:
             display = f"{d['display']} ({shift_str})" if shift_str else d['display']
             items.append((f"date_{d['date']}", display[:24], d['date']))
 
+        select_date = LocalizationService.get('select_date', lang)
+        available_dates = LocalizationService.get('available_dates', lang)
         self.notify.send_whatsapp_list(
             sender_id,
-            f" Dr. {doctor_name}\nSelect an available date:",
+            f" Dr. {doctor_name}\n{select_date}",
             items,
-            title="Available Dates"
+            title=available_dates[:24]
         )
 
     def _show_shifts(self, sender_id, shifts, date_str):
@@ -995,11 +1019,16 @@ class SmartBookingEngine:
             next_day_tag = ' (next day)' if slot.get('next_day') else ''
             items.append((f"time_{slot['start']}", f" {fmt(slot['start'])}", f"{fmt(slot['start'])} – {fmt(slot['end'])}{next_day_tag}"))
 
-        list_header = "Select a time slot:"
+        lang = self._get_lang(sender_id)
+        select_time = LocalizationService.get('select_time', lang)
+        time_slots = LocalizationService.get('time_slots', lang)
+
+        list_header = f" {select_time}"
         if len(slots) > 10:
-            list_header = f"Tap to pick (slots 1-10). For slots 11-{len(slots)}, reply with the number above."
+            list_header = f" {select_time} (1-10 shown. Reply with a number for others)"
+            
         self.notify.send_whatsapp_list(
-            sender_id, list_header, items, title="Time Slots", button_text="Choose Slot"
+            sender_id, list_header, items, title=time_slots[:24], button_text=LocalizationService.get('select', lang)[:20]
         )
 
     # ───────────────────────────────────────
@@ -1046,15 +1075,18 @@ class SmartBookingEngine:
                     logger.warning(f"Failed to cancel old appointment during reschedule: {e}")
             from services.appointment_service import AppointmentService
             fmt = AppointmentService.format_time_ampm
+            
+            lang = bk.get('language', 'en')
+            booking_success = LocalizationService.get('booking_success', lang)
+            dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {bk.get('doctor_name')}", lang)
+            
             confirm_msg = (
-                f" *Appointment Booked!*\n\n"
+                f" {booking_success} {bk.get('patient_name')}\n\n"
                 f"🆔 ID: {appt_id}\n"
-                f" Patient: {bk.get('patient_name')}\n"
-                f"‍️ Doctor: Dr. {bk.get('doctor_name')}\n"
+                f"‍️ Doctor: {dr_bilingual}\n"
                 f" Date: {bk['date']}\n"
                 f" Time: {fmt(bk['time_slot'])} – {fmt(bk.get('end_time', ''))}\n\n"
-                f" Status: Pending Doctor Approval\n"
-                f"_You'll be notified once confirmed._"
+                f" Status: Pending Doctor Approval"
             )
             self.notify.send_whatsapp_text(sender_id, confirm_msg)
 
@@ -1423,6 +1455,7 @@ def _parse_date(text):
         TODAY_WORDS, TOMORROW_WORDS, DAY_AFTER_WORDS,
         MULTILINGUAL_DAY_NAMES, IN_N_DAYS_PATTERNS, NUMBER_WORDS, MONTH_MAP
     )
+    from services.localization_service import LocalizationService
 
     t = text.lower().strip()
     today = datetime.now()

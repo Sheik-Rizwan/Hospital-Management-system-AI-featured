@@ -57,6 +57,7 @@ from routes.whatsapp_routes import (
 from routes.vendor_routes import vendor_bp
 from routes.procurement_routes import procurement_bp
 from routes.chat_routes import chat_bp
+from routes.voice_routes import voice_bp
 
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
 app.register_blueprint(doctor_bp, url_prefix='/api/doctor')
@@ -66,6 +67,16 @@ app.register_blueprint(whatsapp_bp, url_prefix='/api/whatsapp')
 app.register_blueprint(vendor_bp, url_prefix='/api/vendor')
 app.register_blueprint(procurement_bp, url_prefix='/api/procurement')
 app.register_blueprint(chat_bp, url_prefix='/api/chat')
+app.register_blueprint(voice_bp, url_prefix='/api/voice')
+
+# WebSocket for Twilio Media Streams (real-time voice bot)
+try:
+    from flask_sock import Sock
+    from services.voice_stream_service import handle_voice_stream
+    sock = Sock(app)
+    sock.route('/api/voice/stream')(handle_voice_stream)
+except ImportError:
+    pass  # flask-sock not installed — voice streaming disabled
 
 # Backward-compatible webhook aliases (some WhatsApp app configurations point to /webhook)
 app.add_url_rule('/webhook', 'whatsapp_verify_alias', whatsapp_verify_token, methods=['GET'])
@@ -132,11 +143,19 @@ if __name__ == '__main__':
     debug = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     port = int(os.getenv('PORT', 5000))
 
+    # Start appointment reminder scheduler
+    try:
+        from services.reminder_jobs import start_reminder_scheduler
+        start_reminder_scheduler(app)
+    except Exception as sched_err:
+        print(f"  Reminder scheduler failed to start: {sched_err}")
+
     print(f"\n  Hospital Management System Backend")
     print(f"  Environment: {env}")
     print(f"  Debug: {debug}")
     print(f"  MongoDB: {os.getenv('MONGODB_URI', 'mongodb://127.0.0.1:27017/')}")
     print(f"  Socket.IO: Enabled")
+    print(f"  Voice Bot: WebSocket at /api/voice/stream")
     print(f"\n  API: http://localhost:{port}/api/")
     print(f"  Health: http://localhost:{port}/api/health\n")
 
