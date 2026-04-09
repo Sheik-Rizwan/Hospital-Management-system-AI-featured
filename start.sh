@@ -23,7 +23,7 @@ else
     source venv/bin/activate
 fi
 
-python app.py &
+python3 app.py &
 BACKEND_PID=$!
 echo "[OK] Backend starting (PID: $BACKEND_PID) on port 5000."
 

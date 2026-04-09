@@ -1,3 +1,4 @@
+from __future__ import annotations
 # booking_utils.py — Shared date/time parsing and validation for Voice + WhatsApp booking
 # Consolidates logic from whatsapp_service._parse_natural_date / _parse_natural_time
 

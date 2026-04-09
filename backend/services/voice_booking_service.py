@@ -1,3 +1,4 @@
+from __future__ import annotations
 # voice_booking_service.py — Bridges Sarvam AI tool calls to AppointmentService
 # Handles multilingual voice booking: STT  AI Conversation  Booking  TTS
 

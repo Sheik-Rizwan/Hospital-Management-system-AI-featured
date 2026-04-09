@@ -79,3 +79,8 @@ ngrok.exe
 missing_tags.txt
 emoji_files.txt
 frontend/build_err.txt
+
+# ── Local Setup ──
+hospital_db_portable_export/
+import_db.py
+export_db.py

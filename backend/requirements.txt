@@ -1,36 +1,36 @@
 # Core API Framework & Serving
-Flask==3.1.2
-Flask-Cors==6.0.2
+Flask
+Flask-Cors
 # Async WebSockets & SocketIO (Real-time updates)
-Flask-SocketIO==5.6.0
-python-engineio==4.13.1
-python-socketio==5.16.1
+Flask-SocketIO
+python-engineio
+python-socketio
 # Database & ODM
-pymongo==4.16.0
+pymongo
 # Security, Environment, Authentication
-Flask-Bcrypt==1.0.1
-Flask-JWT-Extended==4.7.1
-bcrypt==5.0.0
-PyJWT==2.10.1
-python-dotenv==1.2.1
+Flask-Bcrypt
+Flask-JWT-Extended
+bcrypt
+PyJWT
+python-dotenv
 # Mail & Form Parsing
-python-multipart==0.0.22
+python-multipart
 # External API Integrations (WhatsApp, LLM, etc.)
-requests==2.32.5
-groq==0.37.1
+requests
+groq
 # Voice & Audio Processing
-SpeechRecognition==3.14.5
-soundfile==0.13.1
-numpy==2.2.6
-torch==2.10.0
-PyAudio==0.2.14
+SpeechRecognition
+soundfile
+numpy
+torch
+# PyAudio
 # Audio format conversion
-pydub==0.25.1
+pydub
 # Real-Time Voice Bot (Twilio + WebSocket)
-flask-sock==0.7.0
-twilio==9.6.2
+flask-sock
+twilio
 # Google Calendar API
-google-api-python-client==2.166.0
-google-auth==2.40.1
+google-api-python-client
+google-auth
 # Background Scheduler
-APScheduler==3.11.0
+APScheduler
