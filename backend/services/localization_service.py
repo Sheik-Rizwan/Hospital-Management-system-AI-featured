@@ -208,7 +208,7 @@ class LocalizationService:
 
     @classmethod
     def get_bilingual_name(cls, name: str, lang_code: str = 'en') -> str:
-        """Returns English Name (Localized Name) if translation is available, else English Name."""
+        """Returns Localized Name if translation is available and lang_code != 'en', else English Name."""
         if lang_code == 'en' or not name:
             return name
             
@@ -219,13 +219,13 @@ class LocalizationService:
         
         # Check direct match
         if lower_name in lang_trans:
-            return f"{cleaned_name} ({lang_trans[lower_name]})"
+            return lang_trans[lower_name]
             
         # Try to find 'Dr. ' prefix dynamically
         if lower_name.startswith('dr. '):
             doc_name = lower_name.replace('dr. ', '')
             for k, v in lang_trans.items():
                 if k.endswith(doc_name) and k.startswith('dr.'):
-                    return f"{cleaned_name} ({v})"
+                    return v
                     
         return cleaned_name

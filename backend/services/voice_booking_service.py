@@ -135,19 +135,20 @@ class VoiceBookingService:
         return narrowed or matched
 
     @staticmethod
-    def _format_available_doctors(doctors: list[dict], missing_doctor_name: str | None = None, limit: int = 8) -> str:
+    def _format_available_doctors(doctors: list[dict], missing_doctor_name: str | None = None, limit: int = 8, lang_code: str = 'en') -> str:
         """Build explicit not-found + doctors grouped by specialization."""
+        from services.localization_service import LocalizationService
         requested_name = re.sub(
             r'^\s*dr\.?\s*',
             '',
             str(missing_doctor_name or '').strip(),
             flags=re.IGNORECASE
         )
-        missing_line = (
-            f"Dr. {requested_name} is not in the hospital."
-            if requested_name
-            else "That doctor is not in the hospital."
-        )
+        if requested_name:
+            doc_name_miss = LocalizationService.get_bilingual_name(f"Dr. {requested_name}", lang_code)
+            missing_line = f"{doc_name_miss} is not in the hospital."
+        else:
+            missing_line = "That doctor is not in the hospital."
 
         if not doctors:
             return f"{missing_line} There are no active doctors available right now."
@@ -158,12 +159,16 @@ class VoiceBookingService:
             name = str(doctor.get('full_name', '') or '').strip()
             if not name:
                 continue
+            name_clean = name.replace('Dr.', '').replace('dr.', '').strip()
+            doc_name = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang_code)
             specialization = str(doctor.get('specialization', 'General Consultation') or 'General Consultation').strip()
             if not specialization:
                 specialization = 'General Consultation'
-            if specialization not in spec_groups:
-                spec_groups[specialization] = []
-            spec_groups[specialization].append(f"Dr. {name}")
+            spec_loc = LocalizationService.get_bilingual_name(specialization, lang_code)
+            
+            if spec_loc not in spec_groups:
+                spec_groups[spec_loc] = []
+            spec_groups[spec_loc].append(doc_name)
 
         if not spec_groups:
             return f"{missing_line} There are no active doctors available right now."
@@ -239,9 +244,9 @@ class VoiceBookingService:
             logger.info(f" Voice tool call: {tool_name}({args})")
 
             if tool_name == 'check_availability':
-                result = self._check_availability(args)
+                result = self._check_availability(args, language_code)
             elif tool_name == 'book_appointment':
-                result = self._book_appointment(args, patient_id)
+                result = self._book_appointment(args, patient_id, language_code)
             else:
                 result = f"Unknown tool: {tool_name}"
 
@@ -253,7 +258,7 @@ class VoiceBookingService:
 
         return tool_callback
 
-    def _check_availability(self, args: dict) -> str:
+    def _check_availability(self, args: dict, lang_code: str = 'en') -> str:
         """
         Resolve doctor by name, validate date, then return availability.
         Uses booking_utils for date/time parsing and ambiguous time resolution.
@@ -285,7 +290,7 @@ class VoiceBookingService:
         matched = self._match_doctors_with_specialization(doctor_name, doctors, specialization_hint)
 
         if not matched:
-            return self._format_available_doctors(doctors, doctor_name)
+            return self._format_available_doctors(doctors, doctor_name, lang_code=lang_code)
 
         if len(matched) > 1:
             choices = ', '.join(
@@ -344,7 +349,7 @@ class VoiceBookingService:
             logger.warning(f"️ Could not fetch patient name for {patient_id}: {e}")
         return ''
 
-    def _book_appointment(self, args: dict, patient_id: str) -> str:
+    def _book_appointment(self, args: dict, patient_id: str, lang_code: str = 'en') -> str:
         """
         Create an appointment in MongoDB from AI-collected args.
         Uses booking_utils for date/time validation and smart resolution.
@@ -378,7 +383,7 @@ class VoiceBookingService:
         specialization_hint = args.get('specialization')
         matched = self._match_doctors_with_specialization(doctor_name, doctors, specialization_hint)
         if not matched:
-            return self._format_available_doctors(doctors, doctor_name)
+            return self._format_available_doctors(doctors, doctor_name, lang_code=lang_code)
 
         if len(matched) > 1:
             choices = ', '.join(

@@ -727,10 +727,14 @@ class SarvamService:
             system_content = self.system_prompt + f"\n\nIMPORTANT: The user is speaking in {lang_name}. Respond in {lang_name}."
             system_content += f"\nToday's date is {datetime.now().strftime('%Y-%m-%d, %A')}."
 
+            from services.localization_service import LocalizationService
+
             if available_services:
-                system_content += f"\nAvailable Services: {', '.join(available_services)}"
+                loc_services = [LocalizationService.get_bilingual_name(s, language_code) for s in available_services]
+                system_content += f"\nAvailable Services: {', '.join(loc_services)}"
             if available_doctors:
-                system_content += f"\nAvailable Doctors: {', '.join(available_doctors)}"
+                loc_doctors = [LocalizationService.get_bilingual_name(f"Dr. {d.replace('Dr. ', '').replace('dr. ', '')}", language_code) for d in available_doctors]
+                system_content += f"\nAvailable Doctors: {', '.join(loc_doctors)}"
 
             chat_messages = [{"role": "system", "content": system_content}]
 
@@ -953,7 +957,6 @@ class SarvamService:
             working_text = re.sub(r'APT-[\w-]+', _preserve, working_text)
             working_text = re.sub(r'\d{4}-\d{2}-\d{2}', _preserve, working_text)
             working_text = re.sub(r'\d{1,2}:\d{2}\s*(?:AM|PM)?', _preserve, working_text, flags=re.IGNORECASE)
-            working_text = re.sub(r'Dr\.?\s+[A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*', _preserve, working_text)
 
             translated = self.translate_text(working_text, 'en', language_code)
 

@@ -843,7 +843,7 @@ class WhatsAppService:
 
         return narrowed or matched_doctors
 
-    def _build_doctor_disambiguation_message(self, doctor_query, matched_doctors):
+    def _build_doctor_disambiguation_message(self, doctor_query, matched_doctors, lang_code='en'):
         """Build an explicit disambiguation prompt when multiple doctors match."""
         if not matched_doctors:
             return "Multiple doctors match. Please specify the doctor name and specialization."
@@ -860,8 +860,9 @@ class WhatsAppService:
             doctor_label = re.sub(r'^\s*dr\.?\s*', '', raw_name, flags=re.IGNORECASE).title()
             if not doctor_label:
                 doctor_label = cleaned_query or "this doctor"
+            doctor_label_loc = LocalizationService.get_bilingual_name(f"Dr. {doctor_label}", lang_code)
             header = (
-                f"There are {len(matched_doctors)} doctors named Dr. {doctor_label} with different specializations:\n"
+                f"There are {len(matched_doctors)} doctors named {doctor_label_loc} with different specializations:\n"
             )
         else:
             label = cleaned_query or "your request"
@@ -869,12 +870,17 @@ class WhatsAppService:
 
         body = ""
         for doctor in matched_doctors[:10]:
-            body += f"- Dr. {doctor.get('full_name', 'Unknown')} ({doctor.get('specialization', 'General')})\n"
+            name = str(doctor.get('full_name', 'Unknown')).strip()
+            name_clean = name.replace('Dr.', '').replace('dr.', '').strip()
+            doc_name = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang_code)
+            specialization = str(doctor.get('specialization', 'General')).strip()
+            spec_loc = LocalizationService.get_bilingual_name(specialization, lang_code)
+            body += f"- {doc_name} ({spec_loc})\n"
 
         footer = "Which doctor do you need? Please tell the exact doctor name or specialization."
         return header + body + footer
 
-    def _build_missing_doctor_line(self, missing_doctor_name=None):
+    def _build_missing_doctor_line(self, missing_doctor_name=None, lang_code='en'):
         """Build the explicit missing-doctor line requested by users."""
         requested_name = re.sub(
             r'^\s*dr\.?\s*',
@@ -882,13 +888,13 @@ class WhatsAppService:
             str(missing_doctor_name or '').strip(),
             flags=re.IGNORECASE
         )
-        return (
-            f"Dr. {requested_name} is not there in our database."
-            if requested_name
-            else "That doctor is not there in our database."
-        )
+        if requested_name:
+            doc_name = LocalizationService.get_bilingual_name(f"Dr. {requested_name}", lang_code)
+            return f"{doc_name} is not there in our database."
+        else:
+            return "That doctor is not there in our database."
 
-    def _build_present_doctors_list_message(self, doctors, limit=10, include_prompt=False):
+    def _build_present_doctors_list_message(self, doctors, limit=10, include_prompt=False, lang_code='en'):
         """Build numbered present-doctors list with specialization."""
         if not doctors:
             return "No active doctors are currently available in the hospital."
@@ -898,8 +904,11 @@ class WhatsAppService:
             name = str(doc.get('full_name', '') or '').strip()
             if not name:
                 continue
+            name_clean = name.replace('Dr.', '').replace('dr.', '').strip()
+            doc_name = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang_code)
             specialization = str(doc.get('specialization', 'General') or 'General').strip() or 'General'
-            lines.append(f"{len(lines) + 1}. Dr. {name} ({specialization})")
+            spec_loc = LocalizationService.get_bilingual_name(specialization, lang_code)
+            lines.append(f"{len(lines) + 1}. {doc_name} ({spec_loc})")
 
         if not lines:
             return "No active doctors are currently available in the hospital."
@@ -909,20 +918,20 @@ class WhatsAppService:
             message += "\nPlease choose one doctor from the present doctors list."
         return message
 
-    def _build_available_doctors_fallback_message(self, doctors, missing_doctor_name=None, limit=10):
+    def _build_available_doctors_fallback_message(self, doctors, missing_doctor_name=None, limit=10, lang_code='en'):
         """Build explicit not-found + numbered present-doctors fallback text."""
-        missing_line = self._build_missing_doctor_line(missing_doctor_name)
-        present_doctors = self._build_present_doctors_list_message(doctors, limit=limit)
+        missing_line = self._build_missing_doctor_line(missing_doctor_name, lang_code)
+        present_doctors = self._build_present_doctors_list_message(doctors, limit=limit, lang_code=lang_code)
         return f"{missing_line}\n{present_doctors}"
 
-    def _send_missing_doctor_two_step_messages(self, sender_id, doctors, missing_doctor_name=None, limit=10):
+    def _send_missing_doctor_two_step_messages(self, sender_id, doctors, missing_doctor_name=None, limit=10, lang_code='en'):
         """Send strict 2-step fallback for unknown doctors.
 
         1) Dr. <name> is not there in our database.
         2) Present doctors:\n1. Dr. <name> (<specialization>) ...
         """
-        missing_line = self._build_missing_doctor_line(missing_doctor_name)
-        present_doctors = self._build_present_doctors_list_message(doctors, limit=limit)
+        missing_line = self._build_missing_doctor_line(missing_doctor_name, lang_code)
+        present_doctors = self._build_present_doctors_list_message(doctors, limit=limit, lang_code=lang_code)
         self.notifier.send_whatsapp_text(sender_id, missing_line)
         self.notifier.send_whatsapp_text(sender_id, present_doctors)
         return missing_line, present_doctors
@@ -935,6 +944,7 @@ class WhatsAppService:
         and slot-based end_time from doctor's actual schedule.
         """
         today = datetime.now().date()
+        lang_code = session_data.get('detected_lang', 'en') if isinstance(session_data, dict) else 'en'
         try:
             if tool_name == "list_available_doctors":
                 date_input = tool_args.get("date")
@@ -973,12 +983,18 @@ class WhatsAppService:
 
                     result = f"On {date_str}, these doctors are available:\n"
                     for doc in available_doctors:
-                        result += f"- Dr. {doc['name']} ({doc['specialization']}) — {', '.join(doc['shifts'])}\n"
+                        name_clean = doc['name'].replace('Dr.', '').replace('dr.', '').strip()
+                        doc_name = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang_code)
+                        spec_loc = LocalizationService.get_bilingual_name(doc['specialization'], lang_code)
+                        result += f"- {doc_name} ({spec_loc}) — {', '.join(doc['shifts'])}\n"
                     return result
                 else:
                     result = "Our available doctors:\n"
                     for doc in doctors[:10]:
-                        result += f"- Dr. {doc['full_name']} ({doc.get('specialization', 'General')})\n"
+                        name_clean = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
+                        doc_name = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang_code)
+                        spec_loc = LocalizationService.get_bilingual_name(doc.get('specialization', 'General'), lang_code)
+                        result += f"- {doc_name} ({spec_loc})\n"
                     return result
 
             elif tool_name == "check_availability":
@@ -1016,7 +1032,9 @@ class WhatsAppService:
                     missing_line, present_doctors = self._send_missing_doctor_two_step_messages(
                         sender_id,
                         doctors,
-                        doctor_name
+                        doctor_name,
+                        limit=10,
+                        lang_code=lang_code
                     )
                     if isinstance(session_data, dict):
                         session_data['_suppress_next_ai_text'] = True
@@ -1024,18 +1042,21 @@ class WhatsAppService:
 
                 # If multiple doctors match, ask for disambiguation
                 if len(matched_doctors) > 1:
-                    return self._build_doctor_disambiguation_message(doctor_name, matched_doctors)
+                    return self._build_doctor_disambiguation_message(doctor_name, matched_doctors, lang_code=lang_code)
 
                 matched_doctor = matched_doctors[0]
                 doctor_id = matched_doctor['user_id']
                 doctor_specialization = matched_doctor.get('specialization', 'General')
+                name_clean = matched_doctor.get('full_name', '').replace('Dr.', '').replace('dr.', '').strip()
+                doc_name = LocalizationService.get_bilingual_name(f"Dr. {name_clean}", lang_code)
+                spec_loc = LocalizationService.get_bilingual_name(doctor_specialization, lang_code)
 
                 # Get shifts and slots
                 shifts = self.appt_service.get_available_shifts(doctor_id, date_str)
                 if not shifts:
                     weekly = get_doctor_weekly_schedule(doctor_id, self.appt_service)
                     return (
-                        f"Dr. {matched_doctor['full_name']} ({doctor_specialization}) is NOT available on {date_str}.\n"
+                        f"{doc_name} ({spec_loc}) is NOT available on {date_str}.\n"
                         f"Their weekly schedule:\n{weekly}"
                     )
 
@@ -1046,7 +1067,7 @@ class WhatsAppService:
                         all_slots.extend([slot['start'] for slot in slots])
 
                 if not all_slots:
-                    return f"All slots are booked for Dr. {matched_doctor['full_name']} on {date_str}."
+                    return f"All slots are booked for {doc_name} on {date_str}."
 
                 # Smart time resolution if time was provided
                 if time_input:
@@ -1061,7 +1082,7 @@ class WhatsAppService:
                     if check_time in all_slots:
                         return (
                             f"Yes, {display_check_time} is available on {date_str} with "
-                            f"Dr. {matched_doctor['full_name']} ({doctor_specialization})."
+                            f"{doc_name} ({spec_loc})."
                         )
                     else:
                         available_display = ', '.join(self._format_time_display(slot_time) for slot_time in all_slots[:8])
@@ -1072,8 +1093,8 @@ class WhatsAppService:
                 else:
                     all_slots_display = ', '.join(self._format_time_display(slot_time) for slot_time in all_slots[:10])
                     return (
-                        f"Available slots on {date_str} for Dr. {matched_doctor['full_name']} "
-                        f"({doctor_specialization}) are: {all_slots_display}."
+                        f"Available slots on {date_str} for {doc_name} "
+                        f"({spec_loc}) are: {all_slots_display}."
                     )
 
             elif tool_name == "book_appointment":
@@ -1154,7 +1175,7 @@ class WhatsAppService:
                         if all_available else 'No slots available'
                     )
                     return (
-                        f"The slot at {self._format_time_display(time_str)} is NOT available with Dr. {matched_doctor['full_name']} ({doctor_specialization}) on {date_str}. "
+                        f"The slot at {self._format_time_display(time_str)} is NOT available with {doc_name} ({spec_loc}) on {date_str}. "
                         f"Available slots: {slots_str}. "
                         f"Please ask the user which slot they want."
                     )
@@ -1193,8 +1214,8 @@ class WhatsAppService:
                     session_data['messages'] = []
                     self._transition_to(sender_id, STATE_CHAT, session_data)
                     return (
-                        f"SUCCESS. Booked for patient {booked_for_name} with Dr. {matched_doctor['full_name']} "
-                        f"({doctor_specialization}) on {date_str} at {self._format_time_display(time_str)}-{self._format_time_display(end_time_str)}. "
+                        f"SUCCESS. Booked for patient {booked_for_name} with {doc_name} "
+                        f"({spec_loc}) on {date_str} at {self._format_time_display(time_str)}-{self._format_time_display(end_time_str)}. "
                         f"Inform the user with all confirmation details."
                     )
                 else:
