@@ -170,7 +170,14 @@ def resolve_date(text: str, today: date = None) -> tuple:
 
     text_lower = text.lower().strip()
 
-    # Already YYYY-MM-DD
+    # Accept DD-MM-YYYY (preferred user-facing format)
+    try:
+        parsed = datetime.strptime(text_lower, '%d-%m-%Y').date()
+        return _validate_future(parsed, today)
+    except ValueError:
+        pass
+
+    # Also accept YYYY-MM-DD for backward compatibility
     try:
         parsed = datetime.strptime(text_lower, '%Y-%m-%d').date()
         return _validate_future(parsed, today)
@@ -269,18 +276,22 @@ def _validate_future(d: date, today: date) -> tuple:
 
 def validate_booking_date(date_str: str, today: date = None) -> tuple:
     """
-    Validate a YYYY-MM-DD string is a valid future date.
+    Validate a DD-MM-YYYY (or YYYY-MM-DD for backward compatibility)
+    string is a valid future date.
     Returns: (is_valid: bool, error_msg: str | None)
     """
     if today is None:
         today = date.today()
     try:
-        d = datetime.strptime(date_str, '%Y-%m-%d').date()
+        try:
+            d = datetime.strptime(date_str, '%d-%m-%Y').date()
+        except ValueError:
+            d = datetime.strptime(date_str, '%Y-%m-%d').date()
         if d <= today:
             return False, f"The date {d.strftime('%B %d, %Y')} has already passed. Please choose from tomorrow onwards."
         return True, None
     except ValueError:
-        return False, f"'{date_str}' is not a valid date format. Please use YYYY-MM-DD."
+        return False, f"'{date_str}' is not a valid date format. Please use DD-MM-YYYY."
 
 
 # ═══════════════════════════════════════════

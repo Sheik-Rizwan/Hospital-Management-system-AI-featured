@@ -314,6 +314,7 @@ class SmartBookingEngine:
         self.patient = patient_service
         self.notify = notifier
         self.sm = session_manager  # session manager (wraps _get_session / _transition_to)
+        self._current_lang = 'en'  # Cache for current message lang
 
     # ───────────────────────────────────────
     #  PUBLIC API
@@ -325,6 +326,7 @@ class SmartBookingEngine:
         Returns True if handled, False if it should fall through to LLM/menu.
         """
         data = session.get('data', {})
+        self._current_lang = data.get('language', 'en')  # Set context lang
         bk_state = data.get('booking_state', BK_IDLE)
 
         # ── If already in a booking flow, continue it ──
@@ -719,13 +721,23 @@ class SmartBookingEngine:
 
     def _handle_date_input(self, sender_id, text, data):
         """User is picking a date."""
-        # Try list selection (date_YYYY-MM-DD)
+        # Try list selection (date_YYYY-MM-DD internal payload)
         if text.startswith('date_'):
             date_str = text.replace('date_', '', 1)
         else:
             date_str = text.strip()
 
-        # Try YYYY-MM-DD
+        # Try DD-MM-YYYY (preferred user-facing format)
+        try:
+            parsed = datetime.strptime(date_str, '%d-%m-%Y')
+            data['date'] = parsed.strftime('%Y-%m-%d')
+            # Persist date selection before advancing
+            self.sm.transition_to(sender_id, data)
+            return self._advance_booking(sender_id, data)
+        except ValueError:
+            pass
+
+        # Try YYYY-MM-DD (backward compatibility)
         try:
             datetime.strptime(date_str, '%Y-%m-%d')
             data['date'] = date_str
@@ -745,7 +757,7 @@ class SmartBookingEngine:
 
         self.notify.send_whatsapp_text(
             sender_id,
-            "I couldn't understand that date. Please pick from the list or say 'tomorrow', '28th Feb', etc."
+            "I couldn't understand that date. Please pick from the list or type DD-MM-YYYY (for example, 28-02-2026)."
         )
 
     def _handle_shift_input(self, sender_id, text, data):
@@ -883,6 +895,10 @@ class SmartBookingEngine:
     # ───────────────────────────────────────
 
     def _get_lang(self, sender_id):
+        # Prefer the language cached for this message processing turn
+        if hasattr(self, '_current_lang') and self._current_lang:
+            return self._current_lang
+            
         from mongodb_config import MongoDatabase
         s = MongoDatabase().db.whatsapp_sessions.find_one({'sender_id': sender_id})
         return s.get('data', {}).get('language', 'en') if s else 'en'
@@ -891,22 +907,27 @@ class SmartBookingEngine:
         """Send a WhatsApp list of doctors."""
         lang = self._get_lang(sender_id)
         select_doctor = LocalizationService.get('select_doctor', lang)
+        all_doctors_label = LocalizationService.get('all_doctors', lang)
         
         items = []
         for doc in doctors[:10]:
             name = doc['full_name'].replace('Dr.', '').replace('dr.', '').strip()
-            dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {name}", lang)
+            dr_display = LocalizationService.get_bilingual_display(f"Dr. {name}", lang)
             spec = doc.get('specialization', '')
-            spec_bilingual = LocalizationService.get_bilingual_name(spec, lang)
+            spec_display = LocalizationService.get_bilingual_display(spec, lang)
             items.append((
                 f"doc_{doc['user_id']}",
-                dr_bilingual[:24],
-                spec_bilingual[:72]
+                dr_display[:24],
+                spec_display[:72]
             ))
 
-        header = f"‍️ Doctors in *{specialty_label}*:" if specialty_label else f"‍️ {select_doctor}"
+        if specialty_label:
+            spec_display = LocalizationService.get_bilingual_display(specialty_label, lang)
+            header = f"‍️ {spec_display}:"
+        else:
+            header = f"‍️ {select_doctor}"
         self.notify.send_whatsapp_list(
-            sender_id, header, items, title="Doctors", button_text=LocalizationService.get('select', lang)[:20]
+            sender_id, header, items, title=all_doctors_label[:24], button_text=LocalizationService.get('select', lang)[:20]
         )
 
     def _show_doctor_list_grouped(self, sender_id, doctors):
@@ -919,98 +940,162 @@ class SmartBookingEngine:
             spec = d.get('specialization', 'Other')
             groups.setdefault(spec, []).append(d)
 
-        msg = f"‍️ *Our Doctors:*\n\n"
+        all_doctors_label = LocalizationService.get('all_doctors', lang)
+        msg = f"‍️ *{all_doctors_label}:*\n\n"
         for spec, docs in sorted(groups.items()):
-            spec_bilingual = LocalizationService.get_bilingual_name(spec, lang)
-            msg += f"*{spec_bilingual}*\n"
+            spec_display = LocalizationService.get_bilingual_display(spec, lang)
+            msg += f"*{spec_display}*\n"
             for d in docs:
-                dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {d['full_name']}", lang)
-                msg += f"  • {dr_bilingual}\n"
+                name = d['full_name'].replace('Dr.', '').replace('dr.', '').strip()
+                dr_display = LocalizationService.get_bilingual_display(f"Dr. {name}", lang)
+                msg += f"  • {dr_display}\n"
             msg += "\n"
-        msg += "Reply with a *doctor name* or *specialty* to continue."
 
         self.notify.send_whatsapp_text(sender_id, msg)
 
         # Also send interactive list
         items = []
         for d in doctors[:10]:
-            dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {d['full_name']}", lang)
-            spec_bilingual = LocalizationService.get_bilingual_name(d.get('specialization', 'Other'), lang)
+            name = d['full_name'].replace('Dr.', '').replace('dr.', '').strip()
+            dr_display = LocalizationService.get_bilingual_display(f"Dr. {name}", lang)
+            spec = d.get('specialization', 'Other')
+            spec_display = LocalizationService.get_bilingual_display(spec, lang)
             items.append((
                 f"doc_{d['user_id']}",
-                dr_bilingual[:24],
-                spec_bilingual[:72]
+                dr_display[:24],
+                spec_display[:72]
             ))
         self.notify.send_whatsapp_list(
-            sender_id, f"{select_doctor}", items, title="Doctors", button_text=LocalizationService.get('select', lang)[:20]
+            sender_id, f"{select_doctor}", items, title=all_doctors_label[:24], button_text=LocalizationService.get('select', lang)[:20]
         )
 
     def _show_available_dates(self, sender_id, doctor_id, doctor_name):
-        """Show upcoming available dates for a doctor."""
+        """Show upcoming available dates for a doctor with localized day/month names."""
         lang = self._get_lang(sender_id)
         available = self.appt.get_doctor_available_dates(doctor_id, num_dates=10)
         
         if not available:
             no_dates = LocalizationService.get('no_dates_doctor', lang)
+            dr_display = LocalizationService.get_bilingual_display(f"Dr. {doctor_name}", lang)
             self.notify.send_whatsapp_text(
                 sender_id,
-                f"Dr. {doctor_name} - {no_dates}"
+                f"{dr_display} - {no_dates}"
             )
             return
 
         items = []
         for d in available:
-            shift_str = ', '.join(d.get('shifts', []))
-            display = f"{d['display']} ({shift_str})" if shift_str else d['display']
-            items.append((f"date_{d['date']}", display[:24], d['date']))
+            date_str = d['date']  # YYYY-MM-DD
+            localized_display = LocalizationService.format_date_localized(date_str, lang)
+            dd_mm_yyyy = LocalizationService.format_date_ddmmyyyy(date_str)
+            items.append((f"date_{date_str}", localized_display[:24], dd_mm_yyyy))
 
         select_date = LocalizationService.get('select_date', lang)
         available_dates = LocalizationService.get('available_dates', lang)
+        dr_display = LocalizationService.get_bilingual_display(f"Dr. {doctor_name}", lang)
         self.notify.send_whatsapp_list(
             sender_id,
-            f" Dr. {doctor_name}\n{select_date}",
+            f" {dr_display}\n{select_date}",
             items,
-            title=available_dates[:24]
+            title=available_dates[:24],
+            button_text=LocalizationService.get('select', lang)[:20]
         )
 
     def _show_shifts(self, sender_id, shifts, date_str):
-        """Show available shifts with AM/PM display."""
+        """Show available periods (Morning/Afternoon/Evening/Night) based on actual slots."""
+        lang = self._get_lang(sender_id)
         from services.appointment_service import AppointmentService
-        fmt = AppointmentService.format_time_ampm
 
-        if len(shifts) <= 3:
-            btn_titles = [f"{s['shift_name']} ({s['free_slots']} slots)" for s in shifts]
-            btn_ids = [f"shift_{s['start']}_{s['end']}" for s in shifts]
+        # Define period boundaries (hour-based)
+        PERIODS = [
+            ('period_morning',    5, 12),   # 5:00 AM – 11:59 AM
+            ('period_afternoon', 12, 17),   # 12:00 PM – 4:59 PM
+            ('period_evening',   17, 21),   # 5:00 PM – 8:59 PM
+            ('period_night',     21, 5),    # 9:00 PM – 4:59 AM (wraps)
+        ]
+
+        # Classify each shift's slots into periods
+        period_counts = {}
+        for s in shifts:
+            start_hour = int(s['start'].split(':')[0])
+            free = s['free_slots']
+            for key, p_start, p_end in PERIODS:
+                if p_start < p_end:  # Normal range
+                    if p_start <= start_hour < p_end and free > 0:
+                        period_counts[key] = period_counts.get(key, 0) + free
+                else:  # Night wraps around
+                    if (start_hour >= p_start or start_hour < p_end) and free > 0:
+                        period_counts[key] = period_counts.get(key, 0) + free
+
+        if not period_counts:
+            self.notify.send_whatsapp_text(sender_id, LocalizationService.get('no_slots_period', lang))
+            return
+
+        dd_mm_yyyy = LocalizationService.format_date_ddmmyyyy(date_str)
+        localized_date = LocalizationService.format_date_localized(date_str, lang)
+        select_period = LocalizationService.get('select_period', lang)
+
+        # Build buttons or list based on count
+        available_periods = [(k, c) for k, c in period_counts.items()]
+        if len(available_periods) <= 3:
+            btn_titles = [f"{LocalizationService.get(k, lang)}" for k, c in available_periods]
+            # Use shift start/end matching the period
+            btn_ids = []
+            for k, c in available_periods:
+                # Find the first shift that matches this period
+                for s in shifts:
+                    start_hour = int(s['start'].split(':')[0])
+                    for pk, ps, pe in PERIODS:
+                        if pk == k:
+                            if ps < pe and ps <= start_hour < pe:
+                                btn_ids.append(f"shift_{s['start']}_{s['end']}")
+                                break
+                            elif ps >= pe and (start_hour >= ps or start_hour < pe):
+                                btn_ids.append(f"shift_{s['start']}_{s['end']}")
+                                break
+                    if len(btn_ids) == len([x for x in available_periods if x[0] <= k]):
+                        break
+            # Fallback: use shift_ ids
+            if len(btn_ids) < len(available_periods):
+                btn_ids = [f"shift_{shifts[i]['start']}_{shifts[i]['end']}" for i in range(min(len(shifts), len(available_periods)))]
             self.notify.send_whatsapp_buttons(
-                sender_id, f" Select a shift for {date_str}:", btn_titles[:3], btn_ids[:3]
+                sender_id, f" {localized_date} ({dd_mm_yyyy})\n{select_period}", btn_titles[:3], btn_ids[:3]
             )
         else:
             items = []
-            for s in shifts:
-                items.append((
-                    f"shift_{s['start']}_{s['end']}",
-                    s['shift_name'],
-                    f"{fmt(s['start'])}–{fmt(s['end'])} ({s['free_slots']} slots)"
-                ))
+            for k, c in available_periods:
+                label = LocalizationService.get(k, lang)
+                for s in shifts:
+                    start_hour = int(s['start'].split(':')[0])
+                    for pk, ps, pe in PERIODS:
+                        if pk == k:
+                            if (ps < pe and ps <= start_hour < pe) or (ps >= pe and (start_hour >= ps or start_hour < pe)):
+                                items.append((f"shift_{s['start']}_{s['end']}", label[:24], f"{c} slots"))
+                                break
+                    if len(items) == len([x for x in available_periods if x[0] <= k]):
+                        break
             self.notify.send_whatsapp_list(
-                sender_id, f" Select a shift for {date_str}:", items, title="Shifts"
+                sender_id, f" {localized_date} ({dd_mm_yyyy})\n{select_period}", items, title="Shifts"
             )
 
     def _show_slots(self, sender_id, slots, bk):
         """Show available time slots with numbering in AM/PM format."""
         from services.appointment_service import AppointmentService
         fmt = AppointmentService.format_time_ampm
+        lang = self._get_lang(sender_id)
 
         # ── Text message with ALL slots (no limit) ──
+        dr_display = LocalizationService.get_bilingual_display(f"Dr. {bk.get('doctor_name', '?')}", lang)
+        date_display = LocalizationService.format_date_ddmmyyyy(bk.get('date', '?'))
+        time_slots_label = LocalizationService.get('time_slots', lang)
         msg_lines = [
-            f" *Available Slots ({len(slots)})*",
-            f"Dr. {bk.get('doctor_name', '?')} | {bk.get('date', '?')} | {bk.get('shift_name', '')} shift\n",
+            f" *{time_slots_label} ({len(slots)})*",
+            f"{dr_display} | {date_display}\n",
         ]
         for i, slot in enumerate(slots, 1):
             next_day_tag = ' (next day)' if slot.get('next_day') else ''
             msg_lines.append(f"  {i}. {fmt(slot['start'])} – {fmt(slot['end'])}{next_day_tag}")
 
-        msg_lines.append("\nReply with a *number* or *time* (e.g. '9 AM').")
         self.notify.send_whatsapp_text(sender_id, '\n'.join(msg_lines))
 
         # ── Interactive list (WhatsApp max 10 rows) ──
@@ -1078,15 +1163,22 @@ class SmartBookingEngine:
             
             lang = bk.get('language', 'en')
             booking_success = LocalizationService.get('booking_success', lang)
-            dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {bk.get('doctor_name')}", lang)
+            dr_display = LocalizationService.get_bilingual_display(f"Dr. {bk.get('doctor_name')}", lang)
+            svc_display = LocalizationService.get_bilingual_display(bk.get('service_name', ''), lang)
+            date_display = LocalizationService.format_date_ddmmyyyy(bk['date'])
+            date_localized = LocalizationService.format_date_localized(bk['date'], lang)
             
             confirm_msg = (
                 f" {booking_success} {bk.get('patient_name')}\n\n"
                 f"🆔 ID: {appt_id}\n"
-                f"‍️ Doctor: {dr_bilingual}\n"
-                f" Date: {bk['date']}\n"
-                f" Time: {fmt(bk['time_slot'])} – {fmt(bk.get('end_time', ''))}\n\n"
-                f" Status: Pending Doctor Approval"
+                f"👨‍⚕️ {LocalizationService.get('lbl_doctor', lang)}: {dr_display}\n"
+            )
+            if svc_display:
+                confirm_msg += f"💼 {LocalizationService.get('lbl_service', lang)}: {svc_display}\n"
+            confirm_msg += (
+                f"📅 {LocalizationService.get('lbl_date', lang)}: {date_localized} ({date_display})\n"
+                f"⏰ {LocalizationService.get('lbl_time', lang)}: {fmt(bk['time_slot'])} – {fmt(bk.get('end_time', ''))}\n\n"
+                f"📝 {LocalizationService.get('lbl_status', lang)}: {LocalizationService.get('status_pending', lang)}"
             )
             self.notify.send_whatsapp_text(sender_id, confirm_msg)
 
@@ -1134,6 +1226,7 @@ class SmartBookingEngine:
             return
 
         if date:
+            date_display = LocalizationService.format_date_ddmmyyyy(date)
             # Filter to doctors with availability on that date
             available = []
             for doc in doctors:
@@ -1150,10 +1243,10 @@ class SmartBookingEngine:
 
             if not available:
                 spec_label = f" in {specialty}" if specialty else ""
-                self.notify.send_whatsapp_text(sender_id, f"No doctors available{spec_label} on {date}.")
+                self.notify.send_whatsapp_text(sender_id, f"No doctors available{spec_label} on {date_display}.")
                 return
 
-            msg = f"‍️ *Doctors available on {date}*"
+            msg = f"‍️ *Doctors available on {date_display}*"
             if specialty:
                 msg += f" ({specialty})"
             msg += ":\n\n"
@@ -1221,23 +1314,24 @@ class SmartBookingEngine:
 
             # Have doctor + date — show real slots
             shifts = self.appt.get_available_shifts(matched['user_id'], date)
+            date_display = LocalizationService.format_date_ddmmyyyy(date)
             if not shifts:
                 self.notify.send_whatsapp_text(
                     sender_id,
-                    f"Dr. {matched['full_name']} has no available slots on {date}."
+                    f"Dr. {matched['full_name']} has no available slots on {date_display}."
                 )
                 return
 
             from services.appointment_service import AppointmentService
             fmt = AppointmentService.format_time_ampm
-            msg = f" *Dr. {matched['full_name']}* — {date}:\n\n"
+            msg = f" *Dr. {matched['full_name']}* — {date_display}:\n\n"
             for s in shifts:
                 slots = self.appt.get_shift_slots(matched['user_id'], date, s['start'], s['end'])
                 times = ', '.join(fmt(sl['start']) for sl in slots)
                 msg += f"*{s['shift_name']}* ({fmt(s['start'])}–{fmt(s['end'])}): {s['free_slots']} slots\n"
                 if times:
                     msg += f"  {times}\n"
-            msg += "\nWant to book? Just say: _book with Dr. " + matched['full_name'] + f" on {date}_"
+            msg += "\nWant to book? Just say: _book with Dr. " + matched['full_name'] + f" on {date_display}_"
             self.notify.send_whatsapp_text(sender_id, msg)
 
         elif specialty:
@@ -1249,8 +1343,9 @@ class SmartBookingEngine:
 
             if not date:
                 date = datetime.now().strftime('%Y-%m-%d')  # default to today
+            date_display = LocalizationService.format_date_ddmmyyyy(date)
 
-            msg = f" *{specialty} Slots on {date}*:\n\n"
+            msg = f" *{specialty} Slots on {date_display}*:\n\n"
             any_available = False
             for doc in doctors:
                 shifts = self.appt.get_available_shifts(doc['user_id'], date)
