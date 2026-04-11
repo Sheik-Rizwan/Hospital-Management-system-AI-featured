@@ -1,0 +1,218 @@
+[
+  {
+    "_id": {
+      "$oid": "6996cf1091a40a40b5166218"
+    },
+    "message_id": "msg_39ef0547c90e",
+    "chat_id": "chat_76b727278453",
+    "sender_id": "doctor_Na",
+    "sender_name": "ashwaq",
+    "sender_role": "doctor",
+    "content": "",
+    "type": "file",
+    "file_url": "http://localhost:5000/api/uploads/2295ff92_Screenshot_2026-01-27_101736.png",
+    "file_name": "Screenshot_2026-01-27_101736.png",
+    "timestamp": {
+      "$date": "2026-02-19T14:21:28.104Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "6996cf2091a40a40b516622f"
+    },
+    "message_id": "msg_b82435820a70",
+    "chat_id": "chat_76b727278453",
+    "sender_id": "doctor_Na",
+    "sender_name": "ashwaq",
+    "sender_role": "doctor",
+    "content": "his this is your actual vituals",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-02-19T14:21:44.851Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "6996cf3791a40a40b516624a"
+    },
+    "message_id": "msg_70daedae5b78",
+    "chat_id": "chat_76b727278453",
+    "sender_id": "doctor_Na",
+    "sender_name": "ashwaq",
+    "sender_role": "doctor",
+    "content": "hi this is Rizwan how can I help for you what about you",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-02-19T14:22:07.550Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "6996cfc491a40a40b5166307"
+    },
+    "message_id": "msg_07d58f22c8e5",
+    "chat_id": "chat_76b727278453",
+    "sender_id": "doctor_Na",
+    "sender_name": "ashwaq",
+    "sender_role": "doctor",
+    "content": "",
+    "type": "file",
+    "file_url": "http://localhost:5000/api/uploads/56ee622b_Hospital_Management_System_BRD.docx",
+    "file_name": "Hospital_Management_System_BRD.docx",
+    "timestamp": {
+      "$date": "2026-02-19T14:24:28.029Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "6996d03a91a40a40b5166382"
+    },
+    "message_id": "msg_0c051e9d7321",
+    "chat_id": "chat_76b727278453",
+    "sender_id": "doctor_Na",
+    "sender_name": "ashwaq",
+    "sender_role": "doctor",
+    "content": "yes",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-02-19T14:26:26.698Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "69a13d75da4f9723fa8d6386"
+    },
+    "message_id": "msg_35cc21ba73f2",
+    "chat_id": "chat_454b68de3ac8",
+    "sender_id": "doctor_Na",
+    "sender_name": "ashwaq",
+    "sender_role": "doctor",
+    "content": "hi chaman whatsapp",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-02-27T12:15:09.873Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "69a13dcfda4f9723fa8d6387"
+    },
+    "message_id": "msg_6ec4f8bc9e57",
+    "chat_id": "chat_454b68de3ac8",
+    "sender_id": "doctor_c3fa5a51",
+    "sender_name": "Chaman ",
+    "sender_role": "doctor",
+    "content": "fine hey hi ashwaq what about you",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-02-27T12:16:39.028Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "69a13decda4f9723fa8d6388"
+    },
+    "message_id": "msg_b98e581cbce5",
+    "chat_id": "chat_454b68de3ac8",
+    "sender_id": "doctor_c3fa5a51",
+    "sender_name": "Chaman ",
+    "sender_role": "doctor",
+    "content": "ya whats going on",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-02-27T12:17:08.847Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "69a55882808e41f2c61af575"
+    },
+    "message_id": "msg_57cc381bff89",
+    "chat_id": "chat_7fbd3bd8947a",
+    "sender_id": "doctor_c3fa5a51",
+    "sender_name": "Doctor A",
+    "sender_role": "doctor",
+    "content": "hi shareef what medications do you have",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-03-02T14:59:38.208Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "69a5695752c147a4a503772b"
+    },
+    "message_id": "msg_c00a880ecb44",
+    "chat_id": "chat_7fbd3bd8947a",
+    "sender_id": "vendor_5780c7c2",
+    "sender_name": "pharmatech",
+    "sender_role": "vendor",
+    "content": "yay i have paracetomal and other many medications which one you are likely to get",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-03-02T16:11:27.048Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "69a9220f6e63a959650e87b6"
+    },
+    "message_id": "msg_abf4f6006a07",
+    "chat_id": "chat_7fbd3bd8947a",
+    "sender_id": "vendor_5780c7c2",
+    "sender_name": "pharmatech",
+    "sender_role": "vendor",
+    "content": "which medications you suppose to use",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-03-05T11:56:23.472Z"
+    },
+    "is_read": false
+  },
+  {
+    "_id": {
+      "$oid": "69ae6433e4ba5b01b8ee2e14"
+    },
+    "message_id": "msg_32c5277ae843",
+    "chat_id": "chat_454b68de3ac8",
+    "sender_id": "doctor_Na",
+    "sender_name": "Doctor C",
+    "sender_role": "doctor",
+    "content": "yes what medicines you have",
+    "type": "text",
+    "file_url": "",
+    "file_name": "",
+    "timestamp": {
+      "$date": "2026-03-09T11:39:55.642Z"
+    },
+    "is_read": false
+  }
+]

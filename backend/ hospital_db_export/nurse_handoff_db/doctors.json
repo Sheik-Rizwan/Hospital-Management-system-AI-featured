@@ -1,0 +1,59 @@
+[
+  {
+    "_id": {
+      "$oid": "697b85f6fcf2cc7f11504e6f"
+    },
+    "user_id": "doctor_Na",
+    "created_at": {
+      "$date": "2026-01-29T21:38:22.327Z"
+    },
+    "department": "",
+    "email": "ashwaq@gmail.com",
+    "full_name": "ashwaq",
+    "is_active": true,
+    "license_number": "Na",
+    "password": "$2b$12$R3RRKnve26u114zUmm8Lo.ClEWAtjiHFPMFwb5tnYw62GJGXSnQN.",
+    "phone": "",
+    "role": "doctor",
+    "specialization": "Cardiology",
+    "service_id": "SVC-002"
+  },
+  {
+    "_id": {
+      "$oid": "69a0070c963b230fc3fd826e"
+    },
+    "user_id": "doctor_c3fa5a51",
+    "email": "chaman@gmail.com",
+    "password": "$2b$12$x5khhncC64Lr9V6h5VUfaOnKwj6do9lg3JAVVXXOpTkoIsKJt2KfS",
+    "full_name": "Chaman",
+    "role": "doctor",
+    "specialization": "General Consultation",
+    "license_number": "na",
+    "department": "",
+    "phone": "",
+    "created_at": {
+      "$date": "2026-02-26T14:10:44.105Z"
+    },
+    "is_active": true,
+    "service_id": "SVC-001"
+  },
+  {
+    "_id": {
+      "$oid": "69a0077b963b230fc3fd8271"
+    },
+    "user_id": "doctor_812860ca",
+    "email": "taj@gmail.com",
+    "password": "$2b$12$khNRm8x4A9Bx9O/pnzMtS.7cWMllXvxk2RRrEYdXlLFTvOD2MvTMG",
+    "full_name": "Tajuddin",
+    "role": "doctor",
+    "specialization": "Dermatology",
+    "license_number": "None",
+    "department": "",
+    "phone": "",
+    "created_at": {
+      "$date": "2026-02-26T14:12:35.145Z"
+    },
+    "is_active": true,
+    "service_id": "SVC-003"
+  }
+]

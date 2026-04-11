@@ -1,0 +1,139 @@
+[
+  {
+    "_id": {
+      "$oid": "69d7346e3c11ff253134dd61"
+    },
+    "sender_id": "919845641125",
+    "state": "MENU",
+    "data": {},
+    "updated_at": {
+      "$date": "2026-04-09T16:11:22.901Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d7355b3c11ff253134dd62"
+    },
+    "sender_id": "918885851826",
+    "state": "MENU",
+    "data": {},
+    "updated_at": {
+      "$date": "2026-04-09T12:45:03.421Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d75186cbf534cb8a3e83c9"
+    },
+    "sender_id": "919742053697",
+    "state": "CHAT",
+    "data": {
+      "detected_lang": "ta",
+      "messages": [
+        {
+          "role": "assistant",
+          "content": "\u0bb5\u0ba3\u0b95\u0bcd\u0b95\u0bae\u0bcd, \u0b90\u0baf\u0bbe. \u0ba8\u0bc0\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0b92\u0bb0\u0bc1 \u0ba8\u0bbf\u0baf\u0bae\u0ba9\u0ba4\u0bcd\u0ba4\u0bc8 \u0baa\u0bc1\u0ba4\u0bbf\u0baf\u0ba4\u0bbe\u0b95 \u0baa\u0bc1\u0ba4\u0bbf\u0baf \u0ba8\u0bbf\u0baf\u0bae\u0ba9\u0bae\u0bbe\u0b95 \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bbe \u0b85\u0bb2\u0bcd\u0bb2\u0ba4\u0bc1 \u0b8f\u0bb1\u0bcd\u0b95\u0ba9\u0bb5\u0bc7 \u0b89\u0bb3\u0bcd\u0bb3 \u0b92\u0bb0\u0bc1 \u0ba8\u0bbf\u0baf\u0bae\u0ba9\u0ba4\u0bcd\u0ba4\u0bc8 \u0bae\u0bbe\u0bb1\u0bcd\u0bb1 \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bbe?"
+        },
+        {
+          "role": "user",
+          "content": "\u0b86\u0bae\u0bcd"
+        },
+        {
+          "role": "assistant",
+          "content": "\u0bae\u0ba9\u0bcd\u0ba9\u0bbf\u0b95\u0bcd\u0b95\u0bb5\u0bc1\u0bae\u0bcd, \u0b90\u0baf\u0bbe. \u0ba8\u0bc0\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0b8e\u0ba8\u0bcd\u0ba4 \u0bae\u0bb0\u0bc1\u0ba4\u0bcd\u0ba4\u0bc1\u0bb5\u0bb0\u0bc8 \u0baa\u0bbe\u0bb0\u0bcd\u0b95\u0bcd\u0b95 \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bcd? \u0b85\u0bb5\u0bb0\u0bcd\u0b95\u0bb3\u0bbf\u0ba9\u0bcd \u0baa\u0bc6\u0baf\u0bb0\u0bc8\u0baf\u0bcb \u0b85\u0bb2\u0bcd\u0bb2\u0ba4\u0bc1 \u0b9a\u0bbf\u0bb1\u0baa\u0bcd\u0baa\u0bc1 \u0ba4\u0bc1\u0bb1\u0bc8\u0baf\u0bc8\u0baf\u0bcb (\u0b8e.\u0b95\u0bbe. \u0b87\u0ba4\u0baf\u0bb5\u0bbf\u0baf\u0bb2\u0bcd, \u0baa\u0bb2\u0bcd \u0bae\u0bb0\u0bc1\u0ba4\u0bcd\u0ba4\u0bc1\u0bb5\u0bae\u0bcd) \u0b95\u0bc2\u0bb1\u0bb5\u0bc1\u0bae\u0bcd."
+        },
+        {
+          "role": "user",
+          "content": "\u0baa\u0bca\u0ba4\u0bc1 \u0bae\u0bb0\u0bc1\u0ba4\u0bcd\u0ba4\u0bc1\u0bb5\u0bae\u0bcd"
+        },
+        {
+          "role": "assistant",
+          "content": "\u0b90\u0baf\u0bbe, \u0baa\u0bca\u0ba4\u0bc1 \u0bae\u0bb0\u0bc1\u0ba4\u0bcd\u0ba4\u0bc1\u0bb5\u0ba4\u0bcd\u0ba4\u0bbf\u0bb2\u0bcd \u0ba8\u0bbf\u0baa\u0bc1\u0ba3\u0bb0\u0bbe\u0ba9 \u0b9f\u0bbe\u0b95\u0bcd\u0b9f\u0bb0\u0bcd \u0b9a\u0bae\u0ba9\u0bcd \u0b95\u0bbf\u0b9f\u0bc8\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bbe\u0bb0\u0bcd. \u0ba8\u0bc0\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0b8e\u0baa\u0bcd\u0baa\u0bcb\u0ba4\u0bc1 \u0ba8\u0bbf\u0baf\u0bae\u0ba9\u0bae\u0bcd \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bcd?"
+        },
+        {
+          "role": "user",
+          "content": "\u0ba8\u0bc7\u0bb0\u0bae\u0bcd \u0b95\u0bbe\u0bb2\u0bae\u0bcd \u0b9a\u0bca\u0bb2\u0bcd\u0bb2\u0bb5\u0bc1\u0bae\u0bcd"
+        },
+        {
+          "role": "assistant",
+          "content": "\u0b90\u0baf\u0bbe, \u0b9f\u0bbe\u0b95\u0bcd\u0b9f\u0bb0\u0bcd \u0b9a\u0bae\u0ba9\u0bcd \u0b95\u0bbf\u0b9f\u0bc8\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bbe\u0bb0\u0bcd. \u0ba8\u0bc0\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0b8e\u0baa\u0bcd\u0baa\u0bcb\u0ba4\u0bc1 \u0ba8\u0bbf\u0baf\u0bae\u0ba9\u0bae\u0bcd \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bcd? \u0ba4\u0bc7\u0ba4\u0bbf \u0bae\u0bb1\u0bcd\u0bb1\u0bc1\u0bae\u0bcd \u0ba8\u0bc7\u0bb0\u0ba4\u0bcd\u0ba4\u0bc8 \u0b95\u0bc1\u0bb1\u0bbf\u0baa\u0bcd\u0baa\u0bbf\u0b9f\u0bb5\u0bc1\u0bae\u0bcd."
+        },
+        {
+          "role": "user",
+          "content": "\u0b85\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4 \u0ba4\u0bbf\u0b99\u0bcd\u0b95\u0bb3\u0bcd"
+        },
+        {
+          "role": "assistant",
+          "content": "\u0b90\u0baf\u0bbe, \u0b85\u0b9f\u0bc1\u0ba4\u0bcd\u0ba4 \u0ba4\u0bbf\u0b99\u0bcd\u0b95\u0bb3\u0ba9\u0bcd\u0bb1\u0bc1 (2026-04-14), \u0b9f\u0bbe\u0b95\u0bcd\u0b9f\u0bb0\u0bcd \u0b85\u0bb7\u0bcd\u0bb5\u0bbe\u0b95\u0bcd, \u0b9f\u0bbe\u0b95\u0bcd\u0b9f\u0bb0\u0bcd \u0b9a\u0bae\u0ba9\u0bcd, \u0bae\u0bb1\u0bcd\u0bb1\u0bc1\u0bae\u0bcd \u0b9f\u0bbe\u0b95\u0bcd\u0b9f\u0bb0\u0bcd \u0ba4\u0bbe\u0b9c\u0bcd \u0b86\u0b95\u0bbf\u0baf\u0bcb\u0bb0\u0bcd \u0b95\u0bbf\u0b9f\u0bc8\u0b95\u0bcd\u0b95\u0bbf\u0ba9\u0bcd\u0bb1\u0ba9\u0bb0\u0bcd. \u0ba8\u0bc0\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0baf\u0bbe\u0bb0\u0bbf\u0b9f\u0bae\u0bcd \u0ba8\u0bbf\u0baf\u0bae\u0ba9\u0bae\u0bcd \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bcd?"
+        },
+        {
+          "role": "user",
+          "content": "\u0b9a\u0bae\u0ba9\u0bcd"
+        },
+        {
+          "role": "assistant",
+          "content": "\u0b90\u0baf\u0bbe, \u0b9f\u0bbe\u0b95\u0bcd\u0b9f\u0bb0\u0bcd \u0b9a\u0bae\u0ba9\u0bcd 2026-04-14 \u0b85\u0ba9\u0bcd\u0bb1\u0bc1 \u0b87\u0bb0\u0bb5\u0bc1 \u0ba8\u0bc7\u0bb0\u0b99\u0bcd\u0b95\u0bb3\u0bbf\u0bb2\u0bcd \u0b95\u0bbf\u0b9f\u0bc8\u0b95\u0bcd\u0b95\u0bbf\u0bb1\u0bbe\u0bb0\u0bcd. \u0b95\u0bbf\u0b9f\u0bc8\u0b95\u0bcd\u0b95\u0bc1\u0bae\u0bcd \u0ba8\u0bc7\u0bb0\u0b99\u0bcd\u0b95\u0bb3\u0bcd: 10:00 PM, 10:45 PM, 11:30 PM, 12:15 AM, 1:00 AM, 1:45 AM, 2:30 AM, 3:15 AM, 4:00 AM, 4:45 AM. \u0ba8\u0bc0\u0b99\u0bcd\u0b95\u0bb3\u0bcd \u0b8e\u0ba8\u0bcd\u0ba4 \u0ba8\u0bc7\u0bb0\u0ba4\u0bcd\u0ba4\u0bbf\u0bb2\u0bcd \u0ba8\u0bbf\u0baf\u0bae\u0ba9\u0bae\u0bcd \u0bb5\u0bc7\u0ba3\u0bcd\u0b9f\u0bc1\u0bae\u0bcd?"
+        },
+        {
+          "role": "user",
+          "content": "\u0bae\u0bbe\u0bb2\u0bc8 4 \u0bae\u0ba3\u0bbf"
+        },
+        {
+          "role": "assistant",
+          "content": "I'm having a little trouble connecting right now. Can we try again in a moment?"
+        },
+        {
+          "role": "user",
+          "content": "4:00 am"
+        },
+        {
+          "role": "assistant",
+          "content": "I'm having a little trouble connecting right now. Can we try again in a moment?"
+        }
+      ],
+      "booked_for": null,
+      "booking_state": "BK_IDLE",
+      "date": "2026-04-12",
+      "doctor_id": "doctor_c3fa5a51",
+      "doctor_name": "Chaman",
+      "end_time": "04:00",
+      "language": "en",
+      "patient_name": null,
+      "service_id": null,
+      "service_name": null,
+      "shift_end": "07:00",
+      "shift_name": "Night",
+      "shift_start": "22:00",
+      "specialty": "general consultation",
+      "time_slot": "03:15",
+      "_available_slots": [
+        "22:00",
+        "22:45",
+        "23:30",
+        "00:15",
+        "01:00",
+        "01:45",
+        "02:30",
+        "03:15",
+        "04:00",
+        "04:45",
+        "05:30",
+        "06:15"
+      ]
+    },
+    "updated_at": {
+      "$date": "2026-04-09T12:59:16.994Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d75a13cbf534cb8a3e83cf"
+    },
+    "sender_id": "916361005641",
+    "state": "MENU",
+    "data": {},
+    "updated_at": {
+      "$date": "2026-04-09T16:51:05.495Z"
+    }
+  }
+]

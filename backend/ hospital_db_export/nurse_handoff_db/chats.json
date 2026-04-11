@@ -1,0 +1,91 @@
+[
+  {
+    "_id": {
+      "$oid": "6996cef691a40a40b51661ed"
+    },
+    "chat_id": "chat_76b727278453",
+    "participant_ids": [
+      "vendor_047e5b03",
+      "doctor_Na"
+    ],
+    "participants": [
+      {
+        "user_id": "vendor_047e5b03",
+        "name": "",
+        "role": "vendor"
+      },
+      {
+        "user_id": "doctor_Na",
+        "name": "ashwaq",
+        "role": "doctor"
+      }
+    ],
+    "request_id": "vreq_293611763ec7",
+    "created_at": {
+      "$date": "2026-02-19T14:21:02.722Z"
+    },
+    "last_message_at": {
+      "$date": "2026-02-19T14:26:26.701Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "69a13d6eda4f9723fa8d6385"
+    },
+    "chat_id": "chat_454b68de3ac8",
+    "participant_ids": [
+      "doctor_Na",
+      "doctor_c3fa5a51"
+    ],
+    "participants": [
+      {
+        "user_id": "doctor_Na",
+        "name": "ashwaq",
+        "role": "doctor"
+      },
+      {
+        "user_id": "doctor_c3fa5a51",
+        "name": "Chaman ",
+        "role": "doctor"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-27T12:15:02.382Z"
+    },
+    "last_message_at": {
+      "$date": "2026-03-09T11:39:55.651Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "69a55872808e41f2c61af574"
+    },
+    "chat_id": "chat_7fbd3bd8947a",
+    "participant_ids": [
+      "vendor_5780c7c2",
+      "doctor_c3fa5a51"
+    ],
+    "participants": [
+      {
+        "user_id": "vendor_5780c7c2",
+        "name": "",
+        "role": "vendor"
+      },
+      {
+        "user_id": "doctor_c3fa5a51",
+        "name": "Doctor A",
+        "role": "doctor"
+      }
+    ],
+    "request_id": "vreq_51234d34cf93",
+    "created_at": {
+      "$date": "2026-03-02T14:59:22.456Z"
+    },
+    "last_message_at": {
+      "$date": "2026-03-05T11:56:23.485Z"
+    },
+    "is_active": true
+  }
+]

@@ -1,0 +1,156 @@
+[
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84998"
+    },
+    "user_id": "nurse_001",
+    "assigned_beds": [],
+    "created_at": {
+      "$date": "2026-01-29T21:41:20.923Z"
+    },
+    "current_workload": 0,
+    "department": "",
+    "email": "hema@gmail.com",
+    "employee_id": "001",
+    "full_name": "Hema",
+    "is_active": true,
+    "is_available": false,
+    "password": "$2b$12$C5ScmW0Mirwz7sS/fi7.ce9fpTr1pbKL6pS7SC6c/0kKjYd3u9a6O",
+    "phone": "",
+    "role": "nurse",
+    "shift": "Day",
+    "status": "emergency"
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84999"
+    },
+    "user_id": "nurse_002",
+    "email": "sireesha@gmail.com",
+    "password": "$2b$12$uYbl2F.G5BgjA7e6zKW/EOeUCzeD6UjwZegz6jIbxC7oJB50vUrSW",
+    "full_name": "Sireesha",
+    "role": "nurse",
+    "department": "Emergency",
+    "employee_id": "002",
+    "phone": "",
+    "shift": "Day",
+    "status": "offline",
+    "is_available": false,
+    "current_workload": 0,
+    "assigned_beds": [],
+    "created_at": {
+      "$date": "2026-01-30T08:32:45.349Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a8499a"
+    },
+    "user_id": "nurse_b6c853a9",
+    "email": "srivalli@gmail.com",
+    "password": "$2b$12$vTe.5/7cakp2fbSe3iAIDOHy5GpB9nQF40j2dnrcWGqJX8bsdUVoe",
+    "full_name": "srivalli",
+    "role": "nurse",
+    "department": "ICU",
+    "employee_id": "04",
+    "phone": "",
+    "shift": "Day",
+    "status": "online",
+    "is_available": true,
+    "current_workload": 0,
+    "assigned_beds": [],
+    "created_at": {
+      "$date": "2026-02-25T18:08:06.393Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a8499b"
+    },
+    "user_id": "nurse_014",
+    "email": "bhavana@gmail.com",
+    "password": "$2b$12$2OLVzjwcqPGlajBbz4Yo/uYDdGChcOpcmqWFhCuPnk80RNGd2eDpi",
+    "full_name": "Bhavana",
+    "role": "nurse",
+    "department": "general ward",
+    "employee_id": "014",
+    "phone": "",
+    "shift": "Day",
+    "status": "online",
+    "is_available": true,
+    "current_workload": 0,
+    "assigned_beds": [],
+    "created_at": {
+      "$date": "2026-01-30T08:35:27.142Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a8499c"
+    },
+    "user_id": "nurse_015",
+    "email": "srilatha@gmail.com",
+    "password": "$2b$12$fxPi0hCv8t3.wCCztfYEG.EpEUU29b9muMzBTsnTINBWf9fsxbay.",
+    "full_name": "Sri Latha",
+    "role": "nurse",
+    "department": "General ward",
+    "employee_id": "015",
+    "phone": "",
+    "shift": "Day",
+    "status": "online",
+    "is_available": true,
+    "current_workload": 0,
+    "assigned_beds": [],
+    "created_at": {
+      "$date": "2026-01-30T08:36:24.476Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "69a01ecf87a2f99180e02645"
+    },
+    "user_id": "nurse_0288e858",
+    "email": "sara@gmail.com",
+    "password": "$2b$12$brgba2G3xAKj3nnltHQbCejOrj8YkMjkFOvsxLeDpBEXYfWSBRVLy",
+    "full_name": "Sara Khan",
+    "role": "nurse",
+    "department": "ICU",
+    "employee_id": "NS-2024-002",
+    "phone": "+91-9876543210",
+    "shift": "Day",
+    "status": "online",
+    "is_available": true,
+    "current_workload": 0,
+    "assigned_beds": [],
+    "created_at": {
+      "$date": "2026-02-25T17:34:56.256Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "69a01ecf87a2f99180e02646"
+    },
+    "user_id": "nurse_57b2f608",
+    "email": "n_0fed@test.com",
+    "password": "$2b$12$NsOct6amHaP5m4tB1MLNHuWxDAxgQkpl.G3ONjprh7/27U1larv2W",
+    "full_name": "Nurse 0fed",
+    "role": "nurse",
+    "department": "",
+    "employee_id": "N-0fed",
+    "phone": "",
+    "shift": "Day",
+    "status": "online",
+    "is_available": true,
+    "current_workload": 0,
+    "assigned_beds": [],
+    "created_at": {
+      "$date": "2026-02-25T18:07:59.248Z"
+    },
+    "is_active": true
+  }
+]

@@ -1,0 +1,577 @@
+[
+  {
+    "_id": {
+      "$oid": "6997017888ee1a2fb447029b"
+    },
+    "quotation_id": "quote_91eef58f",
+    "request_id": "req_698d395a",
+    "vendor_id": "vendor_047e5b03",
+    "vendor_name": "med supply",
+    "unit_price": 4.5,
+    "total_price": 2250.0,
+    "delivery_days": 3,
+    "validity_days": 15,
+    "terms": "Net 30 payment terms",
+    "notes": "Premium quality sterile surgical gloves",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-19T17:56:32.098Z"
+    },
+    "created_at": {
+      "$date": "2026-02-19T17:56:32.098Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6997025388ee1a2fb44702c5"
+    },
+    "quotation_id": "quote_bd2199d3",
+    "request_id": "req_600090d2",
+    "vendor_id": "vendor_047e5b03",
+    "vendor_name": "med supply",
+    "unit_price": 4.5,
+    "total_price": 2250.0,
+    "delivery_days": 3,
+    "validity_days": 15,
+    "terms": "Net 30 payment terms",
+    "notes": "Premium quality sterile surgical gloves",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-19T18:00:11.964Z"
+    },
+    "created_at": {
+      "$date": "2026-02-19T18:00:11.964Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699955d7131e4786f2b4e4c4"
+    },
+    "quotation_id": "quote_d3bf89d7",
+    "request_id": "req_ba695b04",
+    "vendor_id": "vendor_456ecf31",
+    "vendor_name": "med supply",
+    "unit_price": 10.0,
+    "total_price": 100.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": false,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-21T12:21:03.381Z"
+    },
+    "created_at": {
+      "$date": "2026-02-21T12:21:03.381Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699968ff79dbd723c1bd7f33"
+    },
+    "quotation_id": "quote_73d6458d",
+    "request_id": "req_613abd31",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 10.0,
+    "total_price": 100.0,
+    "delivery_days": 3,
+    "validity_days": 202,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-21T13:42:47.005Z"
+    },
+    "created_at": {
+      "$date": "2026-02-21T13:42:47.005Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699aa28df1c80ba5fef858ea"
+    },
+    "quotation_id": "quote_57205902",
+    "request_id": "req_236db199",
+    "vendor_id": "vendor_456ecf31",
+    "vendor_name": "med supply",
+    "unit_price": 20.0,
+    "total_price": 400.0,
+    "delivery_days": 7,
+    "validity_days": 100,
+    "terms": "",
+    "notes": "",
+    "is_selected": false,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-22T12:00:37.434Z"
+    },
+    "created_at": {
+      "$date": "2026-02-22T12:00:37.434Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699aa28df1c80ba5fef858eb"
+    },
+    "quotation_id": "quote_1a9c0c0a",
+    "request_id": "req_236db199",
+    "vendor_id": "vendor_456ecf31",
+    "vendor_name": "med supply",
+    "unit_price": 20.0,
+    "total_price": 400.0,
+    "delivery_days": 7,
+    "validity_days": 100,
+    "terms": "",
+    "notes": "",
+    "is_selected": false,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-22T12:00:37.437Z"
+    },
+    "created_at": {
+      "$date": "2026-02-22T12:00:37.437Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699ad7424b78244a31338933"
+    },
+    "quotation_id": "quote_1cdff9ba",
+    "request_id": "req_236db199",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 50.0,
+    "total_price": 1000.0,
+    "delivery_days": 7,
+    "validity_days": 10,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-22T15:45:30.907Z"
+    },
+    "created_at": {
+      "$date": "2026-02-22T15:45:30.907Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d81810262f892863416e6"
+    },
+    "quotation_id": "quote_05d61af5",
+    "request_id": "req_74efb421",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 600.0,
+    "total_price": 600.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-24T16:16:25.450Z"
+    },
+    "created_at": {
+      "$date": "2026-02-24T16:16:25.450Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d8aa50262f89286341776"
+    },
+    "quotation_id": "quote_7bc3d57f",
+    "request_id": "req_6d65bb4b",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 1000.0,
+    "total_price": 5000.0,
+    "delivery_days": 2,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-24T16:55:25.820Z"
+    },
+    "created_at": {
+      "$date": "2026-02-24T16:55:25.820Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a15dbbe486af725fa6eb50"
+    },
+    "quotation_id": "quote_568d27b6",
+    "request_id": "req_07709079",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 2000.0,
+    "total_price": 20000.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-02-27T14:32:51.499Z"
+    },
+    "created_at": {
+      "$date": "2026-02-27T14:32:51.499Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a51ef135a9b901e3877d95"
+    },
+    "quotation_id": "quote_d44af54f",
+    "request_id": "req_fc8ca145",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 100.0,
+    "total_price": 100.0,
+    "delivery_days": 7,
+    "validity_days": 1,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-02T10:54:01.689Z"
+    },
+    "created_at": {
+      "$date": "2026-03-02T10:54:01.689Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a559a4808e41f2c61af577"
+    },
+    "quotation_id": "quote_d84a6c7d",
+    "request_id": "req_ba695b04",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 10.0,
+    "total_price": 100.0,
+    "delivery_days": 1,
+    "validity_days": 2000,
+    "terms": "",
+    "notes": "",
+    "is_selected": false,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-02T15:04:28.541Z"
+    },
+    "created_at": {
+      "$date": "2026-03-02T15:04:28.541Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a5604fcb8be6d8b8d0acc6"
+    },
+    "quotation_id": "quote_5e8c09f6",
+    "request_id": "req_b60a39d3",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 10.0,
+    "total_price": 100.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": false,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-02T15:32:54.999Z"
+    },
+    "created_at": {
+      "$date": "2026-03-02T15:32:54.999Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a560a2cb8be6d8b8d0acc7"
+    },
+    "quotation_id": "quote_0a596057",
+    "request_id": "req_ea2920bd",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 100.0,
+    "total_price": 1000.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": false,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-02T15:34:18.007Z"
+    },
+    "created_at": {
+      "$date": "2026-03-02T15:34:18.007Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a56bab52c147a4a5037730"
+    },
+    "quotation_id": "quote_74b65992",
+    "request_id": "req_4d21158e",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 500.0,
+    "total_price": 25000.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-02T16:21:23.550Z"
+    },
+    "created_at": {
+      "$date": "2026-03-02T16:21:23.550Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a5771bcd8e7f528811f93f"
+    },
+    "quotation_id": "quote_589b6635",
+    "request_id": "req_1f29c5b7",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 5.0,
+    "total_price": 50.0,
+    "delivery_days": 10,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-02T17:10:11.544Z"
+    },
+    "created_at": {
+      "$date": "2026-03-02T17:10:11.544Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a90eb4ac563eaed2c8bf4d"
+    },
+    "quotation_id": "quote_cf412e7f",
+    "request_id": "req_be37e02e",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 1000.0,
+    "total_price": 10000.0,
+    "delivery_days": 7,
+    "validity_days": 24,
+    "terms": "",
+    "notes": "validity 24 hrs",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-05T10:33:48.363Z"
+    },
+    "created_at": {
+      "$date": "2026-03-05T10:33:48.363Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a90f6a0b232affdcac57b1"
+    },
+    "quotation_id": "quote_015ae953",
+    "request_id": "req_9bc8f258",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 200.0,
+    "total_price": 2000.0,
+    "delivery_days": 2,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-05T10:36:50.795Z"
+    },
+    "created_at": {
+      "$date": "2026-03-05T10:36:50.795Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a95b7bb93888cb9827c3db"
+    },
+    "quotation_id": "quote_ee64a3a2",
+    "request_id": "req_612259ed",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 5000.0,
+    "total_price": 100000.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-05T16:01:23.782Z"
+    },
+    "created_at": {
+      "$date": "2026-03-05T16:01:23.782Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7739b9269c460dbfa2b9"
+    },
+    "quotation_id": "quote_1a5ddf18",
+    "request_id": "req_1307585a",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 20.0,
+    "total_price": 1000.0,
+    "delivery_days": 4,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-06T12:12:01.115Z"
+    },
+    "created_at": {
+      "$date": "2026-03-06T12:12:01.115Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa79ce88ef218451d08a7c"
+    },
+    "quotation_id": "quote_15302f6a",
+    "request_id": "req_9d7128db",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 1000.0,
+    "total_price": 10000.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-06T12:23:02.901Z"
+    },
+    "created_at": {
+      "$date": "2026-03-06T12:23:02.901Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7a5c88ef218451d08a7f"
+    },
+    "quotation_id": "quote_13518d93",
+    "request_id": "req_60182c29",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 10.0,
+    "total_price": 100.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-06T12:25:24.191Z"
+    },
+    "created_at": {
+      "$date": "2026-03-06T12:25:24.191Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa80492f377e5638a01629"
+    },
+    "quotation_id": "quote_c19550fd",
+    "request_id": "req_ac0dd58a",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 50.0,
+    "total_price": 1500.0,
+    "delivery_days": 2,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-06T12:50:41.963Z"
+    },
+    "created_at": {
+      "$date": "2026-03-06T12:50:41.963Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ae77cc6b88493b406f46e2"
+    },
+    "quotation_id": "quote_fafebcd3",
+    "request_id": "req_69c8e1e0",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 100.0,
+    "total_price": 5000.0,
+    "delivery_days": 7,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-09T13:03:32.935Z"
+    },
+    "created_at": {
+      "$date": "2026-03-09T13:03:32.935Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69affbd8bc2552cac356e594"
+    },
+    "quotation_id": "quote_8e69b99e",
+    "request_id": "req_3dfd74e8",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "unit_price": 10.0,
+    "total_price": 100.0,
+    "delivery_days": 3,
+    "validity_days": 30,
+    "terms": "",
+    "notes": "",
+    "is_selected": true,
+    "is_deleted": false,
+    "submitted_at": {
+      "$date": "2026-03-10T16:39:12.688Z"
+    },
+    "created_at": {
+      "$date": "2026-03-10T16:39:12.688Z"
+    }
+  }
+]

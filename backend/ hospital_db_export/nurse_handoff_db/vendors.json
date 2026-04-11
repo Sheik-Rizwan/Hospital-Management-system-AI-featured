@@ -1,0 +1,82 @@
+[
+  {
+    "_id": {
+      "$oid": "6996a5fafea74095402ce67d"
+    },
+    "user_id": "vendor_456ecf31",
+    "email": "vendor1@gmail.com",
+    "password": "$2b$12$/pu55RLKYf52Ory3KqeUGeJ246W08XOlHrEy1vzGWHCIfq0KX2THK",
+    "company_name": "med supply",
+    "contact_person": "adarsh",
+    "role": "vendor",
+    "phone": "",
+    "address": "",
+    "category": "general",
+    "gst_number": "",
+    "bank_details": {},
+    "is_approved": true,
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-19T11:26:10.959Z"
+    },
+    "created_by": "system",
+    "updated_at": {
+      "$date": "2026-02-19T11:26:10.959Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6996c83e325cde4ba66ac33c"
+    },
+    "user_id": "vendor_047e5b03",
+    "email": "vendor2@gmail.com",
+    "password": "$2b$12$I1.QZeCJaGvkWWKmrVv9uex0Fwlf/6CBXOlt2UklNoIi/mEdghKoi",
+    "company_name": "med supply",
+    "contact_person": "sunil",
+    "role": "vendor",
+    "phone": "",
+    "address": "",
+    "category": "general",
+    "gst_number": "",
+    "bank_details": {},
+    "is_approved": true,
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-19T13:52:22.921Z"
+    },
+    "created_by": "system",
+    "updated_at": {
+      "$date": "2026-02-19T13:57:46.393Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6999669f131e4786f2b4e50b"
+    },
+    "user_id": "vendor_5780c7c2",
+    "email": "rizwanashu625@gmail.com",
+    "password": "$2b$12$UTBx7DvopJExTeXOk6k4N.ry1HEh4C.Xj0/sZMxjsI7fFE8wGuOPK",
+    "company_name": "pharmatech",
+    "contact_person": "shareef",
+    "role": "vendor",
+    "phone": "",
+    "address": "",
+    "category": "general",
+    "gst_number": "",
+    "bank_details": {},
+    "is_approved": true,
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-21T13:32:39.068Z"
+    },
+    "created_by": "system",
+    "updated_at": {
+      "$date": "2026-03-05T12:09:31.379Z"
+    },
+    "full_name": "SHifa",
+    "specialization": ""
+  }
+]

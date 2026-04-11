@@ -1,0 +1,2760 @@
+[
+  {
+    "_id": {
+      "$oid": "698da3fc7bb642a929b0ad2a"
+    },
+    "log_id": "LOG-FCC2DDF2",
+    "appointment_id": "APT-06D0674C",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-12T15:27:16.921Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6992f8021b59613839c26624"
+    },
+    "log_id": "LOG-D7802483",
+    "appointment_id": "APT-FB6BC682",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-16T16:27:06.722Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6992f971a0ca5b3ec98fd0c7"
+    },
+    "log_id": "LOG-DB017AE5",
+    "appointment_id": "APT-FB6BC682",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-16T16:33:13.454Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699301f5a5e981c7b46db7d7"
+    },
+    "log_id": "LOG-CF3A5C39",
+    "appointment_id": "APT-37173F02",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-16T17:09:33.030Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699307f1577590735b7115e9"
+    },
+    "log_id": "LOG-3A7864B5",
+    "appointment_id": "APT-5E126258",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-16T17:35:05.185Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69930922577590735b711625"
+    },
+    "log_id": "LOG-CB7837FE",
+    "appointment_id": "APT-F5B053D1",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-16T17:40:10.540Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69930dc0cda0d45b2391a52c"
+    },
+    "log_id": "LOG-3989EC33",
+    "appointment_id": "APT-7FE30CD4",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-16T17:59:52.992Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699311a1cda0d45b2391a549"
+    },
+    "log_id": "LOG-9E2002D0",
+    "appointment_id": "APT-1F0FF234",
+    "action": "booked_pending_approval",
+    "performed_by": "919886732638",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-16T18:16:25.780Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699311b4cda0d45b2391a54a"
+    },
+    "log_id": "LOG-D6E3193E",
+    "appointment_id": "APT-F5B053D1",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-16T18:16:44.078Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699311c8d340488457a47794"
+    },
+    "log_id": "LOG-0E96C702",
+    "appointment_id": "APT-7FE30CD4",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-16T18:17:04.563Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936543b35fa194c7530951"
+    },
+    "log_id": "LOG-A805A304",
+    "appointment_id": "APT-8291A390",
+    "action": "booked_pending_approval",
+    "performed_by": "919999999999",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-17T00:13:15.659Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936598e923c4e766a96d06"
+    },
+    "log_id": "LOG-0DB102CF",
+    "appointment_id": "APT-97A39076",
+    "action": "booked_pending_approval",
+    "performed_by": "919999999999",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-17T00:14:40.089Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699365b9c4fabf613dc90f18"
+    },
+    "log_id": "LOG-5568FCCE",
+    "appointment_id": "APT-4CDF6390",
+    "action": "booked_pending_approval",
+    "performed_by": "919999999999",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-17T00:15:13.767Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936df6289833b27c8d6e2a"
+    },
+    "log_id": "LOG-733481D8",
+    "appointment_id": "APT-801C1D35",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-17T00:50:22.133Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936e31289833b27c8d6e2b"
+    },
+    "log_id": "LOG-8AE8C752",
+    "appointment_id": "APT-801C1D35",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T00:51:21.577Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936ee4a119591656fd3c01"
+    },
+    "log_id": "LOG-9B4A965E",
+    "appointment_id": "APT-F814CB58",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-17T00:54:20.934Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936f23a119591656fd3c03"
+    },
+    "log_id": "LOG-B445BB52",
+    "appointment_id": "APT-CDF147F1",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-17T00:55:23.845Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936f30a119591656fd3c04"
+    },
+    "log_id": "LOG-2B91768F",
+    "appointment_id": "APT-CDF147F1",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T00:55:36.899Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f4cb9e0f69be2c2c540"
+    },
+    "log_id": "LOG-EC99D9F4",
+    "appointment_id": "APT-6B8FC902",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-17T15:43:32.210Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f81b9e0f69be2c2c541"
+    },
+    "log_id": "LOG-73FBF153",
+    "appointment_id": "APT-6B8FC902",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T15:44:25.537Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f92b9e0f69be2c2c542"
+    },
+    "log_id": "LOG-C2E99835",
+    "appointment_id": "APT-801C1D35",
+    "action": "completed",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T15:44:42.036Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f93b9e0f69be2c2c543"
+    },
+    "log_id": "LOG-D04618D4",
+    "appointment_id": "APT-F5B053D1",
+    "action": "completed",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T15:44:43.062Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f95b9e0f69be2c2c544"
+    },
+    "log_id": "LOG-4B3E75D8",
+    "appointment_id": "APT-7FE30CD4",
+    "action": "completed",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T15:44:45.176Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f96b9e0f69be2c2c545"
+    },
+    "log_id": "LOG-27344CF3",
+    "appointment_id": "APT-FB6BC682",
+    "action": "completed",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T15:44:46.867Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f98b9e0f69be2c2c546"
+    },
+    "log_id": "LOG-0669D859",
+    "appointment_id": "APT-37173F02",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T15:44:48.480Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f9ab9e0f69be2c2c547"
+    },
+    "log_id": "LOG-42E5C13B",
+    "appointment_id": "APT-5E126258",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T15:44:50.263Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f9cb9e0f69be2c2c548"
+    },
+    "log_id": "LOG-7F5CE31E",
+    "appointment_id": "APT-1F0FF234",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T15:44:52.282Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69945e37acf210a146259219"
+    },
+    "log_id": "LOG-67025F9E",
+    "appointment_id": "APT-991C0B99",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-17T17:55:27.542Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69945e5dacf210a14625921a"
+    },
+    "log_id": "LOG-8E8A1F1C",
+    "appointment_id": "APT-991C0B99",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-17T17:56:05.666Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699550a27b164e432e92f976"
+    },
+    "log_id": "LOG-B90214C1",
+    "appointment_id": "APT-04E7C494",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-18T11:09:46.609Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699550de7b164e432e92f978"
+    },
+    "log_id": "LOG-811B2BA9",
+    "appointment_id": "APT-5BBA6A4A",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-18T11:10:46.438Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699551667b164e432e92f979"
+    },
+    "log_id": "LOG-A0C4E56F",
+    "appointment_id": "APT-04E7C494",
+    "action": "rejected",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. please book an another timings i had some other work t do ",
+    "timestamp": {
+      "$date": "2026-02-18T11:13:02.059Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699551867b164e432e92f97a"
+    },
+    "log_id": "LOG-57CBC248",
+    "appointment_id": "APT-5BBA6A4A",
+    "action": "rejected",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. today im not coming try other day",
+    "timestamp": {
+      "$date": "2026-02-18T11:13:34.692Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69959e84105cb24f605a1a91"
+    },
+    "log_id": "LOG-224840DE",
+    "appointment_id": "APT-78F3B633",
+    "action": "booked_pending_approval",
+    "performed_by": "917892855850",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-18T16:42:04.850Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69959eab105cb24f605a1a92"
+    },
+    "log_id": "LOG-2C68441C",
+    "appointment_id": "APT-78F3B633",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-18T16:42:43.881Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69959ead105cb24f605a1a93"
+    },
+    "log_id": "LOG-9225B23F",
+    "appointment_id": "APT-78F3B633",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-18T16:42:45.137Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d742ebb8c500bc75be314"
+    },
+    "log_id": "LOG-CDFE3040",
+    "appointment_id": "APT-8D22F81A",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-24T15:19:34.749Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d88a60262f89286341729"
+    },
+    "log_id": "LOG-DD430BF4",
+    "appointment_id": "APT-1D19006F",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-24T16:46:54.297Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699ef8286eacf38cdd106f9c"
+    },
+    "log_id": "LOG-91E8EEC0",
+    "appointment_id": "APT-D70624DB",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-25T18:54:56.389Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699fca41ad51615fe79df9f9"
+    },
+    "log_id": "LOG-3D914FFB",
+    "appointment_id": "APT-028BB7A3",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T09:51:21.108Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699fca6aad51615fe79df9fa"
+    },
+    "log_id": "LOG-ABD9CBAE",
+    "appointment_id": "APT-028BB7A3",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-26T09:52:02.322Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699fd6817d3c0076450820c2"
+    },
+    "log_id": "LOG-B5C007CF",
+    "appointment_id": "APT-9B63F4BF",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T10:43:37.085Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699fd8467d3c0076450820c4"
+    },
+    "log_id": "LOG-D60784C6",
+    "appointment_id": "APT-D40563F3",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T10:51:10.042Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699ff500d5d0c8f03415a8ca"
+    },
+    "log_id": "LOG-151EBA73",
+    "appointment_id": "APT-2A233014",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T12:53:44.281Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699ff7f55650c2cb271c9c74"
+    },
+    "log_id": "LOG-B3CEF5C2",
+    "appointment_id": "APT-2A233014",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-26T13:06:21.556Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a029e769ae4f22e4467152"
+    },
+    "log_id": "LOG-2F354F9C",
+    "appointment_id": "APT-BDB5C740",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T16:39:27.926Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a02a25726e9f94f434ca04"
+    },
+    "log_id": "LOG-280443B8",
+    "appointment_id": "APT-D70624DB",
+    "action": "rejected",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. im not available ",
+    "timestamp": {
+      "$date": "2026-02-26T16:40:29.804Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a02a31726e9f94f434ca05"
+    },
+    "log_id": "LOG-2D46788F",
+    "appointment_id": "APT-BDB5C740",
+    "action": "rejected",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. not available ",
+    "timestamp": {
+      "$date": "2026-02-26T16:40:41.578Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a02a3f726e9f94f434ca06"
+    },
+    "log_id": "LOG-B9628133",
+    "appointment_id": "APT-8D22F81A",
+    "action": "rejected",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. nort availab;e ",
+    "timestamp": {
+      "$date": "2026-02-26T16:40:55.489Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a02a43726e9f94f434ca07"
+    },
+    "log_id": "LOG-7C6B840D",
+    "appointment_id": "APT-D40563F3",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-26T16:40:59.500Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a02a44726e9f94f434ca08"
+    },
+    "log_id": "LOG-059B0956",
+    "appointment_id": "APT-9B63F4BF",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-26T16:41:00.681Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a02a45726e9f94f434ca09"
+    },
+    "log_id": "LOG-00150C48",
+    "appointment_id": "APT-1D19006F",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-26T16:41:01.351Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0345946e112b7a50853c8"
+    },
+    "log_id": "LOG-DE0F5BE2",
+    "appointment_id": "APT-41C61A18",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T17:24:01.793Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0374fe08418c14028c8d1"
+    },
+    "log_id": "LOG-18D88E14",
+    "appointment_id": "APT-47262E57",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T17:36:39.318Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a03c5aba8377a43bfe878d"
+    },
+    "log_id": "LOG-E08CC43B",
+    "appointment_id": "APT-BCBE2AEB",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T17:58:10.929Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a03e13efea917a7cbac884"
+    },
+    "log_id": "LOG-CD7890AA",
+    "appointment_id": "APT-852D184C",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T18:05:31.066Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a03f70f12cc56827690b11"
+    },
+    "log_id": "LOG-69E922E2",
+    "appointment_id": "APT-1E528D52",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T18:11:20.268Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a04255f12cc56827690b13"
+    },
+    "log_id": "LOG-CCD878FE",
+    "appointment_id": "APT-80A6F658",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T18:23:41.737Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a04286f12cc56827690b14"
+    },
+    "log_id": "LOG-4BF349E1",
+    "appointment_id": "APT-1E528D52",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-26T18:24:30.638Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08d1def50b505829cbf37"
+    },
+    "log_id": "LOG-BA4C5192",
+    "appointment_id": "APT-9B68FB00",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T23:42:45.215Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08d3cef50b505829cbf38"
+    },
+    "log_id": "LOG-F2E62778",
+    "appointment_id": "APT-9B68FB00",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-26T23:43:16.155Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08ef5ed810119046f3d76"
+    },
+    "log_id": "LOG-BC8569A7",
+    "appointment_id": "APT-3C83179B",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T23:50:37.439Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08f25ed810119046f3d77"
+    },
+    "log_id": "LOG-E41E87B6",
+    "appointment_id": "APT-3C83179B",
+    "action": "rejected",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. im busy try to book on other day",
+    "timestamp": {
+      "$date": "2026-02-26T23:51:25.749Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08f7fed810119046f3d79"
+    },
+    "log_id": "LOG-C395065D",
+    "appointment_id": "APT-0540CE5F",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-26T23:52:55.093Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08f83ed810119046f3d7a"
+    },
+    "log_id": "LOG-A2832CE0",
+    "appointment_id": "APT-0540CE5F",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-26T23:52:59.962Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a092dbf2df5635da79aad4"
+    },
+    "log_id": "LOG-883A1B27",
+    "appointment_id": "APT-D106CD22",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:07:15.825Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a092e6f2df5635da79aad5"
+    },
+    "log_id": "LOG-F685E320",
+    "appointment_id": "APT-80A6F658",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:07:26.767Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09360f2df5635da79aad7"
+    },
+    "log_id": "LOG-ABE0D264",
+    "appointment_id": "APT-52911E24",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:09:28.318Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09420f2df5635da79aad8"
+    },
+    "log_id": "LOG-81924C5B",
+    "appointment_id": "APT-852D184C",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:12:40.832Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0943af2df5635da79aadb"
+    },
+    "log_id": "LOG-E190806C",
+    "appointment_id": "APT-2651A514",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:13:06.107Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09495f2df5635da79aadd"
+    },
+    "log_id": "LOG-E566BE3D",
+    "appointment_id": "APT-8D53F09C",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:14:37.766Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0950af2df5635da79aade"
+    },
+    "log_id": "LOG-DD4DA05C",
+    "appointment_id": "APT-2651A514",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:16:34.130Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0950bf2df5635da79aadf"
+    },
+    "log_id": "LOG-5CE1F873",
+    "appointment_id": "APT-52911E24",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:16:35.346Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09518f2df5635da79aae0"
+    },
+    "log_id": "LOG-15D352FA",
+    "appointment_id": "APT-8D53F09C",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:16:48.543Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09563f2df5635da79aae2"
+    },
+    "log_id": "LOG-DDF6843B",
+    "appointment_id": "APT-B23C2F98",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:18:03.171Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09576f2df5635da79aae3"
+    },
+    "log_id": "LOG-8EC4BC23",
+    "appointment_id": "APT-B23C2F98",
+    "action": "rejected",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. im bust at the time",
+    "timestamp": {
+      "$date": "2026-02-27T00:18:22.796Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a095b3f2df5635da79aae5"
+    },
+    "log_id": "LOG-B2E1B862",
+    "appointment_id": "APT-5C3D1AED",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:19:23.483Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a095baf2df5635da79aae6"
+    },
+    "log_id": "LOG-B6153353",
+    "appointment_id": "APT-5C3D1AED",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:19:30.215Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0961bf2df5635da79aae8"
+    },
+    "log_id": "LOG-4A7985A5",
+    "appointment_id": "APT-574E217A",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:21:07.180Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09696f2df5635da79aae9"
+    },
+    "log_id": "LOG-C2BAE9E3",
+    "appointment_id": "APT-574E217A",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:23:10.565Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a096f1f2df5635da79aaeb"
+    },
+    "log_id": "LOG-9B36ABD0",
+    "appointment_id": "APT-9B6AE64E",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:24:41.600Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a096f8f2df5635da79aaec"
+    },
+    "log_id": "LOG-E4C99EC8",
+    "appointment_id": "APT-9B6AE64E",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:24:48.009Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0978ab261bf4e0c2595fc"
+    },
+    "log_id": "LOG-64D4D155",
+    "appointment_id": "APT-36B74287",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:27:14.530Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09793b261bf4e0c2595fd"
+    },
+    "log_id": "LOG-67397E48",
+    "appointment_id": "APT-36B74287",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:27:23.648Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a097adb261bf4e0c2595fe"
+    },
+    "log_id": "LOG-E77D472E",
+    "appointment_id": "APT-1F0FF234",
+    "action": "completed",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:27:49.104Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09810b261bf4e0c259600"
+    },
+    "log_id": "LOG-D482738F",
+    "appointment_id": "APT-81DB3D90",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:29:28.238Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0982db261bf4e0c259601"
+    },
+    "log_id": "LOG-5B027479",
+    "appointment_id": "APT-81DB3D90",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:29:57.078Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09868b261bf4e0c259603"
+    },
+    "log_id": "LOG-AF8123DE",
+    "appointment_id": "APT-04665C73",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T00:30:56.044Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09897b261bf4e0c259604"
+    },
+    "log_id": "LOG-8577961D",
+    "appointment_id": "APT-04665C73",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T00:31:43.340Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1224d8a4a6de8a0bb6f9c"
+    },
+    "log_id": "LOG-F20B4EB5",
+    "appointment_id": "APT-A14A9081",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T10:19:17.957Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a122888a4a6de8a0bb6f9d"
+    },
+    "log_id": "LOG-0EAC57F9",
+    "appointment_id": "APT-A14A9081",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T10:20:16.800Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1274a651b2f556cbfdc08"
+    },
+    "log_id": "LOG-8B904060",
+    "appointment_id": "APT-54F99D9D",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T10:40:34.599Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1276e651b2f556cbfdc09"
+    },
+    "log_id": "LOG-1888A2ED",
+    "appointment_id": "APT-54F99D9D",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T10:41:10.695Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a12781651b2f556cbfdc0a"
+    },
+    "log_id": "LOG-70B098CA",
+    "appointment_id": "APT-D106CD22",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T10:41:29.219Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1405dfcdf74032b62e92c"
+    },
+    "log_id": "LOG-0A1D4E7C",
+    "appointment_id": "APT-B1820186",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:27:33.421Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1409ffcdf74032b62e92f"
+    },
+    "log_id": "LOG-621AECE2",
+    "appointment_id": "APT-281A78A0",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:28:39.521Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14120a3892a5a68237f0c"
+    },
+    "log_id": "LOG-EB708A85",
+    "appointment_id": "APT-BCBE2AEB",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:30:48.462Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14152a3892a5a68237f0e"
+    },
+    "log_id": "LOG-874B9448",
+    "appointment_id": "APT-3C357D81",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:31:38.596Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1417aa3892a5a68237f10"
+    },
+    "log_id": "LOG-07ADD3BC",
+    "appointment_id": "APT-4910F67C",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:32:18.471Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a141ede486af725fa6eb3a"
+    },
+    "log_id": "LOG-1454E562",
+    "appointment_id": "APT-3C357D81",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:34:13.970Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a141f1e486af725fa6eb3b"
+    },
+    "log_id": "LOG-9A5C732C",
+    "appointment_id": "APT-281A78A0",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:34:17.217Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a141f3e486af725fa6eb3c"
+    },
+    "log_id": "LOG-4ED5E073",
+    "appointment_id": "APT-B1820186",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:34:19.233Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14264e486af725fa6eb3d"
+    },
+    "log_id": "LOG-7F07A5BF",
+    "appointment_id": "APT-47262E57",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:36:12.267Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14264e486af725fa6eb3e"
+    },
+    "log_id": "LOG-3F06FC4B",
+    "appointment_id": "APT-4910F67C",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:36:12.755Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14265e486af725fa6eb3f"
+    },
+    "log_id": "LOG-77F21BD6",
+    "appointment_id": "APT-41C61A18",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:36:13.697Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a142f8e486af725fa6eb41"
+    },
+    "log_id": "LOG-EA970484",
+    "appointment_id": "APT-322D5D41",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:38:40.350Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14350e486af725fa6eb43"
+    },
+    "log_id": "LOG-B5596852",
+    "appointment_id": "APT-1CAF1DD2",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:40:08.937Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14388e486af725fa6eb44"
+    },
+    "log_id": "LOG-EF448D63",
+    "appointment_id": "APT-322D5D41",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:41:04.845Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14389e486af725fa6eb45"
+    },
+    "log_id": "LOG-14C0A363",
+    "appointment_id": "APT-1CAF1DD2",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:41:05.281Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a143c9e486af725fa6eb47"
+    },
+    "log_id": "LOG-9E60B99B",
+    "appointment_id": "APT-2B69FE82",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:42:09.755Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a143fbe486af725fa6eb48"
+    },
+    "log_id": "LOG-A3AB8BB4",
+    "appointment_id": "APT-2B69FE82",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:42:59.395Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14477e486af725fa6eb4a"
+    },
+    "log_id": "LOG-6CF975CF",
+    "appointment_id": "APT-C0062ACD",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:45:03.521Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14492e486af725fa6eb4b"
+    },
+    "log_id": "LOG-3E5E764B",
+    "appointment_id": "APT-C0062ACD",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:45:30.936Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a144e6e486af725fa6eb4d"
+    },
+    "log_id": "LOG-E4DF93B5",
+    "appointment_id": "APT-B598929A",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T12:46:54.997Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1452de486af725fa6eb4e"
+    },
+    "log_id": "LOG-53CBCF36",
+    "appointment_id": "APT-B598929A",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T12:48:05.322Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a16c1438e021b21fd96dcf"
+    },
+    "log_id": "LOG-0E5566FF",
+    "appointment_id": "APT-0000F711",
+    "action": "booked_pending_approval",
+    "performed_by": "patient_01",
+    "performed_by_role": "patient",
+    "details": "Booked via patient, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T15:34:04.074Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a16d2638e021b21fd96dd1"
+    },
+    "log_id": "LOG-6A18ADA4",
+    "appointment_id": "APT-871FE984",
+    "action": "booked_pending_approval",
+    "performed_by": "patient_01",
+    "performed_by_role": "patient",
+    "details": "Booked via patient, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T15:38:38.572Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a16ea138e021b21fd96dd2"
+    },
+    "log_id": "LOG-FD54FE0A",
+    "appointment_id": "APT-0000F711",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T15:44:57.279Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a16ea138e021b21fd96dd3"
+    },
+    "log_id": "LOG-FB60D80F",
+    "appointment_id": "APT-871FE984",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-27T15:44:57.952Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a171abc5a8a50c7f04ef07"
+    },
+    "log_id": "LOG-7D46669B",
+    "appointment_id": "APT-5D477DA8",
+    "action": "booked_pending_approval",
+    "performed_by": "patient_01",
+    "performed_by_role": "patient",
+    "details": "Booked via patient, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-27T15:57:55.524Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a2998c54cd9df3c86c5af0"
+    },
+    "log_id": "LOG-57808733",
+    "appointment_id": "APT-BE3020F1",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-28T13:00:20.658Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a299a866f80c956e402900"
+    },
+    "log_id": "LOG-834875FF",
+    "appointment_id": "APT-BE3020F1",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-28T13:00:48.728Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a299a966f80c956e402901"
+    },
+    "log_id": "LOG-06169E28",
+    "appointment_id": "APT-5D477DA8",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-28T13:00:49.050Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a299ef66f80c956e402903"
+    },
+    "log_id": "LOG-779EC9A1",
+    "appointment_id": "APT-ED8C9FCD",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-02-28T13:01:59.964Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a299f866f80c956e402904"
+    },
+    "log_id": "LOG-9CB82450",
+    "appointment_id": "APT-ED8C9FCD",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-02-28T13:02:08.545Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a5285c319a5616acc2332a"
+    },
+    "log_id": "LOG-394F12B4",
+    "appointment_id": "APT-71CA1AFE",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-02T11:34:12.337Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55840808e41f2c61af571"
+    },
+    "log_id": "LOG-C14B9232",
+    "appointment_id": "APT-71CA1AFE",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-02T14:58:32.136Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55847808e41f2c61af572"
+    },
+    "log_id": "LOG-BAA0E614",
+    "appointment_id": "APT-A14A9081",
+    "action": "completed",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-02T14:58:39.953Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55a3c808e41f2c61af579"
+    },
+    "log_id": "LOG-8F71CB3F",
+    "appointment_id": "APT-9B073206",
+    "action": "booked_pending_approval",
+    "performed_by": "patient_01",
+    "performed_by_role": "patient",
+    "details": "Booked via patient, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-02T15:07:00.409Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55a6c808e41f2c61af57b"
+    },
+    "log_id": "LOG-8F8FE7AC",
+    "appointment_id": "APT-013423CC",
+    "action": "booked_pending_approval",
+    "performed_by": "patient_01",
+    "performed_by_role": "patient",
+    "details": "Booked via patient, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-02T15:07:48.552Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55bb69d7a1eb221ee76ab"
+    },
+    "log_id": "LOG-D86ED589",
+    "appointment_id": "APT-F39FE47A",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-02T15:13:18.026Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55bde9d7a1eb221ee76ac"
+    },
+    "log_id": "LOG-5E34AA6D",
+    "appointment_id": "APT-F39FE47A",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-02T15:13:58.900Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55c169d7a1eb221ee76ae"
+    },
+    "log_id": "LOG-38B1D6A8",
+    "appointment_id": "APT-C71F20CF",
+    "action": "booked_pending_approval",
+    "performed_by": "patient_01",
+    "performed_by_role": "patient",
+    "details": "Booked via patient, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-02T15:14:54.846Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55c6dcb8be6d8b8d0acc3"
+    },
+    "log_id": "LOG-5D7860A9",
+    "appointment_id": "APT-BFD1BE5B",
+    "action": "booked_pending_approval",
+    "performed_by": "patient_01",
+    "performed_by_role": "patient",
+    "details": "Booked via patient, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-02T15:16:21.424Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55d0acb8be6d8b8d0acc4"
+    },
+    "log_id": "LOG-69CCA4CA",
+    "appointment_id": "APT-013423CC",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-02T15:18:58.274Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a5680752c147a4a5037723"
+    },
+    "log_id": "LOG-1F0AC9BB",
+    "appointment_id": "APT-9B073206",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-02T16:05:51.824Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a56a8152c147a4a503772d"
+    },
+    "log_id": "LOG-850DA1C7",
+    "appointment_id": "APT-EEDCBBB8",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-02T16:16:25.375Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a56aa652c147a4a503772e"
+    },
+    "log_id": "LOG-DA61DC52",
+    "appointment_id": "APT-EEDCBBB8",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-02T16:17:02.611Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a67fc973f20c380502e761"
+    },
+    "log_id": "LOG-A323DC94",
+    "appointment_id": "APT-7659840F",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-03T11:59:29.488Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6a2dbe6483960d2596c01"
+    },
+    "log_id": "LOG-8D8C12AC",
+    "appointment_id": "APT-C47AADBF",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-03T14:29:07.677Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6a94d5ad49fd250e244e9"
+    },
+    "log_id": "LOG-D93FAB49",
+    "appointment_id": "APT-E7B29F74",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-03T14:56:37.102Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6ad54d8cab3a0fa274336"
+    },
+    "log_id": "LOG-5ACB223D",
+    "appointment_id": "APT-D795E311",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-03T15:13:48.722Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6b4e8d5947e166a40ac7c"
+    },
+    "log_id": "LOG-86B3EECB",
+    "appointment_id": "APT-04AED358",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-03T15:46:08.341Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6b52ad5947e166a40ac7e"
+    },
+    "log_id": "LOG-78E7D170",
+    "appointment_id": "APT-C3DE532E",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-03T15:47:14.173Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6ba0aad2093b4bd1ed93a"
+    },
+    "log_id": "LOG-F95B5FBB",
+    "appointment_id": "APT-6C43BD86",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-03T16:08:02.313Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6c088215196ad36eec398"
+    },
+    "log_id": "LOG-E799B642",
+    "appointment_id": "APT-2173D193",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-03T16:35:44.958Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6c0fd215196ad36eec399"
+    },
+    "log_id": "LOG-39D3FFF8",
+    "appointment_id": "APT-6C43BD86",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-03T16:37:41.650Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a922cf6e63a959650e87b7"
+    },
+    "log_id": "LOG-69613B18",
+    "appointment_id": "APT-C71F20CF",
+    "action": "rejected",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. book at another time ",
+    "timestamp": {
+      "$date": "2026-03-05T11:59:35.679Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a922d66e63a959650e87b8"
+    },
+    "log_id": "LOG-130F699C",
+    "appointment_id": "APT-013423CC",
+    "action": "completed",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-05T11:59:42.290Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a922dd6e63a959650e87b9"
+    },
+    "log_id": "LOG-9DC0DB1F",
+    "appointment_id": "APT-C3DE532E",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-05T11:59:49.860Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a923016e63a959650e87ba"
+    },
+    "log_id": "LOG-6BA06F00",
+    "appointment_id": "APT-281A78A0",
+    "action": "completed",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-05T12:00:25.370Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a9260c173ab5c37c820243"
+    },
+    "log_id": "LOG-7DD8756F",
+    "appointment_id": "APT-2173D193",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-05T12:13:24.716Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7b5c88ef218451d08a83"
+    },
+    "log_id": "LOG-4429A4F7",
+    "appointment_id": "APT-0E02C47E",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-06T12:29:40.772Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7b6f88ef218451d08a84"
+    },
+    "log_id": "LOG-277B57D9",
+    "appointment_id": "APT-0E02C47E",
+    "action": "approved",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-06T12:29:59.505Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7e6d88ef218451d08a85"
+    },
+    "log_id": "LOG-D91EB648",
+    "appointment_id": "APT-0540CE5F",
+    "action": "completed",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment completed by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-06T12:42:45.364Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7e9688ef218451d08a86"
+    },
+    "log_id": "LOG-0DE910FD",
+    "appointment_id": "APT-E7B29F74",
+    "action": "rejected",
+    "performed_by": "doctor_812860ca",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. not available",
+    "timestamp": {
+      "$date": "2026-03-06T12:43:26.117Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ae6408e4ba5b01b8ee2e13"
+    },
+    "log_id": "LOG-002E744D",
+    "appointment_id": "APT-D795E311",
+    "action": "rejected",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. book on 5th",
+    "timestamp": {
+      "$date": "2026-03-09T11:39:12.650Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ae761f6b88493b406f46de"
+    },
+    "log_id": "LOG-8E21089A",
+    "appointment_id": "APT-74DDDB98",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-09T12:56:23.255Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ae763b6b88493b406f46df"
+    },
+    "log_id": "LOG-D75337B1",
+    "appointment_id": "APT-74DDDB98",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-09T12:56:51.474Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ae76f66b88493b406f46e0"
+    },
+    "log_id": "LOG-2D7C6ADA",
+    "appointment_id": "APT-BFD1BE5B",
+    "action": "rejected",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. jbhwfkh",
+    "timestamp": {
+      "$date": "2026-03-09T12:59:58.793Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69afa61630368c29a4d84394"
+    },
+    "log_id": "LOG-4A9E04B5",
+    "appointment_id": "APT-BE129EB5",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-10T10:33:18.803Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69afa6c030368c29a4d84396"
+    },
+    "log_id": "LOG-3086F7DE",
+    "appointment_id": "APT-D5B44F87",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-10T10:36:08.546Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69afb6825cf3d10bc16dfb55"
+    },
+    "log_id": "LOG-7560F60D",
+    "appointment_id": "APT-CE48D2DA",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-10T11:43:22.460Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b3e5a6d1c182b30abac36a"
+    },
+    "log_id": "LOG-278F5E25",
+    "appointment_id": "APT-76B9EA5E",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-13T15:53:34.886Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b3e916d1c182b30abac36c"
+    },
+    "log_id": "LOG-DDAC1ECC",
+    "appointment_id": "APT-C193C027",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-13T16:08:14.269Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b983a6e2f8303eab46c315"
+    },
+    "log_id": "LOG-8D16BDCA",
+    "appointment_id": "APT-A1FF859B",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-17T22:09:02.580Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba3c91b3faae4493c0a488"
+    },
+    "log_id": "LOG-2686B38B",
+    "appointment_id": "APT-74235EFC",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T11:18:01.500Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba43019c9fce3086da436d"
+    },
+    "log_id": "LOG-BCB5BA8D",
+    "appointment_id": "APT-B34F8B85",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T11:45:29.651Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba43379c9fce3086da436e"
+    },
+    "log_id": "LOG-FE5F313C",
+    "appointment_id": "APT-B34F8B85",
+    "action": "approved",
+    "performed_by": "doctor_c3fa5a51",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-18T11:46:23.096Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba4d96ceb3de0591fd52a2"
+    },
+    "log_id": "LOG-8C3B6AF3",
+    "appointment_id": "APT-883F57F9",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T12:30:38.360Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba5a3861748716ce1ee11b"
+    },
+    "log_id": "LOG-9075F616",
+    "appointment_id": "APT-3032C241",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T13:24:32.823Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba66988ac6d50726810006"
+    },
+    "log_id": "LOG-0DFAB7FD",
+    "appointment_id": "APT-D38B62D5",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T14:17:20.246Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba690c0dc6839da984a8ae"
+    },
+    "log_id": "LOG-963141D2",
+    "appointment_id": "APT-CB5195BE",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T14:27:48.529Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba69b30dc6839da984a8b0"
+    },
+    "log_id": "LOG-C2DBB8CA",
+    "appointment_id": "APT-2551DE1A",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T14:30:35.756Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba6a160dc6839da984a8b2"
+    },
+    "log_id": "LOG-B7F1892C",
+    "appointment_id": "APT-F9637ACB",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T14:32:14.487Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba8d790b3cc8144aefdedc"
+    },
+    "log_id": "LOG-D6BB2EC6",
+    "appointment_id": "APT-A0BE350C",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "sarvam_voice",
+    "details": "Booked via sarvam_voice, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-18T17:03:13.356Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69bc23f0fff0fd6eaef676ef"
+    },
+    "log_id": "LOG-83267534",
+    "appointment_id": "APT-DC2EF5DF",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-19T21:57:28.995Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c5235d9b85a28a01724f59"
+    },
+    "log_id": "LOG-3A4A0025",
+    "appointment_id": "APT-16B214EB",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp_ai",
+    "details": "Booked via whatsapp_ai, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-26T17:45:25.873Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6056124b83d30d459a18c"
+    },
+    "log_id": "LOG-FB5F56B4",
+    "appointment_id": "APT-D2D3BCB7",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-27T09:49:45.549Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c605df24b83d30d459a18e"
+    },
+    "log_id": "LOG-895FCBE2",
+    "appointment_id": "APT-97887A33",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-27T09:51:51.211Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c605df24b83d30d459a18f"
+    },
+    "log_id": "LOG-97A69519",
+    "appointment_id": "APT-D2D3BCB7",
+    "action": "cancelled",
+    "performed_by": "wa_918885851826",
+    "performed_by_role": "patient",
+    "details": "Cancelled by patient for rescheduling to APT-97887A33",
+    "timestamp": {
+      "$date": "2026-03-27T09:51:51.216Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6066124b83d30d459a191"
+    },
+    "log_id": "LOG-C17AEA62",
+    "appointment_id": "APT-F978A485",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-27T09:54:01.249Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c606ef24b83d30d459a193"
+    },
+    "log_id": "LOG-6DC25A8A",
+    "appointment_id": "APT-E9612AE4",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-27T09:56:23.285Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c606ef24b83d30d459a194"
+    },
+    "log_id": "LOG-95626205",
+    "appointment_id": "APT-F978A485",
+    "action": "cancelled",
+    "performed_by": "wa_918885851826",
+    "performed_by_role": "patient",
+    "details": "Cancelled by patient for rescheduling to APT-E9612AE4",
+    "timestamp": {
+      "$date": "2026-03-27T09:56:23.287Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6075b24b83d30d459a195"
+    },
+    "log_id": "LOG-0D97F0A3",
+    "appointment_id": "APT-E9612AE4",
+    "action": "approved",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment approved by doctor. ",
+    "timestamp": {
+      "$date": "2026-03-27T09:58:11.985Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6657ac08ecfa6bcfce7e9"
+    },
+    "log_id": "LOG-345DA10D",
+    "appointment_id": "APT-F78CD950",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-27T16:39:46.867Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c7fec0d44063292239fa35"
+    },
+    "log_id": "LOG-93B9CB3E",
+    "appointment_id": "APT-5F839339",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-03-28T21:46:00.069Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c7ff33d44063292239fa36"
+    },
+    "log_id": "LOG-4FD2D42F",
+    "appointment_id": "APT-5F839339",
+    "action": "rejected",
+    "performed_by": "doctor_Na",
+    "performed_by_role": "doctor",
+    "details": "Appointment rejected by doctor. im not able to accept",
+    "timestamp": {
+      "$date": "2026-03-28T21:47:55.036Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca94dcee58040e717eb0b"
+    },
+    "log_id": "LOG-3B791849",
+    "appointment_id": "APT-BF4AA542",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-01T10:42:45.170Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ccc199ca73da3d87ce903a"
+    },
+    "log_id": "LOG-40427305",
+    "appointment_id": "APT-D7DD654E",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-01T12:26:25.638Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d68007e30003e11c2cef07"
+    },
+    "log_id": "LOG-CEE91FF0",
+    "appointment_id": "APT-30505FC7",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-08T21:49:19.326Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d686957067762f7b07e602"
+    },
+    "log_id": "LOG-1050E45F",
+    "appointment_id": "APT-D00F763D",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-08T22:17:17.103Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d687097067762f7b07e604"
+    },
+    "log_id": "LOG-62BE40F8",
+    "appointment_id": "APT-1558235D",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-08T22:19:13.407Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d744c306e11ab8bb07acd3"
+    },
+    "log_id": "LOG-EAE8990F",
+    "appointment_id": "APT-D0B985C6",
+    "action": "booked_pending_approval",
+    "performed_by": "918885851826",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-09T11:48:43.440Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d75384cbf534cb8a3e83cc"
+    },
+    "log_id": "LOG-7B4E3B40",
+    "appointment_id": "APT-AAFF88EA",
+    "action": "booked_pending_approval",
+    "performed_by": "919742053697",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-09T12:51:40.973Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d75449cbf534cb8a3e83ce"
+    },
+    "log_id": "LOG-992937A6",
+    "appointment_id": "APT-60472DC4",
+    "action": "booked_pending_approval",
+    "performed_by": "919742053697",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-09T12:54:57.492Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d7825160c11f3a90837da3"
+    },
+    "log_id": "LOG-76ED0DF7",
+    "appointment_id": "APT-A7B2666B",
+    "action": "booked_pending_approval",
+    "performed_by": "919845641125",
+    "performed_by_role": "whatsapp",
+    "details": "Booked via whatsapp, waiting for approval",
+    "timestamp": {
+      "$date": "2026-04-09T16:11:21.029Z"
+    }
+  }
+]

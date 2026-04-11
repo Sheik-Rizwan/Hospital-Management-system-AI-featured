@@ -1,0 +1,17 @@
+[
+  {
+    "_id": {
+      "$oid": "697b82c675e7496f53ee8bb1"
+    },
+    "user_id": "admin_a652313c",
+    "created_at": {
+      "$date": "2026-01-29T21:24:46.915Z"
+    },
+    "email": "haseeb@gmail.com",
+    "full_name": "Haseeb",
+    "is_active": true,
+    "password": "$2b$12$71uDdRRmRNMO6XlYJiHOa.s4BSXXovsUSzqG7lppWlvC7sgCjRtCO",
+    "phone": "",
+    "role": "super_admin"
+  }
+]

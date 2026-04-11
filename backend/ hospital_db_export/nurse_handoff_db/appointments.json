@@ -1,0 +1,2905 @@
+[
+  {
+    "_id": {
+      "$oid": "698da3fc7bb642a929b0ad29"
+    },
+    "appointment_id": "APT-06D0674C",
+    "patient_id": "wa_918885851826",
+    "doctor_id": "doc_test_unique_123",
+    "date": "2026-12-31",
+    "start_time": "09:00",
+    "end_time": "09:30",
+    "status": "pending_doctor_approval",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-12T15:27:16.919Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-12T15:27:16.919Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6992f8021b59613839c26623"
+    },
+    "appointment_id": "APT-FB6BC682",
+    "patient_id": "wa_918885851826",
+    "doctor_id": "doctor_Na",
+    "date": "2026-02-17",
+    "start_time": "07:00",
+    "end_time": "07:30",
+    "status": "completed",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-16T16:27:06.718Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T15:44:46.866Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699301f5a5e981c7b46db7d6"
+    },
+    "appointment_id": "APT-37173F02",
+    "patient_id": "wa_918885851826",
+    "doctor_id": "doctor_Na",
+    "date": "2026-02-17",
+    "start_time": "08:00",
+    "end_time": "08:30",
+    "status": "confirmed",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-16T17:09:33.026Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T15:44:48.479Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699307f1577590735b7115e8"
+    },
+    "appointment_id": "APT-5E126258",
+    "patient_id": "wa_918885851826",
+    "doctor_id": "doctor_Na",
+    "date": "2026-02-17",
+    "start_time": "09:30",
+    "end_time": "10:00",
+    "status": "confirmed",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-16T17:35:05.181Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T15:44:50.262Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69930922577590735b711624"
+    },
+    "appointment_id": "APT-F5B053D1",
+    "patient_id": "wa_918885851826",
+    "doctor_id": "doctor_Na",
+    "date": "2026-02-18",
+    "start_time": "09:00",
+    "end_time": "09:30",
+    "status": "completed",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-16T17:40:10.531Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T15:44:43.053Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69930dc0cda0d45b2391a52b"
+    },
+    "appointment_id": "APT-7FE30CD4",
+    "patient_id": "wa_918885851826",
+    "doctor_id": "doctor_Na",
+    "date": "2026-02-18",
+    "start_time": "07:00",
+    "end_time": "07:30",
+    "status": "completed",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-16T17:59:52.981Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T15:44:45.168Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699311a1cda0d45b2391a548"
+    },
+    "appointment_id": "APT-1F0FF234",
+    "patient_id": "P2602162638",
+    "doctor_id": "doctor_Na",
+    "date": "2026-02-17",
+    "start_time": "07:30",
+    "end_time": "08:00",
+    "status": "completed",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919886732638",
+    "created_at": {
+      "$date": "2026-02-16T18:16:25.778Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:27:49.102Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699365b9c4fabf613dc90f17"
+    },
+    "appointment_id": "APT-4CDF6390",
+    "patient_id": "P8BBB93E1",
+    "doctor_id": "doc_wa_test_enhanced",
+    "date": "2026-02-18",
+    "start_time": "09:00",
+    "end_time": "09:30",
+    "status": "pending_doctor_approval",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919999999999",
+    "created_at": {
+      "$date": "2026-02-17T00:15:13.767Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T00:15:13.767Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936df6289833b27c8d6e29"
+    },
+    "appointment_id": "APT-801C1D35",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-20",
+    "shift": "Morning",
+    "start_time": "08:00",
+    "end_time": "08:30",
+    "status": "completed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-17T00:50:22.131Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T15:44:42.029Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936ee4a119591656fd3c00"
+    },
+    "appointment_id": "APT-F814CB58",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doc_wa_test_enhanced",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-18",
+    "shift": "Morning",
+    "start_time": "11:30",
+    "end_time": "12:00",
+    "status": "pending_doctor_approval",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-17T00:54:20.933Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T00:54:20.933Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69936f23a119591656fd3c02"
+    },
+    "appointment_id": "APT-CDF147F1",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Haseeb",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-18",
+    "shift": "Morning",
+    "start_time": "10:00",
+    "end_time": "10:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-17T00:55:23.844Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T00:55:36.898Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69943f4cb9e0f69be2c2c53f"
+    },
+    "appointment_id": "APT-6B8FC902",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Harish",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-18",
+    "shift": "Morning",
+    "start_time": "07:30",
+    "end_time": "08:00",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-17T15:43:32.205Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T15:44:25.529Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69945e37acf210a146259218"
+    },
+    "appointment_id": "APT-991C0B99",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-18",
+    "shift": "Morning",
+    "start_time": "08:30",
+    "end_time": "09:00",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-17T17:55:27.537Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-17T17:56:05.663Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699550a27b164e432e92f975"
+    },
+    "appointment_id": "APT-04E7C494",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Vignesh",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-19",
+    "shift": "Evening",
+    "start_time": "22:00",
+    "end_time": "22:30",
+    "status": "rejected",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "please book an another timings i had some other work t do ",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-18T11:09:46.604Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-18T11:13:02.052Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699550de7b164e432e92f977"
+    },
+    "appointment_id": "APT-5BBA6A4A",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-19",
+    "shift": "Evening",
+    "start_time": "22:30",
+    "end_time": "23:00",
+    "status": "rejected",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "today im not coming try other day",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-18T11:10:46.434Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-18T11:13:34.686Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69959e84105cb24f605a1a90"
+    },
+    "appointment_id": "APT-78F3B633",
+    "patient_id": "wa_917892855850",
+    "patient_name": "Harish",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-20",
+    "shift": "Morning",
+    "start_time": "09:00",
+    "end_time": "09:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "917892855850",
+    "created_at": {
+      "$date": "2026-02-18T16:42:04.846Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-18T16:42:45.135Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d742ebb8c500bc75be313"
+    },
+    "appointment_id": "APT-8D22F81A",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-25",
+    "shift": "Morning",
+    "start_time": "08:00",
+    "end_time": "08:30",
+    "status": "rejected",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "nort availab;e ",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-24T15:19:34.716Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T16:40:55.482Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d88a60262f89286341728"
+    },
+    "appointment_id": "APT-1D19006F",
+    "patient_id": "wa_918885851826",
+    "patient_name": "rizwan",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-25",
+    "shift": "Morning",
+    "start_time": "09:30",
+    "end_time": "10:00",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-24T16:46:54.281Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T16:41:01.349Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699ef8286eacf38cdd106f9b"
+    },
+    "appointment_id": "APT-D70624DB",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-26",
+    "shift": "Evening",
+    "start_time": "01:00",
+    "end_time": "01:30",
+    "status": "rejected",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "im not available ",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-25T18:54:56.330Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T16:40:29.803Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699fca41ad51615fe79df9f8"
+    },
+    "appointment_id": "APT-028BB7A3",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-03-05",
+    "shift": "Evening",
+    "start_time": "22:00",
+    "end_time": "22:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T09:51:21.106Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T09:52:02.320Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699fd6817d3c0076450820c1"
+    },
+    "appointment_id": "APT-9B63F4BF",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-27",
+    "shift": "Morning",
+    "start_time": "08:00",
+    "end_time": "08:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T10:43:37.072Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T16:41:00.679Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699fd8467d3c0076450820c3"
+    },
+    "appointment_id": "APT-D40563F3",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-03-04",
+    "shift": "Morning",
+    "start_time": "10:30",
+    "end_time": "11:00",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T10:51:10.038Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T16:40:59.492Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699ff500d5d0c8f03415a8c9"
+    },
+    "appointment_id": "APT-2A233014",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Chaman",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-27",
+    "shift": "Morning",
+    "start_time": "07:00",
+    "end_time": "07:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T12:53:44.271Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T13:06:21.552Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a029e769ae4f22e4467151"
+    },
+    "appointment_id": "APT-BDB5C740",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-02-27",
+    "shift": "",
+    "start_time": "10:00",
+    "end_time": "10:30",
+    "status": "rejected",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Test WhatsApp User",
+    "rejection_reason": "not available ",
+    "created_by": "sarvam_voice",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T16:39:27.918Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T16:40:41.570Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0345946e112b7a50853c7"
+    },
+    "appointment_id": "APT-41C61A18",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-02-26",
+    "shift": "",
+    "start_time": "10:00",
+    "end_time": "10:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Test WhatsApp User",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T17:24:01.772Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:36:13.696Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0374fe08418c14028c8d0"
+    },
+    "appointment_id": "APT-47262E57",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-02-28",
+    "shift": "",
+    "start_time": "12:00",
+    "end_time": "12:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Test WhatsApp User",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T17:36:39.311Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:36:12.266Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a03c5aba8377a43bfe878c"
+    },
+    "appointment_id": "APT-BCBE2AEB",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-02-27",
+    "shift": "Afternoon",
+    "start_time": "14:00",
+    "end_time": "14:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T17:58:10.922Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:30:48.461Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a03e13efea917a7cbac883"
+    },
+    "appointment_id": "APT-852D184C",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-03-02",
+    "shift": "Morning",
+    "start_time": "11:00",
+    "end_time": "11:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-02-26T18:05:31.064Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:12:40.831Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a03f70f12cc56827690b10"
+    },
+    "appointment_id": "APT-1E528D52",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-02-27",
+    "shift": "Evening",
+    "start_time": "00:00",
+    "end_time": "00:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T18:11:20.262Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T18:24:30.629Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a04255f12cc56827690b12"
+    },
+    "appointment_id": "APT-80A6F658",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-03-05",
+    "shift": "Evening",
+    "start_time": "22:30",
+    "end_time": "23:00",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T18:23:41.736Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:07:26.765Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08d1def50b505829cbf36"
+    },
+    "appointment_id": "APT-9B68FB00",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-27",
+    "shift": "Evening",
+    "start_time": "23:00",
+    "end_time": "23:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T23:42:45.201Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T23:43:16.153Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08ef5ed810119046f3d75"
+    },
+    "appointment_id": "APT-3C83179B",
+    "patient_id": "wa_918885851826",
+    "patient_name": "nidhi",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "SVC-003",
+    "service_name": "Dermatology",
+    "date": "2026-03-01",
+    "shift": "Afternoon",
+    "start_time": "16:00",
+    "end_time": "16:30",
+    "status": "rejected",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "im busy try to book on other day",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T23:50:37.436Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T23:51:25.747Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a08f7fed810119046f3d78"
+    },
+    "appointment_id": "APT-0540CE5F",
+    "patient_id": "wa_918885851826",
+    "patient_name": "nidhi",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "SVC-003",
+    "service_name": "Dermatology",
+    "date": "2026-03-02",
+    "shift": "Afternoon",
+    "start_time": "14:30",
+    "end_time": "15:00",
+    "status": "completed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-26T23:52:55.092Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:42:45.363Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a092dbf2df5635da79aad3"
+    },
+    "appointment_id": "APT-D106CD22",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-28",
+    "shift": "Evening",
+    "start_time": "02:30",
+    "end_time": "03:00",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:07:15.823Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T10:41:29.218Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09360f2df5635da79aad6"
+    },
+    "appointment_id": "APT-52911E24",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Viswa",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-28",
+    "shift": "Evening",
+    "start_time": "03:00",
+    "end_time": "03:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:09:28.315Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:16:35.344Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0943af2df5635da79aada"
+    },
+    "appointment_id": "APT-2651A514",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Viswa",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-28",
+    "shift": "Evening",
+    "start_time": "03:30",
+    "end_time": "04:00",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:13:06.099Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:16:34.128Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09495f2df5635da79aadc"
+    },
+    "appointment_id": "APT-8D53F09C",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-05",
+    "shift": "Evening",
+    "start_time": "01:00",
+    "end_time": "01:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-02-27T00:14:37.765Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:16:48.542Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09563f2df5635da79aae1"
+    },
+    "appointment_id": "APT-B23C2F98",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Keshav jha",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-28",
+    "shift": "Evening",
+    "start_time": "22:00",
+    "end_time": "22:30",
+    "status": "rejected",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "im bust at the time",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:18:03.169Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:18:22.794Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a095b3f2df5635da79aae4"
+    },
+    "appointment_id": "APT-5C3D1AED",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Keshav jha",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-28",
+    "shift": "Evening",
+    "start_time": "22:00",
+    "end_time": "22:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:19:23.481Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:19:30.213Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0961bf2df5635da79aae7"
+    },
+    "appointment_id": "APT-574E217A",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-28",
+    "shift": "Morning",
+    "start_time": "07:30",
+    "end_time": "08:00",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:21:07.178Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:23:10.564Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a096f1f2df5635da79aaea"
+    },
+    "appointment_id": "APT-9B6AE64E",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Bharat",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-28",
+    "shift": "Morning",
+    "start_time": "07:00",
+    "end_time": "07:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:24:41.599Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:24:48.007Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a0978ab261bf4e0c2595fb"
+    },
+    "appointment_id": "APT-36B74287",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Mudassir",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-28",
+    "shift": "Morning",
+    "start_time": "13:00",
+    "end_time": "13:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:27:14.521Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:27:23.647Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09810b261bf4e0c2595ff"
+    },
+    "appointment_id": "APT-81DB3D90",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Fazil",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-02-28",
+    "shift": "Evening",
+    "start_time": "04:30",
+    "end_time": "05:00",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:29:28.234Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:29:57.077Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a09868b261bf4e0c259602"
+    },
+    "appointment_id": "APT-04665C73",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Harish",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "SVC-003",
+    "service_name": "Dermatology",
+    "date": "2026-02-28",
+    "shift": "Afternoon",
+    "start_time": "15:00",
+    "end_time": "15:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T00:30:56.043Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T00:31:43.339Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1224d8a4a6de8a0bb6f9b"
+    },
+    "appointment_id": "APT-A14A9081",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-02",
+    "shift": "Evening",
+    "start_time": "23:30",
+    "end_time": "00:00",
+    "status": "completed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T10:19:17.953Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T14:58:39.947Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1274a651b2f556cbfdc07"
+    },
+    "appointment_id": "APT-54F99D9D",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Adil",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-07",
+    "shift": "Evening",
+    "start_time": "23:00",
+    "end_time": "23:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T10:40:34.591Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T10:41:10.693Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1405dfcdf74032b62e92b"
+    },
+    "appointment_id": "APT-B1820186",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-09",
+    "shift": "Evening",
+    "start_time": "23:00",
+    "end_time": "23:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T12:27:33.420Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:34:19.231Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1409ffcdf74032b62e92e"
+    },
+    "appointment_id": "APT-281A78A0",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Harish",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-02",
+    "shift": "Evening",
+    "start_time": "01:30",
+    "end_time": "02:00",
+    "status": "completed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T12:28:39.520Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T12:00:25.368Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14152a3892a5a68237f0d"
+    },
+    "appointment_id": "APT-3C357D81",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-02",
+    "shift": "Evening",
+    "start_time": "22:00",
+    "end_time": "22:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-02-27T12:31:38.595Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:34:13.969Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a1417aa3892a5a68237f0f"
+    },
+    "appointment_id": "APT-4910F67C",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-02-28",
+    "shift": "Morning",
+    "start_time": "10:30",
+    "end_time": "11:00",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T12:32:18.470Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:36:12.754Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a142f8e486af725fa6eb40"
+    },
+    "appointment_id": "APT-322D5D41",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Praksah",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-06",
+    "shift": "Evening",
+    "start_time": "00:00",
+    "end_time": "00:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T12:38:40.348Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:41:04.844Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14350e486af725fa6eb42"
+    },
+    "appointment_id": "APT-1CAF1DD2",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Keshav",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-03",
+    "shift": "Evening",
+    "start_time": "23:00",
+    "end_time": "23:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T12:40:08.936Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:41:05.280Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a143c9e486af725fa6eb46"
+    },
+    "appointment_id": "APT-2B69FE82",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Chamna",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-03-04",
+    "shift": "Morning",
+    "start_time": "08:00",
+    "end_time": "08:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T12:42:09.752Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:42:59.394Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a14477e486af725fa6eb49"
+    },
+    "appointment_id": "APT-C0062ACD",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Taj",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "SVC-003",
+    "service_name": "Dermatology",
+    "date": "2026-03-02",
+    "shift": "Afternoon",
+    "start_time": "16:00",
+    "end_time": "16:30",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T12:45:03.520Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:45:30.935Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a144e6e486af725fa6eb4c"
+    },
+    "appointment_id": "APT-B598929A",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Harish",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-03",
+    "shift": "Evening",
+    "start_time": "01:30",
+    "end_time": "02:00",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-27T12:46:54.996Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T12:48:05.320Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a16c1438e021b21fd96dce"
+    },
+    "appointment_id": "APT-0000F711",
+    "patient_id": "patient_01",
+    "patient_name": "",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-06",
+    "shift": "",
+    "start_time": "21:00",
+    "end_time": "21:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "patient",
+    "created_by_id": "patient_01",
+    "created_at": {
+      "$date": "2026-02-27T15:34:04.067Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T15:44:57.267Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a16d2638e021b21fd96dd0"
+    },
+    "appointment_id": "APT-871FE984",
+    "patient_id": "patient_01",
+    "patient_name": "",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-06",
+    "shift": "",
+    "start_time": "18:00",
+    "end_time": "18:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "patient",
+    "created_by_id": "patient_01",
+    "created_at": {
+      "$date": "2026-02-27T15:38:38.570Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T15:44:57.951Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a171abc5a8a50c7f04ef06"
+    },
+    "appointment_id": "APT-5D477DA8",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-09",
+    "shift": "",
+    "start_time": "19:00",
+    "end_time": "19:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "patient",
+    "created_by_id": "patient_01",
+    "created_at": {
+      "$date": "2026-02-27T15:57:55.518Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-28T13:00:49.049Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a2998c54cd9df3c86c5aef"
+    },
+    "appointment_id": "APT-BE3020F1",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "SVC-003",
+    "service_name": "Dermatology",
+    "date": "2026-03-06",
+    "shift": "Afternoon",
+    "start_time": "17:30",
+    "end_time": "18:00",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-28T13:00:20.597Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-28T13:00:48.726Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a299ef66f80c956e402902"
+    },
+    "appointment_id": "APT-ED8C9FCD",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "SVC-003",
+    "service_name": "Dermatology",
+    "date": "2026-03-09",
+    "shift": "Afternoon",
+    "start_time": "17:00",
+    "end_time": "17:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-02-28T13:01:59.964Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-28T13:02:08.544Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a5285c319a5616acc23329"
+    },
+    "appointment_id": "APT-71CA1AFE",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-04",
+    "shift": "Evening",
+    "start_time": "22:00",
+    "end_time": "22:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-03-02T11:34:12.335Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T14:58:32.134Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55a3c808e41f2c61af578"
+    },
+    "appointment_id": "APT-9B073206",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-11",
+    "shift": "",
+    "start_time": "19:00",
+    "end_time": "19:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "having pneumonia ",
+    "rejection_reason": "",
+    "created_by": "patient",
+    "created_by_id": "patient_01",
+    "created_at": {
+      "$date": "2026-03-02T15:07:00.400Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T16:05:51.824Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55a6c808e41f2c61af57a"
+    },
+    "appointment_id": "APT-013423CC",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-11",
+    "shift": "",
+    "start_time": "17:30",
+    "end_time": "18:00",
+    "status": "completed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "patient",
+    "created_by_id": "patient_01",
+    "created_at": {
+      "$date": "2026-03-02T15:07:48.551Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T11:59:42.288Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55bb69d7a1eb221ee76aa"
+    },
+    "appointment_id": "APT-F39FE47A",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-06",
+    "shift": "Morning",
+    "start_time": "08:00",
+    "end_time": "08:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-02T15:13:18.019Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T15:13:58.897Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55c169d7a1eb221ee76ad"
+    },
+    "appointment_id": "APT-C71F20CF",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-11",
+    "shift": "",
+    "start_time": "14:00",
+    "end_time": "14:30",
+    "status": "rejected",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "book at another time ",
+    "created_by": "patient",
+    "created_by_id": "patient_01",
+    "created_at": {
+      "$date": "2026-03-02T15:14:54.846Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T11:59:35.676Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55c6dcb8be6d8b8d0acc2"
+    },
+    "appointment_id": "APT-BFD1BE5B",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_Na",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-06",
+    "shift": "",
+    "start_time": "12:00",
+    "end_time": "12:30",
+    "status": "rejected",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "jbhwfkh",
+    "created_by": "patient",
+    "created_by_id": "patient_01",
+    "created_at": {
+      "$date": "2026-03-02T15:16:21.417Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-09T12:59:58.790Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a56a8152c147a4a503772c"
+    },
+    "appointment_id": "APT-EEDCBBB8",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-06",
+    "shift": "Morning",
+    "start_time": "09:00",
+    "end_time": "09:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-02T16:16:25.372Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T16:17:02.609Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a67fc973f20c380502e760"
+    },
+    "appointment_id": "APT-7659840F",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "date": "2026-03-04",
+    "shift": "Afternoon",
+    "start_time": "15:00",
+    "end_time": "15:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-03T11:59:29.471Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-03T11:59:29.471Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6a2dbe6483960d2596c00"
+    },
+    "appointment_id": "APT-C47AADBF",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-04",
+    "shift": "Afternoon",
+    "start_time": "21:00",
+    "end_time": "21:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-03T14:29:07.666Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-03T14:29:07.666Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6a94d5ad49fd250e244e8"
+    },
+    "appointment_id": "APT-E7B29F74",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-04",
+    "shift": "Afternoon",
+    "start_time": "18:00",
+    "end_time": null,
+    "status": "rejected",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "not available",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-03T14:56:37.093Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:43:26.114Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6ad54d8cab3a0fa274335"
+    },
+    "appointment_id": "APT-D795E311",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-04",
+    "shift": "Morning",
+    "start_time": "10:00",
+    "end_time": null,
+    "status": "rejected",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "book on 5th",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-03T15:13:48.715Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-09T11:39:12.639Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6b4e8d5947e166a40ac7b"
+    },
+    "appointment_id": "APT-04AED358",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-04",
+    "shift": "Afternoon",
+    "start_time": "19:00",
+    "end_time": null,
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-03T15:46:08.334Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-03T15:46:08.334Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6b52ad5947e166a40ac7d"
+    },
+    "appointment_id": "APT-C3DE532E",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-07",
+    "shift": "Evening",
+    "start_time": "17:00",
+    "end_time": null,
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-03T15:47:14.171Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T11:59:49.859Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6ba0aad2093b4bd1ed939"
+    },
+    "appointment_id": "APT-6C43BD86",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-11",
+    "shift": "Afternoon",
+    "start_time": "07:00",
+    "end_time": null,
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-03T16:08:02.306Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-03T16:37:41.644Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a6c088215196ad36eec397"
+    },
+    "appointment_id": "APT-2173D193",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-07",
+    "shift": "Evening",
+    "start_time": "00:00",
+    "end_time": "00:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-03T16:35:44.951Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T12:13:24.714Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7b5c88ef218451d08a82"
+    },
+    "appointment_id": "APT-0E02C47E",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Harish",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "SVC-003",
+    "service_name": "Dermatology",
+    "date": "2026-03-16",
+    "shift": "Afternoon",
+    "start_time": "16:30",
+    "end_time": "17:00",
+    "status": "confirmed",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-06T12:29:40.762Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:29:59.504Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ae761f6b88493b406f46dd"
+    },
+    "appointment_id": "APT-74DDDB98",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "date": "2026-03-13",
+    "shift": "Morning",
+    "start_time": "09:30",
+    "end_time": "10:00",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-09T12:56:23.246Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-09T12:56:51.467Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69afa61630368c29a4d84393"
+    },
+    "appointment_id": "APT-BE129EB5",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-11",
+    "shift": "Afternoon",
+    "start_time": "16:00",
+    "end_time": "16:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-10T10:33:18.791Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-10T10:33:18.791Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69afa6c030368c29a4d84395"
+    },
+    "appointment_id": "APT-D5B44F87",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-17",
+    "shift": "Afternoon",
+    "start_time": "17:00",
+    "end_time": "17:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-10T10:36:08.543Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-10T10:36:08.543Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69afb6825cf3d10bc16dfb54"
+    },
+    "appointment_id": "APT-CE48D2DA",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_812860ca",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-17",
+    "shift": "Afternoon",
+    "start_time": "17:30",
+    "end_time": "18:00",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-03-10T11:43:22.448Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-10T11:43:22.448Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b3e5a6d1c182b30abac369"
+    },
+    "appointment_id": "APT-76B9EA5E",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-14",
+    "shift": "",
+    "start_time": "23:30",
+    "end_time": "00:00",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Test WhatsApp User",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-13T15:53:34.823Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-13T15:53:34.823Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b3e916d1c182b30abac36b"
+    },
+    "appointment_id": "APT-C193C027",
+    "patient_id": "wa_919845641125",
+    "patient_name": "River",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-14",
+    "shift": "",
+    "start_time": "23:00",
+    "end_time": "23:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for River",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-03-13T16:08:14.268Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-13T16:08:14.268Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b983a6e2f8303eab46c314"
+    },
+    "appointment_id": "APT-A1FF859B",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-18",
+    "shift": "",
+    "start_time": "14:30",
+    "end_time": "15:00",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Test WhatsApp User",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-17T22:09:02.521Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-17T22:09:02.521Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba3c91b3faae4493c0a487"
+    },
+    "appointment_id": "APT-74235EFC",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-19",
+    "shift": "",
+    "start_time": "23:30",
+    "end_time": "00:15",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Rizwan",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-18T11:18:01.422Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T11:18:01.422Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba43019c9fce3086da436c"
+    },
+    "appointment_id": "APT-B34F8B85",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-19",
+    "shift": "",
+    "start_time": "00:15",
+    "end_time": "01:00",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Rizwan",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-18T11:45:29.644Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T11:46:23.094Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba4d96ceb3de0591fd52a1"
+    },
+    "appointment_id": "APT-883F57F9",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-23",
+    "shift": "Night",
+    "start_time": "02:30",
+    "end_time": "03:15",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-18T12:30:38.352Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T12:30:38.352Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba5a3861748716ce1ee11a"
+    },
+    "appointment_id": "APT-3032C241",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-20",
+    "shift": "Afternoon",
+    "start_time": "20:00",
+    "end_time": "20:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-18T13:24:32.818Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T13:24:32.818Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba66988ac6d50726810005"
+    },
+    "appointment_id": "APT-D38B62D5",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-20",
+    "shift": "Morning",
+    "start_time": "07:00",
+    "end_time": "07:45",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-03-18T14:17:20.244Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T14:17:20.244Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba690c0dc6839da984a8ad"
+    },
+    "appointment_id": "APT-CB5195BE",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Sanjana",
+    "doctor_id": "doctor_Na",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-20",
+    "shift": "",
+    "start_time": "11:00",
+    "end_time": "11:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Sanjana",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-03-18T14:27:48.524Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T14:27:48.524Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba69b30dc6839da984a8af"
+    },
+    "appointment_id": "APT-2551DE1A",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-23",
+    "shift": "",
+    "start_time": "15:00",
+    "end_time": "15:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Nidhi",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-03-18T14:30:35.755Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T14:30:35.755Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba6a160dc6839da984a8b1"
+    },
+    "appointment_id": "APT-F9637ACB",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Shreyas",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-23",
+    "shift": "",
+    "start_time": "22:00",
+    "end_time": "22:45",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Shreyas",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-03-18T14:32:14.485Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T14:32:14.485Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ba8d790b3cc8144aefdedb"
+    },
+    "appointment_id": "APT-A0BE350C",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-20",
+    "shift": "",
+    "start_time": "10:00",
+    "end_time": "10:45",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via Sarvam Voice AI for Rizwan",
+    "rejection_reason": "",
+    "created_by": "sarvam_voice",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-18T17:03:13.334Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-18T17:03:13.334Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69bc23f0fff0fd6eaef676ee"
+    },
+    "appointment_id": "APT-DC2EF5DF",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-03-21",
+    "shift": "Morning",
+    "start_time": "10:00",
+    "end_time": "10:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-19T21:57:28.994Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-19T21:57:28.994Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c5235d9b85a28a01724f58"
+    },
+    "appointment_id": "APT-16B214EB",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "",
+    "service_name": "",
+    "date": "2026-03-27",
+    "shift": "",
+    "start_time": "10:00",
+    "end_time": "10:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Booked via AI Assistant for Test WhatsApp User",
+    "rejection_reason": "",
+    "created_by": "whatsapp_ai",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-26T17:45:25.832Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-26T17:45:25.832Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6056124b83d30d459a18b"
+    },
+    "appointment_id": "APT-D2D3BCB7",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "dyn_dermatology",
+    "service_name": "Dermatology",
+    "date": "2026-03-28",
+    "shift": "Afternoon",
+    "start_time": "18:00",
+    "end_time": "18:30",
+    "status": "cancelled",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "Cancelled by patient for rescheduling to APT-97887A33",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-27T09:49:45.544Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T09:51:51.214Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c605df24b83d30d459a18d"
+    },
+    "appointment_id": "APT-97887A33",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": "dyn_general_consultation",
+    "service_name": "general consultation",
+    "date": "2026-04-01",
+    "shift": "Afternoon",
+    "start_time": "17:00",
+    "end_time": "17:45",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "Rescheduled from APT-D2D3BCB7",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-27T09:51:51.210Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T09:51:51.210Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6066124b83d30d459a190"
+    },
+    "appointment_id": "APT-F978A485",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "dyn_cardiology",
+    "service_name": "Cardiology",
+    "date": "2026-03-31",
+    "shift": "Morning",
+    "start_time": "08:30",
+    "end_time": "09:00",
+    "status": "cancelled",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "Cancelled by patient for rescheduling to APT-E9612AE4",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-27T09:54:01.248Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T09:56:23.286Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c606ef24b83d30d459a192"
+    },
+    "appointment_id": "APT-E9612AE4",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_Na",
+    "service_id": "dyn_cardiology",
+    "service_name": "Cardiology",
+    "date": "2026-04-06",
+    "shift": "Morning",
+    "start_time": "07:00",
+    "end_time": "07:30",
+    "status": "confirmed",
+    "booked_for": "self",
+    "notes": "Rescheduled from APT-F978A485",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-27T09:56:23.284Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T09:58:11.982Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6657ac08ecfa6bcfce7e8"
+    },
+    "appointment_id": "APT-F78CD950",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "dyn_dermatology",
+    "service_name": "Dermatology",
+    "date": "2026-03-28",
+    "shift": "",
+    "start_time": "16:00",
+    "end_time": "16:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-27T16:39:46.854Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T16:39:46.854Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c7fec0d44063292239fa34"
+    },
+    "appointment_id": "APT-5F839339",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Nafeesa rizwan",
+    "doctor_id": "doctor_Na",
+    "service_id": "dyn_cardiology",
+    "service_name": "Cardiology",
+    "date": "2026-03-30",
+    "shift": "",
+    "start_time": "04:00",
+    "end_time": "04:30",
+    "status": "rejected",
+    "booked_for": "other",
+    "notes": "",
+    "rejection_reason": "im not able to accept",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-03-28T21:46:00.064Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-28T21:47:55.035Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca94dcee58040e717eb0a"
+    },
+    "appointment_id": "APT-BF4AA542",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Test WhatsApp User",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "dyn_dermatology",
+    "service_name": "Dermatology",
+    "date": "2026-04-06",
+    "shift": "",
+    "start_time": "16:00",
+    "end_time": "16:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-04-01T10:42:45.159Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:42:45.159Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ccc199ca73da3d87ce9039"
+    },
+    "appointment_id": "APT-D7DD654E",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "dyn_dermatology",
+    "service_name": "Dermatology",
+    "date": "2026-04-02",
+    "shift": "",
+    "start_time": "18:30",
+    "end_time": "19:00",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-04-01T12:26:25.630Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T12:26:25.630Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d68007e30003e11c2cef06"
+    },
+    "appointment_id": "APT-30505FC7",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_Na",
+    "service_id": "dyn_cardiology",
+    "service_name": "Cardiology",
+    "date": "2026-04-10",
+    "shift": "",
+    "start_time": "04:00",
+    "end_time": "04:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-04-08T21:49:19.259Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-08T21:49:19.259Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d686957067762f7b07e601"
+    },
+    "appointment_id": "APT-D00F763D",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_Na",
+    "service_id": "dyn_cardiology",
+    "service_name": "Cardiology",
+    "date": "2026-04-10",
+    "shift": "",
+    "start_time": "06:00",
+    "end_time": "06:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-04-08T22:17:17.098Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-08T22:17:17.098Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d687097067762f7b07e603"
+    },
+    "appointment_id": "APT-1558235D",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_812860ca",
+    "service_id": "dyn_dermatology",
+    "service_name": "Dermatology",
+    "date": "2026-04-15",
+    "shift": "",
+    "start_time": "18:00",
+    "end_time": "18:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-04-08T22:19:13.406Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-08T22:19:13.406Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d744c306e11ab8bb07acd2"
+    },
+    "appointment_id": "APT-D0B985C6",
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "doctor_id": "doctor_Na",
+    "service_id": "dyn_cardiology",
+    "service_name": "Cardiology",
+    "date": "2026-04-14",
+    "shift": "",
+    "start_time": "06:00",
+    "end_time": "06:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "918885851826",
+    "created_at": {
+      "$date": "2026-04-09T11:48:43.434Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-09T11:48:43.434Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d75384cbf534cb8a3e83cb"
+    },
+    "appointment_id": "APT-AAFF88EA",
+    "patient_id": "wa_919742053697",
+    "patient_name": "Jagan",
+    "doctor_id": "doctor_Na",
+    "service_id": "dyn_cardiology",
+    "service_name": "Cardiology",
+    "date": "2026-04-11",
+    "shift": "",
+    "start_time": "04:00",
+    "end_time": "04:30",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919742053697",
+    "created_at": {
+      "$date": "2026-04-09T12:51:40.970Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-09T12:51:40.970Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d75449cbf534cb8a3e83cd"
+    },
+    "appointment_id": "APT-60472DC4",
+    "patient_id": "wa_919742053697",
+    "patient_name": "Jagan",
+    "doctor_id": "doctor_c3fa5a51",
+    "service_id": null,
+    "service_name": null,
+    "date": "2026-04-12",
+    "shift": "Night",
+    "start_time": "03:15",
+    "end_time": "04:00",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919742053697",
+    "created_at": {
+      "$date": "2026-04-09T12:54:57.491Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-09T12:54:57.491Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d7825160c11f3a90837da2"
+    },
+    "appointment_id": "APT-A7B2666B",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "doctor_id": "doctor_Na",
+    "service_id": "dyn_cardiology",
+    "service_name": "Cardiology",
+    "date": "2026-04-11",
+    "shift": "",
+    "start_time": "11:30",
+    "end_time": "12:00",
+    "status": "pending_doctor_approval",
+    "booked_for": "self",
+    "notes": "",
+    "rejection_reason": "",
+    "created_by": "whatsapp",
+    "created_by_id": "919845641125",
+    "created_at": {
+      "$date": "2026-04-09T16:11:21.022Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-09T16:11:21.022Z"
+    }
+  }
+]

@@ -1,0 +1,125 @@
+[
+  {
+    "_id": {
+      "$oid": "697c466a67990659f3348580"
+    },
+    "patient_id": "01",
+    "medications": [
+      {
+        "name": "paracetomol 500mg",
+        "dose": "",
+        "time": "14:00",
+        "frequency": ""
+      },
+      {
+        "name": "levocitrzine montilocast 10mg ",
+        "dose": "",
+        "time": "14:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "oots",
+      "morning_time": "08:00",
+      "afternoon": "oots",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "nurse_003",
+    "plan_id": "plan_1769752170",
+    "created_at": {
+      "$date": "2026-01-30T11:19:30.101Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T11:19:30.101Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "697c7a3e8d306dafaf220f90"
+    },
+    "patient_id": "012",
+    "medications": [
+      {
+        "name": "paracetamol 500mg",
+        "dose": "",
+        "time": "15:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "",
+      "morning_time": "08:00",
+      "afternoon": "",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "doctor_Na",
+    "plan_id": "plan_1769765438",
+    "created_at": {
+      "$date": "2026-01-30T15:00:38.933Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T15:00:38.933Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "699d808d0262f892863416b0"
+    },
+    "patient_id": "015",
+    "medications": [
+      {
+        "name": "paracetomol",
+        "dose": "",
+        "time": "14:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "",
+      "morning_time": "08:00",
+      "afternoon": "",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "nurse_001",
+    "plan_id": "plan_1771929741",
+    "created_at": {
+      "$date": "2026-02-24T16:12:21.444Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-24T16:12:21.444Z"
+    },
+    "is_active": true
+  }
+]

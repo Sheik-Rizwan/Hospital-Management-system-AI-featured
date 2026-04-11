@@ -1,0 +1,246 @@
+[
+  {
+    "_id": {
+      "$oid": "6980b0dc15046fb4a6a849a5"
+    },
+    "patient_id": "01",
+    "medications": [
+      {
+        "name": "paracetomol 500mg",
+        "dose": "",
+        "time": "14:00",
+        "frequency": ""
+      },
+      {
+        "name": "levocitrzine montilocast 10mg ",
+        "dose": "",
+        "time": "14:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "oots",
+      "morning_time": "08:00",
+      "afternoon": "oots",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "nurse_003",
+    "plan_id": "plan_1769752170",
+    "created_at": {
+      "$date": "2026-01-30T11:19:30.101Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-26T14:53:54.528Z"
+    },
+    "is_active": false
+  },
+  {
+    "_id": {
+      "$oid": "6980b0dc15046fb4a6a849a6"
+    },
+    "patient_id": "012",
+    "medications": [
+      {
+        "name": "paracetamol 500mg",
+        "dose": "",
+        "time": "15:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "",
+      "morning_time": "08:00",
+      "afternoon": "",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "doctor_Na",
+    "plan_id": "plan_1769765438",
+    "created_at": {
+      "$date": "2026-01-30T15:00:38.933Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T15:00:38.933Z"
+    },
+    "is_active": true,
+    "doctor_name": "Ashwaq"
+  },
+  {
+    "_id": {
+      "$oid": "69a0112a92cf921b76570521"
+    },
+    "patient_id": "01",
+    "medications": [
+      {
+        "name": "citrizine",
+        "dose": "",
+        "time": "14:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "",
+      "morning_time": "08:00",
+      "afternoon": "",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": "plan_1772097834",
+    "created_at": {
+      "$date": "2026-02-26T14:53:54.539Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T17:39:09.254Z"
+    },
+    "is_active": false,
+    "doctor_name": "Chaman"
+  },
+  {
+    "_id": {
+      "$oid": "69a189653eeaa44bbafe3475"
+    },
+    "patient_id": "01",
+    "medications": [
+      {
+        "name": "pantioprazol",
+        "dose": "",
+        "time": "15:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "",
+      "morning_time": "08:00",
+      "afternoon": "",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "doctor_812860ca",
+    "plan_id": "plan_1772194149",
+    "created_at": {
+      "$date": "2026-02-27T17:39:09.259Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T14:57:10.799Z"
+    },
+    "is_active": false,
+    "doctor_name": "Taj"
+  },
+  {
+    "_id": {
+      "$oid": "69a557ee808e41f2c61af531"
+    },
+    "patient_id": "01",
+    "medications": [
+      {
+        "name": "paracetomol",
+        "dose": "",
+        "time": "15:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "",
+      "morning_time": "08:00",
+      "afternoon": "",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": "plan_1772443630",
+    "created_at": {
+      "$date": "2026-03-02T14:57:10.802Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T14:57:10.802Z"
+    },
+    "is_active": true,
+    "doctor_name": "Chaman"
+  },
+  {
+    "_id": {
+      "$oid": "69c2774483bdb3d10e16fd36"
+    },
+    "patient_id": "014",
+    "medications": [
+      {
+        "name": "pantoprazol ",
+        "dose": "",
+        "time": "4:00",
+        "frequency": ""
+      }
+    ],
+    "meals": {
+      "morning": "",
+      "morning_time": "08:00",
+      "afternoon": "",
+      "afternoon_time": "13:00",
+      "night": "",
+      "night_time": "19:00"
+    },
+    "bathing": {
+      "time": "",
+      "instructions": ""
+    },
+    "vitals": [],
+    "injections": [],
+    "procedures": [],
+    "special_instructions": "",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": "plan_1774352196",
+    "created_at": {
+      "$date": "2026-03-24T17:06:36.207Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-24T17:06:36.207Z"
+    },
+    "is_active": true
+  }
+]

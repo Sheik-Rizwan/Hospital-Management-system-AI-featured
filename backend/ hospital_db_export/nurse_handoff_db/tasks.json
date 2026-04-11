@@ -1,0 +1,3169 @@
+[
+  {
+    "_id": {
+      "$oid": "697c466a67990659f3348585"
+    },
+    "task_id": "task_697c466a67990659f3348581",
+    "patient_id": "01",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1769752170",
+    "task_type": "medication",
+    "title": "Give paracetomol 500mg ()",
+    "description": "Give paracetomol 500mg ()",
+    "scheduled_time": "2026-01-30T14:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_002",
+    "assigned_nurse_name": "Sireesha",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_014",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T15:01:40.875599"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:19:30.105Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-01-30T15:01:40.877Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c466a67990659f3348586"
+    },
+    "task_id": "task_697c466a67990659f3348582",
+    "patient_id": "01",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1769752170",
+    "task_type": "medication",
+    "title": "Give levocitrzine montilocast 10mg ()",
+    "description": "Give levocitrzine montilocast 10mg ()",
+    "scheduled_time": "2026-01-30T14:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "completed",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": {
+      "$date": "2026-03-24T17:09:45.990Z"
+    },
+    "completed_by": "nurse_014",
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_001",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T11:20:22.587303"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:19:30.105Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-03-24T17:09:45.990Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c466a67990659f3348587"
+    },
+    "task_id": "task_697c466a67990659f3348583",
+    "patient_id": "01",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1769752170",
+    "task_type": "meal",
+    "title": "Breakfast: oots",
+    "description": "Breakfast: oots",
+    "scheduled_time": "2026-01-30T08:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "assigned",
+    "priority": "normal",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_002",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-02-27T17:40:15.440562"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:19:30.105Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:15.442Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c466a67990659f3348588"
+    },
+    "task_id": "task_697c466a67990659f3348584",
+    "patient_id": "01",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1769752170",
+    "task_type": "meal",
+    "title": "Lunch: oots",
+    "description": "Lunch: oots",
+    "scheduled_time": "2026-01-30T13:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "completed",
+    "priority": "normal",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": {
+      "$date": "2026-02-26T10:21:10.354Z"
+    },
+    "completed_by": "nurse_015",
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-01-30T11:19:30.105Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-02-26T10:21:10.354Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a1"
+    },
+    "task_id": "task_697c471467990659f3348589",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-01-30T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_003",
+    "assigned_nurse_name": "srivalli",
+    "status": "completed",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-01-30T09:00:00Z"
+    },
+    "completed_at": {
+      "$date": "2026-01-30T15:03:45.229Z"
+    },
+    "completed_by": "nurse_003",
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_014",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T15:01:40.875599"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-01-30T15:03:45.229Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a2"
+    },
+    "task_id": "task_697c471467990659f334858a",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-01-30T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-01-30T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_002",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-02-27T17:40:15.440562"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:15.448Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a3"
+    },
+    "task_id": "task_697c471467990659f334858b",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-01-30T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "pending",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-01-30T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (0)"
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a4"
+    },
+    "task_id": "task_697c471467990659f334858c",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-01-31T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-01-31T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_003",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-01-30T15:04:02.371859"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-01-30T15:04:02.373Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a5"
+    },
+    "task_id": "task_697c471467990659f334858d",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-01-31T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_002",
+    "assigned_nurse_name": "Sireesha",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-01-31T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_014",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T15:01:40.875599"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (1)",
+    "updated_at": {
+      "$date": "2026-01-30T15:01:40.885Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a6"
+    },
+    "task_id": "task_697c471467990659f334858e",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-01-31T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_0288e858",
+    "assigned_nurse_name": "Sara Khan",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-01-31T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_002",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-02-27T17:40:15.440562"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (1)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:15.452Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a7"
+    },
+    "task_id": "task_697c471467990659f334858f",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-01T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "pending",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-01T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (1)"
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a8"
+    },
+    "task_id": "task_697c471467990659f3348590",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-01T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_002",
+    "assigned_nurse_name": "Sireesha",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-01T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_003",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-01-30T15:04:02.371859"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (1)",
+    "updated_at": {
+      "$date": "2026-01-30T15:04:02.376Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485a9"
+    },
+    "task_id": "task_697c471467990659f3348591",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-01T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-01T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_014",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T15:01:40.875599"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (2)",
+    "updated_at": {
+      "$date": "2026-01-30T15:01:40.886Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485aa"
+    },
+    "task_id": "task_697c471467990659f3348592",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-02T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_57b2f608",
+    "assigned_nurse_name": "Nurse 0fed",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-02T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_002",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-02-27T17:40:15.440562"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (2)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:15.455Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485ab"
+    },
+    "task_id": "task_697c471467990659f3348593",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-02T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "pending",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-02T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (2)"
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485ac"
+    },
+    "task_id": "task_697c471467990659f3348594",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-02T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-02T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_003",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-01-30T15:04:02.371859"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (2)",
+    "updated_at": {
+      "$date": "2026-01-30T15:04:02.378Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485ad"
+    },
+    "task_id": "task_697c471467990659f3348595",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-03T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_003",
+    "assigned_nurse_name": "srivalli",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-03T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_014",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T15:01:40.875599"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (3)",
+    "updated_at": {
+      "$date": "2026-01-30T15:01:40.889Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485ae"
+    },
+    "task_id": "task_697c471467990659f3348596",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-03T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_881591ad",
+    "assigned_nurse_name": "Nurse aefa",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-03T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_002",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-02-27T17:40:15.440562"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (3)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:15.458Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485af"
+    },
+    "task_id": "task_697c471467990659f3348597",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-03T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "pending",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-03T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (3)"
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b0"
+    },
+    "task_id": "task_697c471467990659f3348598",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-04T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-04T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_003",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-01-30T15:04:02.371859"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (3)",
+    "updated_at": {
+      "$date": "2026-01-30T15:04:02.380Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b1"
+    },
+    "task_id": "task_697c471467990659f3348599",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-04T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_002",
+    "assigned_nurse_name": "Sireesha",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-04T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_014",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T15:01:40.875599"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (4)",
+    "updated_at": {
+      "$date": "2026-01-30T15:01:40.892Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b2"
+    },
+    "task_id": "task_697c471467990659f334859a",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-04T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-04T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_002",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-02-27T17:40:15.440562"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (4)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:15.462Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b3"
+    },
+    "task_id": "task_697c471467990659f334859b",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-05T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "pending",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-05T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (4)"
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b4"
+    },
+    "task_id": "task_697c471467990659f334859c",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-05T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_002",
+    "assigned_nurse_name": "Sireesha",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-05T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_003",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-01-30T15:04:02.371859"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (4)",
+    "updated_at": {
+      "$date": "2026-01-30T15:04:02.384Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b5"
+    },
+    "task_id": "task_697c471467990659f334859d",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-05T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-05T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_014",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T15:01:40.875599"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (5)",
+    "updated_at": {
+      "$date": "2026-01-30T15:01:40.896Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b6"
+    },
+    "task_id": "task_697c471467990659f334859e",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-06T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-06T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_002",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-02-27T17:40:15.440562"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (5)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:15.465Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b7"
+    },
+    "task_id": "task_697c471467990659f334859f",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-06T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "pending",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-06T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (5)"
+  },
+  {
+    "_id": {
+      "$oid": "697c471467990659f33485b8"
+    },
+    "task_id": "task_697c471467990659f33485a0",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "nurse_001",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "Paracetomol 500mg",
+    "description": "Give Paracetomol 500mg",
+    "scheduled_time": {
+      "$date": "2026-02-06T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-01-30",
+      "end_date": "2026-02-06",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "hot water,oots ,light food rice with sambar,rasasm\ndont use cold drinks,milks",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-02-06T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_003",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-01-30T15:04:02.371859"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T11:22:20.898Z"
+    },
+    "created_by": "nurse_001",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (5)",
+    "updated_at": {
+      "$date": "2026-01-30T15:04:02.387Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "697c7a3e8d306dafaf220f92"
+    },
+    "task_id": "task_697c7a3e8d306dafaf220f91",
+    "patient_id": "012",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1769765438",
+    "task_type": "medication",
+    "title": "Give paracetamol 500mg ()",
+    "description": "Give paracetamol 500mg ()",
+    "scheduled_time": "2026-01-30T15:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha ",
+    "status": "completed",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": {
+      "$date": "2026-02-26T10:44:56.133Z"
+    },
+    "completed_by": "nurse_015",
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_014",
+        "reason": "Nurse switched to emergency",
+        "timestamp": "2026-01-30T15:01:40.875599"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-01-30T15:00:38.959Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-02-26T10:44:56.133Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d808d0262f892863416b2"
+    },
+    "task_id": "task_699d808d0262f892863416b1",
+    "patient_id": "015",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1771929741",
+    "task_type": "medication",
+    "title": "Give paracetomol ()",
+    "description": "Give paracetomol ()",
+    "scheduled_time": "2026-02-24T14:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": null,
+    "assigned_nurse_name": null,
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-02-24T16:12:21.487Z"
+    },
+    "created_by": "system"
+  },
+  {
+    "_id": {
+      "$oid": "69a0112a92cf921b76570523"
+    },
+    "task_id": "task_69a0112a92cf921b76570522",
+    "patient_id": "01",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1772097834",
+    "task_type": "medication",
+    "title": "Give citrizine ()",
+    "description": "Give citrizine ()",
+    "scheduled_time": "2026-02-26T14:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_002",
+        "reason": "Nurse switched to offline",
+        "timestamp": "2026-02-27T17:40:15.440562"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-02-26T14:53:54.556Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:15.445Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a189653eeaa44bbafe3477"
+    },
+    "task_id": "task_69a189653eeaa44bbafe3476",
+    "patient_id": "01",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1772194149",
+    "task_type": "medication",
+    "title": "Give pantioprazol ()",
+    "description": "Give pantioprazol ()",
+    "scheduled_time": "2026-02-27T15:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_002",
+    "assigned_nurse_name": "Sireesha",
+    "status": "completed",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": {
+      "$date": "2026-02-27T17:40:05.847Z"
+    },
+    "completed_by": "nurse_002",
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-02-27T17:39:09.265Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-02-27T17:40:05.847Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a557ee808e41f2c61af533"
+    },
+    "task_id": "task_69a557ee808e41f2c61af532",
+    "patient_id": "01",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1772443630",
+    "task_type": "medication",
+    "title": "Give paracetomol ()",
+    "description": "Give paracetomol ()",
+    "scheduled_time": "2026-03-02T15:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:10.820Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af54f"
+    },
+    "task_id": "task_69a55815808e41f2c61af534",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-02T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-02T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af550"
+    },
+    "task_id": "task_69a55815808e41f2c61af535",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-02T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-02T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (0)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af551"
+    },
+    "task_id": "task_69a55815808e41f2c61af536",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-02T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-02T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (0)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af552"
+    },
+    "task_id": "task_69a55815808e41f2c61af537",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-03T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_0288e858",
+    "assigned_nurse_name": "Sara Khan",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-03T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af553"
+    },
+    "task_id": "task_69a55815808e41f2c61af538",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-03T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_57b2f608",
+    "assigned_nurse_name": "Nurse 0fed",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-03T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (0)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af554"
+    },
+    "task_id": "task_69a55815808e41f2c61af539",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-03T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-03T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_881591ad",
+        "reason": "Nurse Deleted",
+        "timestamp": "2026-03-02T14:58:06.239519"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (0)",
+    "updated_at": {
+      "$date": "2026-03-02T14:58:06.241Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af555"
+    },
+    "task_id": "task_69a55815808e41f2c61af53a",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-04T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-04T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (1)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af556"
+    },
+    "task_id": "task_69a55815808e41f2c61af53b",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-04T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-04T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (1)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af557"
+    },
+    "task_id": "task_69a55815808e41f2c61af53c",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-04T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-04T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (1)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af558"
+    },
+    "task_id": "task_69a55815808e41f2c61af53d",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-05T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_0288e858",
+    "assigned_nurse_name": "Sara Khan",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-05T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (1)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af559"
+    },
+    "task_id": "task_69a55815808e41f2c61af53e",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-05T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_57b2f608",
+    "assigned_nurse_name": "Nurse 0fed",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-05T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (1)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af55a"
+    },
+    "task_id": "task_69a55815808e41f2c61af53f",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-05T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-05T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_881591ad",
+        "reason": "Nurse Deleted",
+        "timestamp": "2026-03-02T14:58:06.239519"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (1)",
+    "updated_at": {
+      "$date": "2026-03-02T14:58:06.245Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af55b"
+    },
+    "task_id": "task_69a55815808e41f2c61af540",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-06T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-06T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (2)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af55c"
+    },
+    "task_id": "task_69a55815808e41f2c61af541",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-06T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-06T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (2)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af55d"
+    },
+    "task_id": "task_69a55815808e41f2c61af542",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-06T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-06T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (2)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af55e"
+    },
+    "task_id": "task_69a55815808e41f2c61af543",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-07T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_0288e858",
+    "assigned_nurse_name": "Sara Khan",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-07T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (2)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af55f"
+    },
+    "task_id": "task_69a55815808e41f2c61af544",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-07T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_57b2f608",
+    "assigned_nurse_name": "Nurse 0fed",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-07T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (2)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af560"
+    },
+    "task_id": "task_69a55815808e41f2c61af545",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-07T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-07T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_881591ad",
+        "reason": "Nurse Deleted",
+        "timestamp": "2026-03-02T14:58:06.239519"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (2)",
+    "updated_at": {
+      "$date": "2026-03-02T14:58:06.248Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af561"
+    },
+    "task_id": "task_69a55815808e41f2c61af546",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-08T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-08T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (3)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af562"
+    },
+    "task_id": "task_69a55815808e41f2c61af547",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-08T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-08T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (3)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af563"
+    },
+    "task_id": "task_69a55815808e41f2c61af548",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-08T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-08T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (3)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af564"
+    },
+    "task_id": "task_69a55815808e41f2c61af549",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-09T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_0288e858",
+    "assigned_nurse_name": "Sara Khan",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-09T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (3)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af565"
+    },
+    "task_id": "task_69a55815808e41f2c61af54a",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-09T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_57b2f608",
+    "assigned_nurse_name": "Nurse 0fed",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-09T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (3)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af566"
+    },
+    "task_id": "task_69a55815808e41f2c61af54b",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-09T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_0288e858",
+    "assigned_nurse_name": "Sara Khan",
+    "status": "assigned",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-09T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [
+      {
+        "from_nurse": "nurse_881591ad",
+        "reason": "Nurse Deleted",
+        "timestamp": "2026-03-02T14:58:06.239519"
+      }
+    ],
+    "reassigned": true,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (3)",
+    "updated_at": {
+      "$date": "2026-03-02T14:58:06.250Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af567"
+    },
+    "task_id": "task_69a55815808e41f2c61af54c",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-10T09:00:00Z"
+    },
+    "shift": "day",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-10T09:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (4)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af568"
+    },
+    "task_id": "task_69a55815808e41f2c61af54d",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-10T14:00:00Z"
+    },
+    "shift": "afternoon",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_014",
+    "assigned_nurse_name": "Bhavana",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-10T14:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (afternoon) and lowest active task count (4)"
+  },
+  {
+    "_id": {
+      "$oid": "69a55815808e41f2c61af569"
+    },
+    "task_id": "task_69a55815808e41f2c61af54e",
+    "patient_id": "01",
+    "patient_name": "john",
+    "doctor_id": "doctor_c3fa5a51",
+    "plan_id": null,
+    "task_type": "medication",
+    "title": "paracetomol",
+    "description": "Give paracetomol",
+    "scheduled_time": {
+      "$date": "2026-03-10T21:00:00Z"
+    },
+    "shift": "night",
+    "schedule": {
+      "days": [
+        "day",
+        "afternoon",
+        "night"
+      ],
+      "start_date": "2026-03-02",
+      "end_date": "2026-03-10",
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_015",
+    "assigned_nurse_name": "Sri Latha",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": {
+      "$date": "2026-03-10T21:00:00Z"
+    },
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-02T14:57:49.103Z"
+    },
+    "created_by": "doctor_c3fa5a51",
+    "assignment_reason": "Selected based on shift (night) and lowest active task count (4)"
+  },
+  {
+    "_id": {
+      "$oid": "69c2774483bdb3d10e16fd38"
+    },
+    "task_id": "task_69c2774483bdb3d10e16fd37",
+    "patient_id": "014",
+    "patient_name": "",
+    "doctor_id": null,
+    "plan_id": "plan_1774352196",
+    "task_type": "medication",
+    "title": "Give pantoprazol ()",
+    "description": "Give pantoprazol ()",
+    "scheduled_time": "2026-03-24T04:00:00",
+    "shift": "day",
+    "schedule": {
+      "days": [],
+      "start_date": null,
+      "end_date": null,
+      "times": {
+        "day": "09:00",
+        "afternoon": "14:00",
+        "night": "21:00"
+      }
+    },
+    "assigned_nurse_id": "nurse_b6c853a9",
+    "assigned_nurse_name": "srivalli",
+    "status": "pending",
+    "priority": "high",
+    "notes": "",
+    "rejected": false,
+    "due_at": null,
+    "completed_at": null,
+    "completed_by": null,
+    "reassignment_history": [],
+    "reassigned": false,
+    "created_at": {
+      "$date": "2026-03-24T17:06:36.270Z"
+    },
+    "created_by": "system",
+    "assignment_reason": "Selected based on shift (day) and lowest active task count (0)"
+  }
+]

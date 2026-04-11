@@ -1,0 +1,46 @@
+[
+  {
+    "_id": {
+      "$oid": "69959dd5028f8c7f15a82c9d"
+    },
+    "phone": "917892855850",
+    "email": "Har@example.com",
+    "name": "Harish",
+    "registered_at": {
+      "$date": "2026-02-18T16:39:09.076Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699c2f7f028f8c7f15a82c9e"
+    },
+    "phone": "919845641125",
+    "email": "Nidhi@example.com",
+    "name": "Nidhi",
+    "registered_at": {
+      "$date": "2026-02-23T16:14:15.202Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699fca0387a2f99180e02642"
+    },
+    "phone": "918885851826",
+    "email": "rizwan@gmail.com",
+    "name": "Rizwan",
+    "registered_at": {
+      "$date": "2026-02-26T09:50:19.905Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d75199efbda210df21e4e0"
+    },
+    "phone": "919742053697",
+    "email": "jagan.pon@cortexcraft.ai",
+    "name": "Jagan",
+    "registered_at": {
+      "$date": "2026-04-09T12:43:29.821Z"
+    }
+  }
+]

@@ -1,0 +1,1038 @@
+[
+  {
+    "_id": {
+      "$oid": "6997017c88ee1a2fb44702a0"
+    },
+    "po_id": "PO-20260219-F060C6",
+    "request_id": "req_698d395a",
+    "quotation_id": "quote_91eef58f",
+    "vendor_id": "vendor_047e5b03",
+    "vendor_name": "med supply",
+    "items": [
+      {
+        "item_name": "Surgical Gloves Sterile (1771503965)",
+        "quantity": 500,
+        "unit_price": 4.5,
+        "total": 2250.0
+      }
+    ],
+    "total_amount": 2250.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-02-19T17:56:42.781Z"
+    },
+    "delivery_notes": "Delivered to hospital warehouse, received by Mr. Ahmed",
+    "budget_id": null,
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T17:56:36.355143",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_047e5b03",
+        "at": "2026-02-19T17:56:38.481814",
+        "note": "Order received, preparing shipment"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_047e5b03",
+        "at": "2026-02-19T17:56:40.619466",
+        "note": "Shipped via BlueDart, tracking: BD-789456"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_047e5b03",
+        "at": "2026-02-19T17:56:42.781037",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T17:56:44.901604",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-19T17:56:36.355Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-19T17:56:44.901Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69996bb879dbd723c1bd7f64"
+    },
+    "po_id": "PO-20260221-D38604",
+    "request_id": "req_613abd31",
+    "quotation_id": "quote_73d6458d",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "paracetomol",
+        "quantity": 10,
+        "unit_price": 10.0,
+        "total": 100.0
+      }
+    ],
+    "total_amount": 100.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-02-22T12:41:35.227Z"
+    },
+    "delivery_notes": "",
+    "budget_id": null,
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-02-21T13:54:24.074314",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-22T12:41:24.244939",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-22T12:41:28.371932",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-22T12:41:35.227016",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-22T12:42:25.407583",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-21T13:54:24.074Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-22T12:42:25.407Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699ad75a4b78244a3133893e"
+    },
+    "po_id": "PO-20260222-8E22D8",
+    "request_id": "req_236db199",
+    "quotation_id": "quote_1cdff9ba",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "surgical blades ",
+        "quantity": 20,
+        "unit_price": 50.0,
+        "total": 1000.0
+      }
+    ],
+    "total_amount": 1000.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-02-22T15:47:04.888Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_abad8f42",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-02-22T15:45:54.396660",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-22T15:46:54.065387",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-22T15:47:00.268922",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-22T15:47:04.888968",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-22T15:47:33.806483",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-22T15:45:54.396Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-22T15:47:33.806Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d81920262f892863416f1"
+    },
+    "po_id": "PO-20260224-D0D37B",
+    "request_id": "req_74efb421",
+    "quotation_id": "quote_05d61af5",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "beds",
+        "quantity": 1,
+        "unit_price": 600.0,
+        "total": 600.0
+      }
+    ],
+    "total_amount": 600.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-02-24T16:17:02.905Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_abad8f42",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:16:42.840422",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-24T16:16:54.128241",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-24T16:16:59.269390",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-24T16:17:02.905299",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:17:21.700739",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-24T16:16:42.840Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-24T16:17:21.700Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d8b2b0262f89286341797"
+    },
+    "po_id": "PO-20260224-15E510",
+    "request_id": "req_6d65bb4b",
+    "quotation_id": "quote_7bc3d57f",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "vituals machines ",
+        "quantity": 5,
+        "unit_price": 1000.0,
+        "total": 5000.0
+      }
+    ],
+    "total_amount": 5000.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-02-24T16:58:25.505Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_abad8f42",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:57:39.963216",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-24T16:58:09.468644",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-24T16:58:19.999688",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-24T16:58:25.505835",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:58:46.469578",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-24T16:57:39.963Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-24T16:58:46.469Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a15dd6e486af725fa6eb51"
+    },
+    "po_id": "PO-20260227-B83FBE",
+    "request_id": "req_07709079",
+    "quotation_id": "quote_568d27b6",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "beds",
+        "quantity": 10,
+        "unit_price": 2000.0,
+        "total": 20000.0
+      }
+    ],
+    "total_amount": 20000.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-02-27T14:33:55.752Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_deec8f81",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-02-27T14:33:18.180420",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-27T14:33:29.915106",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-27T14:33:39.079384",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-02-27T14:33:55.752689",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-27T14:34:30.135095",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-27T14:33:18.180Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T14:34:30.135Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a51f0a35a9b901e3877d96"
+    },
+    "po_id": "PO-20260302-4EAB95",
+    "request_id": "req_fc8ca145",
+    "quotation_id": "quote_d44af54f",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "Masks",
+        "quantity": 1,
+        "unit_price": 100.0,
+        "total": 100.0
+      }
+    ],
+    "total_amount": 100.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-03-02T10:54:52.063Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_abad8f42",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T10:54:26.004257",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-02T10:54:34.833728",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-02T10:54:37.091080",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-02T10:54:52.063416",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T10:54:56.896756",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T10:54:26.004Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T10:54:56.896Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a56c0852c147a4a5037731"
+    },
+    "po_id": "PO-20260302-48B387",
+    "request_id": "req_4d21158e",
+    "quotation_id": "quote_74b65992",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "surgical blades ",
+        "quantity": 50,
+        "unit_price": 500.0,
+        "total": 25000.0
+      }
+    ],
+    "total_amount": 25000.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-03-02T16:23:23.414Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_4263388f",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T16:22:56.810046",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-02T16:23:04.914115",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-02T16:23:19.128575",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-02T16:23:23.414919",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T16:23:29.852561",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T16:22:56.810Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T16:23:29.852Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a577aecd8e7f528811f940"
+    },
+    "po_id": "PO-20260302-9D9396",
+    "request_id": "req_1f29c5b7",
+    "quotation_id": "quote_589b6635",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "Masks",
+        "quantity": 10,
+        "unit_price": 5.0,
+        "total": 50.0
+      }
+    ],
+    "total_amount": 50.0,
+    "status": "acknowledged",
+    "expected_delivery": null,
+    "actual_delivery": null,
+    "delivery_notes": "",
+    "budget_id": "budget_abad8f42",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T17:12:38.215971",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-02T17:12:55.574921",
+        "note": "Status updated to acknowledged"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T17:12:38.215Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T17:12:55.574Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a90ed7ac563eaed2c8bf4e"
+    },
+    "po_id": "PO-20260305-C563E0",
+    "request_id": "req_be37e02e",
+    "quotation_id": "quote_cf412e7f",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "Masks",
+        "quantity": 10,
+        "unit_price": 1000.0,
+        "total": 10000.0
+      }
+    ],
+    "total_amount": 10000.0,
+    "status": "completed",
+    "expected_delivery": null,
+    "actual_delivery": {
+      "$date": "2026-03-05T15:51:47.112Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_4263388f",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-05T10:34:23.303870",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-05T15:51:22.518018",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-05T15:51:38.609124",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-05T15:51:47.112824",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-05T15:51:55.241490",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-05T10:34:23.303Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T15:51:55.241Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a95b89b93888cb9827c3dc"
+    },
+    "po_id": "PO-20260305-5970AA",
+    "request_id": "req_612259ed",
+    "quotation_id": "quote_ee64a3a2",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "beds",
+        "quantity": 20,
+        "unit_price": 5000.0,
+        "total": 100000.0
+      }
+    ],
+    "total_amount": 100000.0,
+    "status": "acknowledged",
+    "expected_delivery": null,
+    "actual_delivery": null,
+    "delivery_notes": "",
+    "budget_id": "budget_4263388f",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-05T16:01:37.718274",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-05T16:14:52.678289",
+        "note": "Status updated to acknowledged"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-05T16:01:37.718Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T16:14:52.678Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa774ab9269c460dbfa2ba"
+    },
+    "po_id": "PO-20260306-308381",
+    "request_id": "req_1307585a",
+    "quotation_id": "quote_1a5ddf18",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "Masks",
+        "quantity": 50,
+        "unit_price": 20.0,
+        "total": 1000.0
+      }
+    ],
+    "total_amount": 1000.0,
+    "status": "created",
+    "expected_delivery": "2026-03-10",
+    "actual_delivery": null,
+    "delivery_notes": "",
+    "budget_id": "budget_4263388f",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:12:18.701558",
+        "note": "PO created"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:12:18.701Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:12:18.701Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7a1188ef218451d08a7d"
+    },
+    "po_id": "PO-20260306-58A69B",
+    "request_id": "req_9d7128db",
+    "quotation_id": "quote_15302f6a",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "beds",
+        "quantity": 10,
+        "unit_price": 1000.0,
+        "total": 10000.0
+      }
+    ],
+    "total_amount": 10000.0,
+    "status": "created",
+    "expected_delivery": "2026-03-13",
+    "actual_delivery": null,
+    "delivery_notes": "",
+    "budget_id": "budget_4263388f",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:24:09.110343",
+        "note": "PO created"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:24:09.110Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:24:09.110Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa7a6e88ef218451d08a80"
+    },
+    "po_id": "PO-20260306-E300AA",
+    "request_id": "req_60182c29",
+    "quotation_id": "quote_13518d93",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "paracetomol",
+        "quantity": 10,
+        "unit_price": 10.0,
+        "total": 100.0
+      }
+    ],
+    "total_amount": 100.0,
+    "status": "created",
+    "expected_delivery": "2026-03-13",
+    "actual_delivery": null,
+    "delivery_notes": "",
+    "budget_id": "budget_4263388f",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:25:42.171384",
+        "note": "PO created"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:25:42.171Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:25:42.171Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa80692f377e5638a0162a"
+    },
+    "po_id": "PO-20260306-F7B9DF",
+    "request_id": "req_ac0dd58a",
+    "quotation_id": "quote_c19550fd",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "surgical blades ",
+        "quantity": 30,
+        "unit_price": 50.0,
+        "total": 1500.0
+      }
+    ],
+    "total_amount": 1500.0,
+    "status": "completed",
+    "expected_delivery": "2026-03-08",
+    "actual_delivery": {
+      "$date": "2026-03-06T12:52:43.173Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_4263388f",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:51:13.208722",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-06T12:52:20.257388",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-06T12:52:32.098487",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-06T12:52:43.173453",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:52:51.233995",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:51:13.208Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:52:51.233Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69ae77eb6b88493b406f46e3"
+    },
+    "po_id": "PO-20260309-132530",
+    "request_id": "req_69c8e1e0",
+    "quotation_id": "quote_fafebcd3",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "beds",
+        "quantity": 50,
+        "unit_price": 100.0,
+        "total": 5000.0
+      }
+    ],
+    "total_amount": 5000.0,
+    "status": "completed",
+    "expected_delivery": "2026-03-16",
+    "actual_delivery": {
+      "$date": "2026-03-09T13:05:24.872Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_abad8f42",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-09T13:04:03.549752",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-09T13:05:09.737412",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-09T13:05:21.203220",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-09T13:05:24.872501",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-09T13:05:37.728108",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-09T13:04:03.549Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-09T13:05:37.728Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69affc00bc2552cac356e595"
+    },
+    "po_id": "PO-20260310-10A8BB",
+    "request_id": "req_3dfd74e8",
+    "quotation_id": "quote_8e69b99e",
+    "vendor_id": "vendor_5780c7c2",
+    "vendor_name": "pharmatech",
+    "items": [
+      {
+        "item_name": "paracetomol",
+        "quantity": 10,
+        "unit_price": 10.0,
+        "total": 100.0
+      }
+    ],
+    "total_amount": 100.0,
+    "status": "completed",
+    "expected_delivery": "2026-03-13",
+    "actual_delivery": {
+      "$date": "2026-03-10T16:43:11.674Z"
+    },
+    "delivery_notes": "",
+    "budget_id": "budget_4263388f",
+    "budget_department": "",
+    "department": "",
+    "created_by": "admin_a652313c",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "created",
+        "by": "admin_a652313c",
+        "at": "2026-03-10T16:39:52.241520",
+        "note": "PO created"
+      },
+      {
+        "status": "acknowledged",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-10T16:43:00.021740",
+        "note": "Status updated to acknowledged"
+      },
+      {
+        "status": "shipped",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-10T16:43:08.244207",
+        "note": "Status updated to shipped"
+      },
+      {
+        "status": "delivered",
+        "by": "vendor_5780c7c2",
+        "at": "2026-03-10T16:43:11.674513",
+        "note": "Status updated to delivered"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-10T16:43:29.107461",
+        "note": "Order completed and inventory updated"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-10T16:39:52.241Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-10T16:43:29.107Z"
+    }
+  }
+]

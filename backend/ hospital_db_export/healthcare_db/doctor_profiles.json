@@ -1,0 +1,84 @@
+[
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84997"
+    },
+    "user_id": "doctor_Na",
+    "created_at": {
+      "$date": "2026-01-29T21:38:22.327Z"
+    },
+    "department": "",
+    "email": "ashwaq@gmail.com",
+    "full_name": "Ashwaq",
+    "is_active": true,
+    "license_number": "Na",
+    "password": "$2b$12$R3RRKnve26u114zUmm8Lo.ClEWAtjiHFPMFwb5tnYw62GJGXSnQN.",
+    "phone": "",
+    "role": "doctor",
+    "specialization": "Cardiology",
+    "service_id": "SVC-002",
+    "updated_at": {
+      "$date": "2026-03-13T14:59:41.521Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a00dd287a2f99180e02643"
+    },
+    "user_id": "doctor_c3fa5a51",
+    "email": "chaman@gmail.com",
+    "password": "$2b$12$x5khhncC64Lr9V6h5VUfaOnKwj6do9lg3JAVVXXOpTkoIsKJt2KfS",
+    "full_name": "Chaman",
+    "role": "doctor",
+    "specialization": "general consultation",
+    "license_number": "na",
+    "department": "",
+    "phone": "",
+    "created_at": {
+      "$date": "2026-02-26T14:10:44.105Z"
+    },
+    "is_active": true,
+    "updated_at": {
+      "$date": "2026-03-13T15:00:39.797Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a00dd287a2f99180e02644"
+    },
+    "user_id": "doctor_812860ca",
+    "email": "taj@gmail.com",
+    "password": "$2b$12$khNRm8x4A9Bx9O/pnzMtS.7cWMllXvxk2RRrEYdXlLFTvOD2MvTMG",
+    "full_name": "Taj",
+    "role": "doctor",
+    "specialization": "Dermatology",
+    "license_number": "None",
+    "department": "",
+    "phone": "",
+    "created_at": {
+      "$date": "2026-02-26T14:12:35.145Z"
+    },
+    "is_active": true,
+    "updated_at": {
+      "$date": "2026-03-13T15:00:10.736Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c5195dc03bcacd2b4e59c8"
+    },
+    "user_id": "doctor_425804b5",
+    "email": "harish@gmail.com",
+    "password": "$2b$12$PytqMHqk9lw28518PFDITOy0I5zPxpC7spnPUiEdv13x.6IQqhTyq",
+    "full_name": "Harish",
+    "role": "doctor",
+    "specialization": "Dental General Consultation",
+    "license_number": "Naa",
+    "department": "",
+    "phone": "",
+    "created_at": {
+      "$date": "2026-03-26T17:02:45.975Z"
+    },
+    "is_active": true
+  }
+]

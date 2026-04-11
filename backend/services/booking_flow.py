@@ -1169,16 +1169,16 @@ class SmartBookingEngine:
             date_localized = LocalizationService.format_date_localized(bk['date'], lang)
             
             confirm_msg = (
-                f" {booking_success} {bk.get('patient_name')}\n\n"
-                f"🆔 ID: {appt_id}\n"
-                f"👨‍⚕️ {LocalizationService.get('lbl_doctor', lang)}: {dr_display}\n"
+                f"{booking_success} {bk.get('patient_name')}\n\n"
+                f"ID: {appt_id}\n"
+                f"{LocalizationService.get('lbl_doctor', lang)}: {dr_display}\n"
             )
             if svc_display:
-                confirm_msg += f"💼 {LocalizationService.get('lbl_service', lang)}: {svc_display}\n"
+                confirm_msg += f"{LocalizationService.get('lbl_service', lang)}: {svc_display}\n"
             confirm_msg += (
-                f"📅 {LocalizationService.get('lbl_date', lang)}: {date_localized} ({date_display})\n"
-                f"⏰ {LocalizationService.get('lbl_time', lang)}: {fmt(bk['time_slot'])} – {fmt(bk.get('end_time', ''))}\n\n"
-                f"📝 {LocalizationService.get('lbl_status', lang)}: {LocalizationService.get('status_pending', lang)}"
+                f"{LocalizationService.get('lbl_date', lang)}: {date_localized} ({date_display})\n"
+                f"{LocalizationService.get('lbl_time', lang)}: {fmt(bk['time_slot'])} – {fmt(bk.get('end_time', ''))}\n\n"
+                f"{LocalizationService.get('lbl_status', lang)}: {LocalizationService.get('status_pending', lang)}"
             )
             self.notify.send_whatsapp_text(sender_id, confirm_msg)
 

@@ -1,0 +1,42 @@
+[
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521020"
+    },
+    "service_id": "SVC-001",
+    "service_name": "General Consultation",
+    "duration_minutes": 30
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521021"
+    },
+    "service_id": "SVC-002",
+    "service_name": "Cardiology",
+    "duration_minutes": 30
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521022"
+    },
+    "service_id": "SVC-003",
+    "service_name": "Dermatology",
+    "duration_minutes": 30
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521023"
+    },
+    "service_id": "SVC-004",
+    "service_name": "Orthopedics",
+    "duration_minutes": 30
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521024"
+    },
+    "service_id": "SVC-005",
+    "service_name": "Pediatrics",
+    "duration_minutes": 30
+  }
+]

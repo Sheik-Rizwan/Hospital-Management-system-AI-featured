@@ -1,0 +1,146 @@
+[
+  {
+    "_id": {
+      "$oid": "6996e46e81290444416d791c"
+    },
+    "item_id": "item_9e105922",
+    "name": "paracetomol",
+    "sku": "",
+    "category": "general_supplies",
+    "description": "",
+    "unit": "pcs",
+    "quantity": 20,
+    "reorder_level": 10,
+    "unit_price": 0.0,
+    "location": "",
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-19T15:52:38.713Z"
+    },
+    "created_by": "doctor_Na",
+    "updated_at": {
+      "$date": "2026-02-19T15:52:38.713Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6996fd0d2f1994dca5c66018"
+    },
+    "item_id": "item_bbb8a986",
+    "name": "surgical gloves ",
+    "sku": "",
+    "category": "medical_equipment",
+    "description": "",
+    "unit": "pcs",
+    "quantity": 99,
+    "reorder_level": 10,
+    "unit_price": 0.0,
+    "location": "",
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-19T17:37:41.170Z"
+    },
+    "created_by": "nurse_001",
+    "updated_at": {
+      "$date": "2026-02-20T15:48:05.559Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69980108af8b4a0ad4eb1559"
+    },
+    "item_id": "item_78b8ee43",
+    "name": "surgical blades ",
+    "sku": "",
+    "category": "general_supplies",
+    "description": "",
+    "unit": "pcs",
+    "quantity": 100,
+    "reorder_level": 10,
+    "unit_price": 0.0,
+    "location": "",
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-20T12:06:56.517Z"
+    },
+    "created_by": "vendor_047e5b03",
+    "updated_at": {
+      "$date": "2026-02-20T12:06:56.517Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699aac9a043d0ebb82ddc97e"
+    },
+    "item_id": "item_c5b9cd33",
+    "name": "beds",
+    "sku": "",
+    "category": "general_supplies",
+    "description": "",
+    "unit": "pcs",
+    "quantity": 59,
+    "reorder_level": 10,
+    "unit_price": 0.0,
+    "location": "",
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-22T12:43:30.379Z"
+    },
+    "created_by": "vendor_5780c7c2",
+    "updated_at": {
+      "$date": "2026-03-02T10:56:08.109Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699d89830262f8928634172c"
+    },
+    "item_id": "item_cd5154ef",
+    "name": "vituals machines ",
+    "sku": "",
+    "category": "medical_equipment",
+    "description": "",
+    "unit": "pcs",
+    "quantity": 5,
+    "reorder_level": 10,
+    "unit_price": 0.0,
+    "location": "",
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-24T16:50:35.333Z"
+    },
+    "created_by": "nurse_001",
+    "updated_at": {
+      "$date": "2026-02-24T16:50:35.333Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a51ddf35a9b901e3877d92"
+    },
+    "item_id": "item_bc1d07a7",
+    "name": "Masks",
+    "sku": "",
+    "category": "general_supplies",
+    "description": "",
+    "unit": "box",
+    "quantity": 20,
+    "reorder_level": 10,
+    "unit_price": 0.0,
+    "location": "",
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-03-02T10:49:27.119Z"
+    },
+    "created_by": "nurse_001",
+    "updated_at": {
+      "$date": "2026-03-02T14:59:04.040Z"
+    }
+  }
+]

@@ -97,12 +97,12 @@ def _send_reminder_for_appointment(appointment, db):
             from services.appointment_service import AppointmentService
             spoken_time = AppointmentService.format_time_ampm(appt_time)
             reminder_msg = (
-                f"⏰ Appointment Reminder\n\n"
+                f"Appointment Reminder\n\n"
                 f"Dear {patient_name},\n"
                 f"This is a reminder for your appointment:\n"
-                f"👨‍⚕️ Doctor: Dr. {doctor_name}\n"
-                f"📅 Date: {appt_date}\n"
-                f"🕐 Time: {spoken_time}\n\n"
+                f"Doctor: Dr. {doctor_name}\n"
+                f"🗓️ Date: {appt_date}\n"
+                f"Time: {spoken_time}\n\n"
                 f"Please arrive 10 minutes early."
             )
             NotificationService.send_whatsapp_text(patient_phone, reminder_msg)

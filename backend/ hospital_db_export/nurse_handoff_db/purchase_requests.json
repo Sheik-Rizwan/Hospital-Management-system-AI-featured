@@ -1,0 +1,1594 @@
+[
+  {
+    "_id": {
+      "$oid": "6996e49281290444416d7921"
+    },
+    "request_id": "req_ba695b04",
+    "item_id": "item_9e105922",
+    "item_name": "paracetomol",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "low",
+    "reason": "needed right now for patients",
+    "department": "",
+    "status": "approved",
+    "requested_by": "doctor_Na",
+    "requested_by_name": "ashwaq",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-02-20T14:56:44.626Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_Na",
+        "at": "2026-02-19T15:53:14.071600",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-02-20T14:56:44.628429",
+        "note": "Request approved and assigned to med supply"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-19T15:53:14.071Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-20T14:56:44.626Z"
+    },
+    "assigned_vendor_id": "vendor_456ecf31"
+  },
+  {
+    "_id": {
+      "$oid": "6997016988ee1a2fb447028b"
+    },
+    "request_id": "req_698d395a",
+    "item_id": null,
+    "item_name": "Surgical Gloves Sterile (1771503965)",
+    "category": "consumables",
+    "quantity": 500,
+    "unit": "box",
+    "urgency": "high",
+    "reason": "Stock running critically low in surgery ward",
+    "department": "",
+    "status": "completed",
+    "requested_by": "doctor_Na",
+    "requested_by_name": "ashwaq",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-02-19T17:56:23.682Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_047e5b03",
+    "selected_quotation_id": "quote_91eef58f",
+    "estimated_cost": 2500.0,
+    "actual_cost": 2250.0,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_Na",
+        "at": "2026-02-19T17:56:17.293339",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T17:56:23.682829",
+        "note": "Request approved by admin"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T17:56:36.352555",
+        "note": "Vendor med supply selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T17:56:44.902133",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-19T17:56:17.293Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-19T17:56:44.902Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6997016d88ee1a2fb4470290"
+    },
+    "request_id": "req_5455ffb4",
+    "item_id": null,
+    "item_name": "IV Fluid Bags (1771503965)",
+    "category": "medicines",
+    "quantity": 200,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "Regular restocking for ICU ward",
+    "department": "",
+    "status": "rejected",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": "We have enough IV fluids in stock currently",
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 1000.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-02-19T17:56:21.570009",
+        "note": "Request created"
+      },
+      {
+        "status": "rejected",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T17:56:27.905153",
+        "note": "We have enough IV fluids in stock currently"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-19T17:56:21.570Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-19T17:56:27.905Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6997024588ee1a2fb44702b5"
+    },
+    "request_id": "req_600090d2",
+    "item_id": null,
+    "item_name": "Surgical Gloves Sterile (1771504185)",
+    "category": "consumables",
+    "quantity": 500,
+    "unit": "box",
+    "urgency": "high",
+    "reason": "Stock running critically low in surgery ward",
+    "department": "",
+    "status": "completed",
+    "requested_by": "doctor_Na",
+    "requested_by_name": "ashwaq",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-02-19T18:00:03.443Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_047e5b03",
+    "selected_quotation_id": "quote_bd2199d3",
+    "estimated_cost": 2500.0,
+    "actual_cost": 2250.0,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_Na",
+        "at": "2026-02-19T17:59:57.060888",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T18:00:03.443749",
+        "note": "Request approved by admin"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T18:00:16.250068",
+        "note": "Vendor med supply selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T18:00:24.733636",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-19T17:59:57.060Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-19T18:00:24.733Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6997024988ee1a2fb44702ba"
+    },
+    "request_id": "req_692c93e4",
+    "item_id": null,
+    "item_name": "IV Fluid Bags (1771504185)",
+    "category": "medicines",
+    "quantity": 200,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "Regular restocking for ICU ward",
+    "department": "",
+    "status": "rejected",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": "We have enough IV fluids in stock currently",
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 1000.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-02-19T18:00:01.292300",
+        "note": "Request created"
+      },
+      {
+        "status": "rejected",
+        "by": "admin_a652313c",
+        "at": "2026-02-19T18:00:07.693403",
+        "note": "We have enough IV fluids in stock currently"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-19T18:00:01.292Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-19T18:00:07.693Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6999688fd73501666644fe00"
+    },
+    "request_id": "req_613abd31",
+    "item_id": "item_9e105922",
+    "item_name": "paracetomol",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "doctor_Na",
+    "requested_by_name": "ashwaq",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-02-21T13:41:26.934Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_73d6458d",
+    "estimated_cost": 0.0,
+    "actual_cost": 100.0,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_Na",
+        "at": "2026-02-21T13:40:55.769526",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-02-21T13:41:26.935926",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-02-21T13:54:24.072734",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-22T12:42:25.408821",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-21T13:40:55.769Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-22T12:42:25.408Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "699aa234f1c80ba5fef858c1"
+    },
+    "request_id": "req_236db199",
+    "item_id": "item_78b8ee43",
+    "item_name": "surgical blades ",
+    "category": "general_supplies",
+    "quantity": 20,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-02-22T11:59:47.723Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_1cdff9ba",
+    "estimated_cost": 0.0,
+    "actual_cost": 1000.0,
+    "budget_id": "budget_abad8f42",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-02-22T11:59:08.406814",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-02-22T11:59:47.724694",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-02-22T15:45:54.392452",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-22T15:47:33.806483",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-22T11:59:08.406Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-22T15:47:33.806Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "699d81420262f892863416c5"
+    },
+    "request_id": "req_74efb421",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "category": "general_supplies",
+    "quantity": 1,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-02-24T16:15:56.889Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_05d61af5",
+    "estimated_cost": 0.0,
+    "actual_cost": 600.0,
+    "budget_id": "budget_abad8f42",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-02-24T16:15:22.603007",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:15:56.889657",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:16:42.839596",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:17:21.707798",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-24T16:15:22.603Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-24T16:17:21.707Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "699d89960262f89286341735"
+    },
+    "request_id": "req_6d65bb4b",
+    "item_id": "item_cd5154ef",
+    "item_name": "vituals machines ",
+    "category": "medical_equipment",
+    "quantity": 5,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-02-24T16:53:10.420Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_7bc3d57f",
+    "estimated_cost": 0.0,
+    "actual_cost": 5000.0,
+    "budget_id": "budget_abad8f42",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-02-24T16:50:54.783030",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:53:10.423211",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:57:39.959783",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-24T16:58:46.470502",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-24T16:50:54.783Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-24T16:58:46.470Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "699d89f00262f89286341746"
+    },
+    "request_id": "req_7369bacf",
+    "item_id": "item_cd5154ef",
+    "item_name": "vituals machines ",
+    "category": "medical_equipment",
+    "quantity": 1000,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "rejected",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": "now we dont have the budget",
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-02-24T16:52:24.221164",
+        "note": "Request created"
+      },
+      {
+        "status": "rejected",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T15:30:54.130830",
+        "note": "now we dont have the budget"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-24T16:52:24.221Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T15:30:54.130Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a15ce5e486af725fa6eb4f"
+    },
+    "request_id": "req_07709079",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-02-27T14:30:25.974Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_568d27b6",
+    "estimated_cost": 0.0,
+    "actual_cost": 20000.0,
+    "budget_id": "budget_deec8f81",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-02-27T14:29:17.393727",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-02-27T14:30:25.976101",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-02-27T14:33:18.178382",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-02-27T14:34:30.136555",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-02-27T14:29:17.393Z"
+    },
+    "updated_at": {
+      "$date": "2026-02-27T14:34:30.136Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69a51eb335a9b901e3877d94"
+    },
+    "request_id": "req_fc8ca145",
+    "item_id": "item_bc1d07a7",
+    "item_name": "Masks",
+    "category": "general_supplies",
+    "quantity": 1,
+    "unit": "box",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-02T10:53:46.233Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_d44af54f",
+    "estimated_cost": 0.0,
+    "actual_cost": 100.0,
+    "budget_id": "budget_abad8f42",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-02T10:52:59.348160",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T10:53:46.236630",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T10:54:26.002218",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T10:54:56.897983",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T10:52:59.348Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T10:54:56.897Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69a55962808e41f2c61af576"
+    },
+    "request_id": "req_ea2920bd",
+    "item_id": "item_9e105922",
+    "item_name": "paracetomol",
+    "category": "general_supplies",
+    "quantity": 20,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "approved",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-02T15:05:02.519Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-02T15:03:22.038697",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T15:05:02.522017",
+        "note": "Request approved and assigned to pharmatech"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T15:03:22.038Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T15:05:02.519Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69a55fbbcb8be6d8b8d0acc5"
+    },
+    "request_id": "req_b60a39d3",
+    "item_id": "item_cd5154ef",
+    "item_name": "vituals machines ",
+    "category": "medical_equipment",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "approved",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-02T15:31:04.798Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-02T15:30:27.738707",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T15:31:04.799943",
+        "note": "Request approved and assigned to pharmatech"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T15:30:27.738Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T15:31:04.798Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69a568b052c147a4a503772a"
+    },
+    "request_id": "req_430579e7",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "category": "general_supplies",
+    "quantity": 1,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "requested",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": null,
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-02T16:08:40.189194",
+        "note": "Request created"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T16:08:40.189Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T16:08:40.189Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a56b6c52c147a4a503772f"
+    },
+    "request_id": "req_4d21158e",
+    "item_id": "item_78b8ee43",
+    "item_name": "surgical blades ",
+    "category": "general_supplies",
+    "quantity": 50,
+    "unit": "pcs",
+    "urgency": "normal",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-02T16:20:41.508Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_74b65992",
+    "estimated_cost": 0.0,
+    "actual_cost": 25000.0,
+    "budget_id": "budget_4263388f",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-02T16:20:20.455352",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T16:20:41.509452",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T16:22:56.808033",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T16:23:29.856256",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T16:20:20.456Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T16:23:29.856Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69a576b7cd8e7f528811f93c"
+    },
+    "request_id": "req_f2872360",
+    "item_id": "item_bc1d07a7",
+    "item_name": "Masks",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "box",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "requested",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": null,
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-02T17:08:31.935892",
+        "note": "Request created"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T17:08:31.935Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T17:08:31.935Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a576c7cd8e7f528811f93d"
+    },
+    "request_id": "req_2538775a",
+    "item_id": "item_bc1d07a7",
+    "item_name": "Masks",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "box",
+    "urgency": "high",
+    "reason": "",
+    "department": "",
+    "status": "requested",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": null,
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-02T17:08:47.882508",
+        "note": "Request created"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T17:08:47.882Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T17:08:47.882Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a576e4cd8e7f528811f93e"
+    },
+    "request_id": "req_1f29c5b7",
+    "item_id": "item_bc1d07a7",
+    "item_name": "Masks",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "box",
+    "urgency": "high",
+    "reason": "",
+    "department": "",
+    "status": "ordered",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-02T17:09:39.432Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_589b6635",
+    "estimated_cost": 0.0,
+    "actual_cost": 50.0,
+    "budget_id": "budget_abad8f42",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-02T17:09:16.693835",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T17:09:39.433639",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-02T17:12:38.212911",
+        "note": "Vendor pharmatech selected"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-02T17:09:16.693Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-02T17:12:38.211Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69a90d9cac563eaed2c8bf4c"
+    },
+    "request_id": "req_be37e02e",
+    "item_id": "item_bc1d07a7",
+    "item_name": "Masks",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "box",
+    "urgency": "urgent",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-05T10:32:59.988Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_cf412e7f",
+    "estimated_cost": 0.0,
+    "actual_cost": 10000.0,
+    "budget_id": "budget_4263388f",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-05T10:29:08.072598",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-05T10:32:59.989527",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-05T10:34:23.300698",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-05T15:51:55.244065",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-05T10:29:08.072Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T15:51:55.244Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69a95b5db93888cb9827c3da"
+    },
+    "request_id": "req_612259ed",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "category": "general_supplies",
+    "quantity": 20,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "ordered",
+    "requested_by": "doctor_Na",
+    "requested_by_name": "Doctor C",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-05T16:01:06.541Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_ee64a3a2",
+    "estimated_cost": 0.0,
+    "actual_cost": 100000.0,
+    "budget_id": "budget_4263388f",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_Na",
+        "at": "2026-03-05T16:00:53.865549",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-05T16:01:06.541938",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-05T16:01:37.715252",
+        "note": "Vendor pharmatech selected"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-05T16:00:53.865Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-05T16:01:37.715Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69aa7712b9269c460dbfa2b8"
+    },
+    "request_id": "req_1307585a",
+    "item_id": "item_bc1d07a7",
+    "item_name": "Masks",
+    "category": "general_supplies",
+    "quantity": 50,
+    "unit": "box",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "ordered",
+    "requested_by": "doctor_812860ca",
+    "requested_by_name": "Doctor B",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-06T12:11:36.567Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_1a5ddf18",
+    "estimated_cost": 0.0,
+    "actual_cost": 1000.0,
+    "budget_id": "budget_4263388f",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_812860ca",
+        "at": "2026-03-06T12:11:22.009626",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:11:36.568384",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:12:18.700359",
+        "note": "Vendor pharmatech selected"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:11:22.009Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:12:18.700Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69aa79a788ef218451d08a79"
+    },
+    "request_id": "req_fcae6a7f",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "rejected",
+    "requested_by": "doctor_812860ca",
+    "requested_by_name": "Doctor B",
+    "requested_by_role": "doctor",
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": "No reason provided",
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_812860ca",
+        "at": "2026-03-06T12:22:23.417695",
+        "note": "Request created"
+      },
+      {
+        "status": "rejected",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:22:38.384665",
+        "note": "No reason provided"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:22:23.417Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:22:38.384Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa79a788ef218451d08a7a"
+    },
+    "request_id": "req_aa07885f",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "rejected",
+    "requested_by": "doctor_812860ca",
+    "requested_by_name": "Doctor B",
+    "requested_by_role": "doctor",
+    "approved_by": null,
+    "approved_at": null,
+    "rejection_reason": "No reason provided",
+    "selected_vendor_id": null,
+    "selected_quotation_id": null,
+    "estimated_cost": 0.0,
+    "actual_cost": null,
+    "budget_id": null,
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_812860ca",
+        "at": "2026-03-06T12:22:23.425134",
+        "note": "Request created"
+      },
+      {
+        "status": "rejected",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:22:41.672133",
+        "note": "No reason provided"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:22:23.425Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:22:41.672Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69aa79a788ef218451d08a7b"
+    },
+    "request_id": "req_9d7128db",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "ordered",
+    "requested_by": "doctor_812860ca",
+    "requested_by_name": "Doctor B",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-06T12:22:47.973Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_15302f6a",
+    "estimated_cost": 0.0,
+    "actual_cost": 10000.0,
+    "budget_id": "budget_4263388f",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_812860ca",
+        "at": "2026-03-06T12:22:23.430217",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:22:47.975124",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:24:09.107271",
+        "note": "Vendor pharmatech selected"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:22:23.430Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:24:09.107Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69aa7a3f88ef218451d08a7e"
+    },
+    "request_id": "req_60182c29",
+    "item_id": "item_9e105922",
+    "item_name": "paracetomol",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "ordered",
+    "requested_by": "doctor_812860ca",
+    "requested_by_name": "Doctor B",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-06T12:25:09.950Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_13518d93",
+    "estimated_cost": 0.0,
+    "actual_cost": 100.0,
+    "budget_id": "budget_4263388f",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_812860ca",
+        "at": "2026-03-06T12:24:55.391193",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:25:09.952074",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:25:42.167894",
+        "note": "Vendor pharmatech selected"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:24:55.391Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:25:42.167Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69aa80022f377e5638a01628"
+    },
+    "request_id": "req_ac0dd58a",
+    "item_id": "item_78b8ee43",
+    "item_name": "surgical blades ",
+    "category": "general_supplies",
+    "quantity": 30,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "doctor_812860ca",
+    "requested_by_name": "Doctor B",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-06T12:50:04.917Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_c19550fd",
+    "estimated_cost": 0.0,
+    "actual_cost": 1500.0,
+    "budget_id": "budget_4263388f",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_812860ca",
+        "at": "2026-03-06T12:49:30.448059",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:50:04.918288",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:51:13.205940",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-06T12:52:51.235786",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-06T12:49:30.448Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-06T12:52:51.235Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69ae774c6b88493b406f46e1"
+    },
+    "request_id": "req_69c8e1e0",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "category": "general_supplies",
+    "quantity": 50,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "doctor_Na",
+    "requested_by_name": "Doctor C",
+    "requested_by_role": "doctor",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-09T13:02:09.556Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_fafebcd3",
+    "estimated_cost": 0.0,
+    "actual_cost": 5000.0,
+    "budget_id": "budget_abad8f42",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "doctor_Na",
+        "at": "2026-03-09T13:01:24.649934",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-09T13:02:09.556936",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-09T13:04:03.548228",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-09T13:05:37.729782",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-09T13:01:24.649Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-09T13:05:37.729Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  },
+  {
+    "_id": {
+      "$oid": "69affb82bc2552cac356e593"
+    },
+    "request_id": "req_3dfd74e8",
+    "item_id": "item_9e105922",
+    "item_name": "paracetomol",
+    "category": "general_supplies",
+    "quantity": 10,
+    "unit": "pcs",
+    "urgency": "medium",
+    "reason": "",
+    "department": "",
+    "status": "completed",
+    "requested_by": "nurse_001",
+    "requested_by_name": "Hema",
+    "requested_by_role": "nurse",
+    "approved_by": "admin_a652313c",
+    "approved_at": {
+      "$date": "2026-03-10T16:38:17.699Z"
+    },
+    "rejection_reason": null,
+    "selected_vendor_id": "vendor_5780c7c2",
+    "selected_quotation_id": "quote_8e69b99e",
+    "estimated_cost": 0.0,
+    "actual_cost": 100.0,
+    "budget_id": "budget_4263388f",
+    "is_deleted": false,
+    "status_history": [
+      {
+        "status": "requested",
+        "by": "nurse_001",
+        "at": "2026-03-10T16:37:46.785810",
+        "note": "Request created"
+      },
+      {
+        "status": "approved",
+        "by": "admin_a652313c",
+        "at": "2026-03-10T16:38:17.700649",
+        "note": "Request approved and assigned to pharmatech"
+      },
+      {
+        "status": "ordered",
+        "by": "admin_a652313c",
+        "at": "2026-03-10T16:39:52.240074",
+        "note": "Vendor pharmatech selected"
+      },
+      {
+        "status": "completed",
+        "by": "admin_a652313c",
+        "at": "2026-03-10T16:43:29.109741",
+        "note": "Delivery completed"
+      }
+    ],
+    "created_at": {
+      "$date": "2026-03-10T16:37:46.785Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-10T16:43:29.109Z"
+    },
+    "assigned_vendor_id": "vendor_5780c7c2"
+  }
+]

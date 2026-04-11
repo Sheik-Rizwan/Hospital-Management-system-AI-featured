@@ -1,0 +1,78 @@
+[
+  {
+    "_id": {
+      "$oid": "699834dd23d069292ec26eb2"
+    },
+    "transaction_id": "txn_1771582685_item_bbb8a986",
+    "item_id": "item_bbb8a986",
+    "item_name": "surgical gloves ",
+    "type": "consume",
+    "quantity": 1,
+    "previous_qty": 100,
+    "new_qty": 99,
+    "user_id": "admin_a652313c",
+    "user_name": "Haseeb",
+    "user_role": "super_admin",
+    "reason": "",
+    "timestamp": {
+      "$date": "2026-02-20T15:48:05.565Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a51f4d35a9b901e3877d97"
+    },
+    "transaction_id": "txn_1772429133_item_c5b9cd33",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "type": "consume",
+    "quantity": 1,
+    "previous_qty": 11,
+    "new_qty": 10,
+    "user_id": "nurse_001",
+    "user_name": "Hema",
+    "user_role": "nurse",
+    "reason": "",
+    "timestamp": {
+      "$date": "2026-03-02T10:55:33.778Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a51f7035a9b901e3877d98"
+    },
+    "transaction_id": "txn_1772429168_item_c5b9cd33",
+    "item_id": "item_c5b9cd33",
+    "item_name": "beds",
+    "type": "consume",
+    "quantity": 1,
+    "previous_qty": 10,
+    "new_qty": 9,
+    "user_id": "nurse_001",
+    "user_name": "Hema",
+    "user_role": "nurse",
+    "reason": "",
+    "timestamp": {
+      "$date": "2026-03-02T10:56:08.110Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a55860808e41f2c61af573"
+    },
+    "transaction_id": "txn_1772443744_item_bc1d07a7",
+    "item_id": "item_bc1d07a7",
+    "item_name": "Masks",
+    "type": "consume",
+    "quantity": 1,
+    "previous_qty": 11,
+    "new_qty": 10,
+    "user_id": "doctor_c3fa5a51",
+    "user_name": "Chaman ",
+    "user_role": "doctor",
+    "reason": "",
+    "timestamp": {
+      "$date": "2026-03-02T14:59:04.042Z"
+    }
+  }
+]

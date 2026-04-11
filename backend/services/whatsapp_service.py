@@ -2375,12 +2375,12 @@ class WhatsAppService:
             dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {data.get('doctor_name', '—')}", lang)
             
             confirm_msg = (
-                f" {booking_success} {patient_name}\n\n"
-                f"🆔 ID: {appt_id}\n"
-                f"‍️ {LocalizationService.get('lbl_doctor', lang)}: {dr_bilingual}\n"
-                f" 📅 {LocalizationService.get('lbl_date', lang)}: {data['date']}\n"
-                f" ⏰ {LocalizationService.get('lbl_time', lang)}: {self._format_time_display(data['time'])} – {self._format_time_display(data.get('end_time', ''))}\n\n"
-                f" 📝 {LocalizationService.get('lbl_status', lang)}: {LocalizationService.get('status_pending', lang)}"
+                f"{booking_success} {patient_name}\n\n"
+                f"ID: {appt_id}\n"
+                f"{LocalizationService.get('lbl_doctor', lang)}: {dr_bilingual}\n"
+                f"{LocalizationService.get('lbl_date', lang)}: {data['date']}\n"
+                f"{LocalizationService.get('lbl_time', lang)}: {self._format_time_display(data['time'])} – {self._format_time_display(data.get('end_time', ''))}\n\n"
+                f"{LocalizationService.get('lbl_status', lang)}: {LocalizationService.get('status_pending', lang)}"
             )
             self.notifier.send_whatsapp_text(sender_id, confirm_msg)
             # Notify doctor in real-time via socket so dashboard updates instantly

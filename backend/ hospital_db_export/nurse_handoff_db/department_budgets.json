@@ -1,0 +1,62 @@
+[
+  {
+    "_id": {
+      "$oid": "6998316a23d069292ec26e92"
+    },
+    "budget_id": "budget_4263388f",
+    "department": "Pharmacy",
+    "fiscal_year": "2026",
+    "total_budget": 500000,
+    "used_budget": 36600.0,
+    "reserved_budget": 125100.0,
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-20T15:33:22.634Z"
+    },
+    "created_by": "admin_a652313c",
+    "updated_at": {
+      "$date": "2026-02-20T15:33:22.634Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6998346f23d069292ec26ea7"
+    },
+    "budget_id": "budget_abad8f42",
+    "department": "surgery suppliments ",
+    "fiscal_year": "2026",
+    "total_budget": 100000,
+    "used_budget": 11700.0,
+    "reserved_budget": 50.0,
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-20T15:46:15.409Z"
+    },
+    "created_by": "admin_a652313c",
+    "updated_at": {
+      "$date": "2026-02-20T15:46:15.409Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "699961c6131e4786f2b4e4d3"
+    },
+    "budget_id": "budget_deec8f81",
+    "department": "cardiology",
+    "fiscal_year": "2026",
+    "total_budget": 50000,
+    "used_budget": 20000.0,
+    "reserved_budget": 0.0,
+    "is_active": true,
+    "is_deleted": false,
+    "created_at": {
+      "$date": "2026-02-21T13:11:58.533Z"
+    },
+    "created_by": "admin_a652313c",
+    "updated_at": {
+      "$date": "2026-02-21T13:11:58.533Z"
+    }
+  }
+]

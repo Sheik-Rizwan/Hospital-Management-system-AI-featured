@@ -1,0 +1,72 @@
+[
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521025"
+    },
+    "date": "2026-01-26",
+    "reason": "Republic Day"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521026"
+    },
+    "date": "2026-03-17",
+    "reason": "Holi"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521027"
+    },
+    "date": "2026-04-02",
+    "reason": "Ram Navami"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521028"
+    },
+    "date": "2026-04-14",
+    "reason": "Dr. Ambedkar Jayanti"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f4521029"
+    },
+    "date": "2026-05-01",
+    "reason": "May Day"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f452102a"
+    },
+    "date": "2026-08-15",
+    "reason": "Independence Day"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f452102b"
+    },
+    "date": "2026-10-02",
+    "reason": "Gandhi Jayanti"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f452102c"
+    },
+    "date": "2026-10-20",
+    "reason": "Dussehra"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f452102d"
+    },
+    "date": "2026-11-09",
+    "reason": "Diwali"
+  },
+  {
+    "_id": {
+      "$oid": "69936bd1b8f13af5f452102e"
+    },
+    "date": "2026-12-25",
+    "reason": "Christmas"
+  }
+]

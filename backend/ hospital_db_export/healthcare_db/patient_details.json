@@ -1,0 +1,308 @@
+[
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a8498e"
+    },
+    "patient_id": "01",
+    "patient_name": "john",
+    "date_of_birth": "2010-05-02",
+    "gender": "Male",
+    "admission_date": "2025-04-02",
+    "room_number": "101",
+    "diagnosis": "pneumonia",
+    "password": "$2b$12$BPjCjj2f1EWTUEqpYfguoOZEcDcYPkaWh15IOfEoZTCpdCB19TkaK",
+    "confirm_password": "John123",
+    "allergies": [],
+    "created_by_nurse": "nurse_001",
+    "created_at": {
+      "$date": "2026-01-29T22:11:51.745Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-29T22:11:51.745Z"
+    },
+    "role": "patient",
+    "user_id": "patient_01",
+    "is_active": true,
+    "email": "john@gmail.com"
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a8498f"
+    },
+    "patient_id": "012",
+    "patient_name": "saud",
+    "date_of_birth": "2020-04-05",
+    "gender": "Male",
+    "admission_date": "2025-06-03",
+    "room_number": "102",
+    "diagnosis": "viral fever",
+    "password": "$2b$12$sKzDoCa7NTvsKeO2coL7n.cpTSVFRx/mSHyX7cAXYCE8ADs4Y3avq",
+    "confirm_password": "Saud123",
+    "allergies": [],
+    "created_by_nurse": "nurse_001",
+    "created_at": {
+      "$date": "2026-01-30T08:21:53.039Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T08:21:53.039Z"
+    },
+    "role": "patient",
+    "user_id": "patient_012",
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84990"
+    },
+    "patient_id": "013",
+    "patient_name": "zunrain",
+    "date_of_birth": "2014-05-03",
+    "gender": "Male",
+    "admission_date": "2026-02-05",
+    "room_number": "104",
+    "diagnosis": "chest pain",
+    "password": "$2b$12$z.4EBvgy5iM9oPAmVcTYTOutjn7LMaP5DqsIiP7DO4ZtUdPqn9xSO",
+    "confirm_password": "Zunrain123",
+    "allergies": [],
+    "created_by_nurse": "nurse_001",
+    "created_at": {
+      "$date": "2026-01-30T08:23:11.507Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T08:23:11.507Z"
+    },
+    "role": "patient",
+    "user_id": "patient_013",
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84991"
+    },
+    "patient_id": "014",
+    "patient_name": "vignesh",
+    "date_of_birth": "2021-05-04",
+    "gender": "Male",
+    "admission_date": "2025-05-03",
+    "room_number": "105",
+    "diagnosis": "Acute Myocardial Infarction",
+    "password": "$2b$12$rRMtOhdCOmO.heuzh9VL..oSvEyWZg2uEd0lGHEcnB36ZobTomtwC",
+    "confirm_password": "Vignesh123",
+    "allergies": [],
+    "created_by_nurse": "nurse_001",
+    "created_at": {
+      "$date": "2026-01-30T08:25:15.262Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T08:25:15.262Z"
+    },
+    "role": "patient",
+    "user_id": "patient_014",
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84992"
+    },
+    "patient_id": "015",
+    "patient_name": "Viswa",
+    "date_of_birth": "2025-05-04",
+    "gender": "Male",
+    "admission_date": "2026-01-02",
+    "room_number": "106",
+    "diagnosis": "Chronic Kidney Disease with Acute Exacerbation",
+    "password": "$2b$12$cKItzoOhwl1KOho3/J/.UOcozv3YyJqfVCYf8wkmP7stc3dQ4Yjea",
+    "confirm_password": "Viswa123",
+    "allergies": [],
+    "created_by_nurse": "nurse_001",
+    "created_at": {
+      "$date": "2026-01-30T08:26:30.375Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T08:26:30.375Z"
+    },
+    "role": "patient",
+    "user_id": "patient_015",
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84993"
+    },
+    "patient_id": "016",
+    "patient_name": "Veeresh",
+    "date_of_birth": "2024-05-02",
+    "gender": "Male",
+    "admission_date": "2025-05-02",
+    "room_number": "108",
+    "diagnosis": "Sepsis",
+    "password": "$2b$12$sZ5THT1tBc1EE8HHENnGGO3HCMepXQwyPRImAsEb7AxUymHbtQKj.",
+    "confirm_password": "Veeresh123",
+    "allergies": [],
+    "created_by_nurse": "nurse_001",
+    "created_at": {
+      "$date": "2026-01-30T08:27:28.702Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T08:27:28.702Z"
+    },
+    "role": "patient",
+    "user_id": "patient_016",
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84994"
+    },
+    "patient_id": "017",
+    "patient_name": "Yashwanth",
+    "date_of_birth": "2025-04-05",
+    "gender": "Male",
+    "admission_date": "2026-01-02",
+    "room_number": "109",
+    "diagnosis": "Diabetic Ketoacidosis (DKA)",
+    "password": "$2b$12$gjFzKyFivnH5..qhcECXXO0e8wNoia/mtpVatsgnjVW4QTFVJH6GS",
+    "confirm_password": "Yashwanth123",
+    "allergies": [],
+    "created_by_nurse": "nurse_001",
+    "created_at": {
+      "$date": "2026-01-30T08:28:46.258Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T08:28:46.258Z"
+    },
+    "role": "patient",
+    "user_id": "patient_017",
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6980b0db15046fb4a6a84995"
+    },
+    "patient_id": "018",
+    "patient_name": "Yukteesh",
+    "date_of_birth": "2004-04-02",
+    "gender": "Male",
+    "admission_date": "2025-04-02",
+    "room_number": "110",
+    "diagnosis": "Severe Dengue Fever",
+    "password": "$2b$12$QcsWWEs2SSvaqsx1Uy5ioOKVV7CO7Nud0nWsyE0x7jmMjGJa/TZma",
+    "confirm_password": "Yukteesh123",
+    "allergies": [],
+    "created_by_nurse": "nurse_001",
+    "created_at": {
+      "$date": "2026-01-30T08:29:58.374Z"
+    },
+    "updated_at": {
+      "$date": "2026-01-30T08:29:58.374Z"
+    },
+    "role": "patient",
+    "user_id": "patient_018",
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "699fca04ad51615fe79df9f7"
+    },
+    "patient_id": "wa_918885851826",
+    "patient_name": "Rizwan",
+    "phone": "918885851826",
+    "user_id": "patient_wa_918885851826",
+    "created_at": {
+      "$date": "2026-02-12T15:21:52.187Z"
+    },
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "69a01ecf87a2f99180e02648"
+    },
+    "user_id": "patient_P2602162638",
+    "password": "$2b$12$k76fANg1hY/6r0ANIeFyr.2GxV/ExDMjAQLc7cm8w2rxSnkIv5rR2",
+    "patient_id": "P2602162638",
+    "patient_name": "Prakash",
+    "role": "patient",
+    "date_of_birth": "1992-01-01",
+    "bed_number": "",
+    "gender": "Unknown",
+    "phone": "919886732638",
+    "created_at": {
+      "$date": "2026-02-16T18:15:05.981Z"
+    },
+    "is_active": true,
+    "created_by_nurse": null,
+    "assigned_doctor": null,
+    "updated_at": {
+      "$date": "2026-02-16T18:15:05.981Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a01ecf87a2f99180e02649"
+    },
+    "user_id": "patient_wa_917892855850",
+    "password": "$2b$12$YE6O.RHFwRnZDBLQXDau1u5RJa07kjypBPJcTZuWIWxcQt8WHJ3fC",
+    "patient_id": "wa_917892855850",
+    "patient_name": "Harish",
+    "role": "patient",
+    "date_of_birth": "2000-01-01",
+    "bed_number": "",
+    "gender": "Unknown",
+    "phone": "917892855850",
+    "created_at": {
+      "$date": "2026-02-18T16:39:09.348Z"
+    },
+    "is_active": true,
+    "created_by_nurse": null,
+    "assigned_doctor": null,
+    "updated_at": {
+      "$date": "2026-02-18T16:39:09.348Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69a01ecf87a2f99180e0264a"
+    },
+    "user_id": "patient_wa_919845641125",
+    "password": "$2b$12$uH94fZ2cBHCEvlmkxoqBM.ylnaD3.zGapcG.OmZ3I0PrADgDhEgrW",
+    "patient_id": "wa_919845641125",
+    "patient_name": "Nidhi",
+    "role": "patient",
+    "date_of_birth": "2000-01-01",
+    "bed_number": "",
+    "gender": "Unknown",
+    "phone": "919845641125",
+    "created_at": {
+      "$date": "2026-02-23T16:14:15.486Z"
+    },
+    "is_active": true,
+    "created_by_nurse": null,
+    "assigned_doctor": null,
+    "updated_at": {
+      "$date": "2026-02-23T16:14:15.486Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69d7519acbf534cb8a3e83ca"
+    },
+    "user_id": "patient_wa_919742053697",
+    "password": "$2b$12$Uf0HKCQCGH.n9uGMzsxm7.t9I7xMjxBLvlrRXyAdfjj.CQyj4bLbi",
+    "patient_id": "wa_919742053697",
+    "patient_name": "Jagan",
+    "role": "patient",
+    "date_of_birth": "2000-01-01",
+    "bed_number": "",
+    "gender": "Unknown",
+    "phone": "919742053697",
+    "created_at": {
+      "$date": "2026-04-09T12:43:30.134Z"
+    },
+    "is_active": true,
+    "created_by_nurse": null,
+    "assigned_doctor": null,
+    "updated_at": {
+      "$date": "2026-04-09T12:43:30.134Z"
+    }
+  }
+]

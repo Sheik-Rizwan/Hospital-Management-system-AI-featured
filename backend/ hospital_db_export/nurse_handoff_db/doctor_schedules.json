@@ -1,0 +1,788 @@
+[
+  {
+    "_id": {
+      "$oid": "699365b9c4fabf613dc90f10"
+    },
+    "doctor_id": "doc_wa_test_enhanced",
+    "day_of_week": "Monday",
+    "start_time": "09:00",
+    "end_time": "17:00",
+    "slot_duration": 30,
+    "is_available": true
+  },
+  {
+    "_id": {
+      "$oid": "699365b9c4fabf613dc90f11"
+    },
+    "doctor_id": "doc_wa_test_enhanced",
+    "day_of_week": "Tuesday",
+    "start_time": "09:00",
+    "end_time": "17:00",
+    "slot_duration": 30,
+    "is_available": true
+  },
+  {
+    "_id": {
+      "$oid": "699365b9c4fabf613dc90f12"
+    },
+    "doctor_id": "doc_wa_test_enhanced",
+    "day_of_week": "Wednesday",
+    "start_time": "09:00",
+    "end_time": "17:00",
+    "slot_duration": 30,
+    "is_available": true
+  },
+  {
+    "_id": {
+      "$oid": "699365b9c4fabf613dc90f13"
+    },
+    "doctor_id": "doc_wa_test_enhanced",
+    "day_of_week": "Thursday",
+    "start_time": "09:00",
+    "end_time": "17:00",
+    "slot_duration": 30,
+    "is_available": true
+  },
+  {
+    "_id": {
+      "$oid": "699365b9c4fabf613dc90f14"
+    },
+    "doctor_id": "doc_wa_test_enhanced",
+    "day_of_week": "Friday",
+    "start_time": "09:00",
+    "end_time": "17:00",
+    "slot_duration": 30,
+    "is_available": true
+  },
+  {
+    "_id": {
+      "$oid": "699c37fe1f43fdde019378b8"
+    },
+    "doctor_id": "doc_test_unique_123",
+    "day_of_week": "Tuesday",
+    "start_time": "09:00",
+    "end_time": "17:00",
+    "slot_duration": 30,
+    "is_available": true
+  },
+  {
+    "_id": {
+      "$oid": "69b98b2ef83cf976edc41a4f"
+    },
+    "schedule_id": "SCH-7917E0ED",
+    "doctor_id": "doctor_c3fa5a51",
+    "day_of_week": "Monday",
+    "start_time": "22:00",
+    "end_time": "07:00",
+    "slot_duration": 45,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-17T22:41:10.848Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-17T22:41:10.848Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b98b2ef83cf976edc41a50"
+    },
+    "schedule_id": "SCH-89E217B5",
+    "doctor_id": "doctor_c3fa5a51",
+    "day_of_week": "Tuesday",
+    "start_time": "22:00",
+    "end_time": "07:00",
+    "slot_duration": 45,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-17T22:41:10.853Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-17T22:41:10.853Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b98b2ef83cf976edc41a51"
+    },
+    "schedule_id": "SCH-CDDBEBE8",
+    "doctor_id": "doctor_c3fa5a51",
+    "day_of_week": "Wednesday",
+    "start_time": "14:00",
+    "end_time": "22:00",
+    "slot_duration": 45,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-17T22:41:10.853Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-17T22:41:10.853Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b98b2ef83cf976edc41a52"
+    },
+    "schedule_id": "SCH-46ADEE7E",
+    "doctor_id": "doctor_c3fa5a51",
+    "day_of_week": "Thursday",
+    "start_time": "22:00",
+    "end_time": "07:00",
+    "slot_duration": 45,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-17T22:41:10.854Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-17T22:41:10.854Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b98b2ef83cf976edc41a53"
+    },
+    "schedule_id": "SCH-B756A90D",
+    "doctor_id": "doctor_c3fa5a51",
+    "day_of_week": "Friday",
+    "start_time": "07:00",
+    "end_time": "14:00",
+    "slot_duration": 45,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-17T22:41:10.855Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-17T22:41:10.855Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b98b2ef83cf976edc41a54"
+    },
+    "schedule_id": "SCH-544A7F04",
+    "doctor_id": "doctor_c3fa5a51",
+    "day_of_week": "Saturday",
+    "start_time": "22:00",
+    "end_time": "07:00",
+    "slot_duration": 45,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-17T22:41:10.855Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-17T22:41:10.855Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69b98b2ef83cf976edc41a55"
+    },
+    "schedule_id": "SCH-19E518E0",
+    "doctor_id": "doctor_c3fa5a51",
+    "day_of_week": "Sunday",
+    "start_time": "22:00",
+    "end_time": "07:00",
+    "slot_duration": 45,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-17T22:41:10.856Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-17T22:41:10.856Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b483"
+    },
+    "schedule_id": "SCH-4AFE22FD",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Monday",
+    "start_time": "03:00",
+    "end_time": "05:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.861Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.861Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b484"
+    },
+    "schedule_id": "SCH-74EF4AC8",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Monday",
+    "start_time": "06:00",
+    "end_time": "07:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.862Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.862Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b485"
+    },
+    "schedule_id": "SCH-791F7BF8",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Monday",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.863Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.863Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b486"
+    },
+    "schedule_id": "SCH-528A2E23",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Tuesday",
+    "start_time": "03:00",
+    "end_time": "05:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.864Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.864Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b487"
+    },
+    "schedule_id": "SCH-825A602D",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Tuesday",
+    "start_time": "06:00",
+    "end_time": "07:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.865Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.865Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b488"
+    },
+    "schedule_id": "SCH-68168C9C",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Tuesday",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.873Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.873Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b489"
+    },
+    "schedule_id": "SCH-A0544479",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Wednesday",
+    "start_time": "03:00",
+    "end_time": "05:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.875Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.875Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b48a"
+    },
+    "schedule_id": "SCH-7E55ACF3",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Wednesday",
+    "start_time": "06:00",
+    "end_time": "07:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.876Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.876Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b48b"
+    },
+    "schedule_id": "SCH-59C405B1",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Wednesday",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.877Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.877Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b48c"
+    },
+    "schedule_id": "SCH-2F2F6574",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Thursday",
+    "start_time": "03:00",
+    "end_time": "05:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.877Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.877Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b48d"
+    },
+    "schedule_id": "SCH-35D64441",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Thursday",
+    "start_time": "06:00",
+    "end_time": "07:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.879Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.879Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b48e"
+    },
+    "schedule_id": "SCH-855FF840",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Thursday",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.879Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.879Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b48f"
+    },
+    "schedule_id": "SCH-EDDF9891",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Friday",
+    "start_time": "03:00",
+    "end_time": "05:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.880Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.880Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b490"
+    },
+    "schedule_id": "SCH-2B8BAC84",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Friday",
+    "start_time": "06:00",
+    "end_time": "07:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.881Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.881Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b491"
+    },
+    "schedule_id": "SCH-80807B80",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Friday",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.882Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.882Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b492"
+    },
+    "schedule_id": "SCH-2B7104EC",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Saturday",
+    "start_time": "03:00",
+    "end_time": "05:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.884Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.884Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b493"
+    },
+    "schedule_id": "SCH-C34E62FE",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Saturday",
+    "start_time": "06:00",
+    "end_time": "07:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.885Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.885Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b494"
+    },
+    "schedule_id": "SCH-FD1D91D0",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Saturday",
+    "start_time": "10:00",
+    "end_time": "14:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.887Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.887Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69c6283f44095e545dc8b495"
+    },
+    "schedule_id": "SCH-495260EC",
+    "doctor_id": "doctor_Na",
+    "day_of_week": "Sunday",
+    "start_time": "00:00",
+    "end_time": "00:00",
+    "slot_duration": 30,
+    "is_available": false,
+    "created_at": {
+      "$date": "2026-03-27T12:18:31.888Z"
+    },
+    "updated_at": {
+      "$date": "2026-03-27T12:18:31.888Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb0c"
+    },
+    "schedule_id": "SCH-B0AA25F2",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Monday",
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.029Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.029Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb0d"
+    },
+    "schedule_id": "SCH-1E2C5926",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Monday",
+    "start_time": "18:00",
+    "end_time": "22:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.029Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.029Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb0e"
+    },
+    "schedule_id": "SCH-734DEFDC",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Tuesday",
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.030Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.030Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb0f"
+    },
+    "schedule_id": "SCH-2BEF36F3",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Tuesday",
+    "start_time": "18:00",
+    "end_time": "22:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.032Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.032Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb10"
+    },
+    "schedule_id": "SCH-F50122EF",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Wednesday",
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.033Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.033Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb11"
+    },
+    "schedule_id": "SCH-608ADA90",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Wednesday",
+    "start_time": "18:00",
+    "end_time": "22:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.033Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.033Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb12"
+    },
+    "schedule_id": "SCH-9C78FDAB",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Thursday",
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.036Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.036Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb13"
+    },
+    "schedule_id": "SCH-21AF3125",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Thursday",
+    "start_time": "18:00",
+    "end_time": "22:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.037Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.037Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb14"
+    },
+    "schedule_id": "SCH-5AAF6408",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Friday",
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.039Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.039Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb15"
+    },
+    "schedule_id": "SCH-9566AEAF",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Friday",
+    "start_time": "18:00",
+    "end_time": "22:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.039Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.039Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb16"
+    },
+    "schedule_id": "SCH-D11889A7",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Saturday",
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.041Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.041Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb17"
+    },
+    "schedule_id": "SCH-F4883646",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Saturday",
+    "start_time": "18:00",
+    "end_time": "22:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.041Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.041Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb18"
+    },
+    "schedule_id": "SCH-C87EE4CC",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Sunday",
+    "start_time": "14:00",
+    "end_time": "16:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.043Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.043Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "69cca9f5cee58040e717eb19"
+    },
+    "schedule_id": "SCH-35608E42",
+    "doctor_id": "doctor_812860ca",
+    "day_of_week": "Sunday",
+    "start_time": "18:00",
+    "end_time": "22:00",
+    "slot_duration": 30,
+    "is_available": true,
+    "created_at": {
+      "$date": "2026-04-01T10:45:33.044Z"
+    },
+    "updated_at": {
+      "$date": "2026-04-01T10:45:33.044Z"
+    }
+  }
+]

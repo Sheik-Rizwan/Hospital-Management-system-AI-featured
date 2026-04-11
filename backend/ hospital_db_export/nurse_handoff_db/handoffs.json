@@ -1,0 +1,696 @@
+[
+  {
+    "_id": {
+      "$oid": "697c39c3961e68429dae8e2c"
+    },
+    "patient_id": "01",
+    "nurse_id": "nurse_001",
+    "nurse_name": "Hema",
+    "shift": "Day",
+    "transcript": " So the temperature is 38.8 degrees Celsius. Blood pressure is 110 over 70 mmHg heart rate 104 feet per minute. So respiratory rate is 26 per minute and saturated oxygen is 92% on 4 liters per minute. oxygen via nasal cannula the patient is conscious and oriented but appears fatigue you and mildly dispense Hispanic on excursion relative of with a large spectrum is presenter of articulation revolves the bilateral basal crackles more prominent on the right side",
+    "structured_report": {
+      "vitals": {
+        "recorded_time": null,
+        "temperature_celsius": 38.8,
+        "blood_pressure": {
+          "systolic": 110,
+          "diastolic": 70,
+          "unit": "mmHg",
+          "status": null
+        },
+        "heart_rate": {
+          "value": 104,
+          "unit": "bpm",
+          "status": null
+        },
+        "respiratory_rate": {
+          "value": 26,
+          "unit": "per_min",
+          "status": null
+        },
+        "spo2": {
+          "value": 92,
+          "unit": "percent",
+          "oxygen_support": "4 liters per minute via nasal cannula",
+          "status": null
+        }
+      },
+      "clinical_status": {
+        "consciousness": "conscious and oriented",
+        "response": null,
+        "respiratory_exam": "bilateral basal crackles more prominent on the right side",
+        "urine_output": {
+          "value": null,
+          "unit": "ml_per_hr",
+          "catheter": null,
+          "status": null
+        },
+        "skin_condition": null
+      },
+      "investigations": {
+        "wbc_count": {
+          "value": null,
+          "unit": "per_mm3",
+          "status": null
+        },
+        "crp": {
+          "status": null
+        },
+        "serum_lactate": {
+          "value": null,
+          "unit": "mmol_per_L",
+          "status": null
+        },
+        "chest_xray": null,
+        "blood_cultures": null
+      },
+      "medications_and_therapies": [],
+      "care_plan": {
+        "monitoring": [],
+        "hemodynamic_goal": {
+          "map_target": null
+        },
+        "respiratory_plan": null,
+        "labs": {
+          "repeat_lactate_in_hours": null
+        },
+        "alert_doctor_if": []
+      }
+    },
+    "timestamp": {
+      "$date": "2026-01-30T10:25:31.610Z"
+    },
+    "handoff_id": "handoff_1769748931"
+  },
+  {
+    "_id": {
+      "$oid": "697c3dee7c9b389a33147642"
+    },
+    "patient_id": "01",
+    "nurse_id": "nurse_001",
+    "nurse_name": "Hema",
+    "shift": "Evening",
+    "transcript": "During the afternoon assessment, the patient\u2019s vitals show slight improvement. Temperature is 38.1\u00b0C, BP 112/74 mmHg, heart rate 98 bpm, respiratory rate 24/min, and SpO\u2082 94% on 3 L/min oxygen. The patient is alert, able to speak full sentences, and reports reduced chest tightness. Cough persists but sputum volume has decreased. Oral intake is poor due to fatigue. Lung sounds still reveal crackles in the right lower zone.",
+    "structured_report": {
+      "vitals": {
+        "recorded_time": null,
+        "temperature": {
+          "value": 38.1,
+          "unit": "C",
+          "status": null
+        },
+        "blood_pressure": {
+          "value": "112/74",
+          "unit": "mmHg",
+          "status": null
+        },
+        "heart_rate": {
+          "value": 98,
+          "unit": "bpm",
+          "status": null
+        },
+        "respiratory_rate": {
+          "value": 24,
+          "unit": "per_min",
+          "status": null
+        },
+        "oxygen_saturation": {
+          "value": 94,
+          "unit": "percent",
+          "oxygen_support": "3 L/min oxygen",
+          "status": null
+        }
+      },
+      "clinical_status": {
+        "consciousness": "alert",
+        "response": "able to speak full sentences",
+        "respiratory_exam": "crackles in the right lower zone",
+        "urine_output": {
+          "value": null,
+          "unit": "ml_per_hr",
+          "catheter": null,
+          "status": null
+        },
+        "skin_condition": null
+      },
+      "investigations": {
+        "wbc_count": {
+          "value": null,
+          "unit": "per_mm3",
+          "status": null
+        },
+        "crp": {
+          "status": null
+        },
+        "serum_lactate": {
+          "value": null,
+          "unit": "mmol_per_L",
+          "status": null
+        },
+        "chest_xray": null,
+        "blood_cultures": null
+      },
+      "medications_and_therapies": [],
+      "care_plan": {
+        "monitoring": [],
+        "hemodynamic_goal": {
+          "map_target": null
+        },
+        "respiratory_plan": null,
+        "labs": {
+          "repeat_lactate_in_hours": null
+        },
+        "alert_doctor_if": []
+      }
+    },
+    "timestamp": {
+      "$date": "2026-01-30T10:43:18.618Z"
+    },
+    "handoff_id": "handoff_1769749998"
+  },
+  {
+    "_id": {
+      "$oid": "697c3e127c9b389a33147643"
+    },
+    "patient_id": "01",
+    "nurse_id": "nurse_001",
+    "nurse_name": "Hema",
+    "shift": "Night",
+    "transcript": "Vitals recorded in the evening show temperature 37.6\u00b0C, BP 108/70 mmHg, heart rate 92 bpm, respiratory rate 22/min, and SpO\u2082 95% on 2 L/min oxygen. The pa\ntient is stable, comfortable at rest, and reports less shortness of breath. Cough is occasional with minimal sputum. No signs of respiratory distress noted. IV antibiotics were administered on time with no adverse reactions.",
+    "structured_report": {
+      "vitals": {
+        "recorded_time": "evening",
+        "temperature": {
+          "value": 37.6,
+          "unit": "C",
+          "status": null
+        },
+        "blood_pressure": {
+          "value": "108/70",
+          "unit": "mmHg",
+          "status": null
+        },
+        "heart_rate": {
+          "value": 92,
+          "unit": "bpm",
+          "status": null
+        },
+        "respiratory_rate": {
+          "value": 22,
+          "unit": "per_min",
+          "status": null
+        },
+        "oxygen_saturation": {
+          "value": 95,
+          "unit": "percent",
+          "oxygen_support": "2 L/min oxygen",
+          "status": null
+        }
+      },
+      "clinical_status": {
+        "consciousness": null,
+        "response": null,
+        "respiratory_exam": null,
+        "urine_output": {
+          "value": null,
+          "unit": "ml_per_hr",
+          "catheter": null,
+          "status": null
+        },
+        "skin_condition": null
+      },
+      "investigations": {
+        "wbc_count": {
+          "value": null,
+          "unit": "per_mm3",
+          "status": null
+        },
+        "crp": {
+          "status": null
+        },
+        "serum_lactate": {
+          "value": null,
+          "unit": "mmol_per_L",
+          "status": null
+        },
+        "chest_xray": null,
+        "blood_cultures": null
+      },
+      "medications_and_therapies": [
+        {
+          "name": "IV antibiotics",
+          "route": "IV",
+          "dose": null,
+          "frequency": null,
+          "rate": null,
+          "indication": null
+        }
+      ],
+      "care_plan": {
+        "monitoring": [],
+        "hemodynamic_goal": {
+          "map_target": null
+        },
+        "respiratory_plan": null,
+        "labs": {
+          "repeat_lactate_in_hours": null
+        },
+        "alert_doctor_if": []
+      }
+    },
+    "timestamp": {
+      "$date": "2026-01-30T10:43:54.664Z"
+    },
+    "handoff_id": "handoff_1769750034"
+  },
+  {
+    "_id": {
+      "$oid": "697c3e2d7c9b389a33147644"
+    },
+    "patient_id": "01",
+    "nurse_id": "nurse_001",
+    "nurse_name": "Hema",
+    "shift": "Day",
+    "transcript": "At night assessment, the patient remains stable. Temperature is 37.2\u00b0C, BP 110/72 mmHg, heart rate 88 bpm, respiratory rate 20/min, and SpO\u2082 96% on 2 L/min oxygen. The patient is drowsy but easily arousable and denies chest pain or severe breathlessness. Breathing is even and unlabored. No acute events during the shift. Urine output is adequate.",
+    "structured_report": {
+      "vitals": {
+        "recorded_time": null,
+        "temperature": {
+          "value": 37.2,
+          "unit": "C",
+          "status": null
+        },
+        "blood_pressure": {
+          "value": "110/72",
+          "unit": "mmHg",
+          "status": null
+        },
+        "heart_rate": {
+          "value": 88,
+          "unit": "bpm",
+          "status": null
+        },
+        "respiratory_rate": {
+          "value": 20,
+          "unit": "per_min",
+          "status": null
+        },
+        "oxygen_saturation": {
+          "value": 96,
+          "unit": "percent",
+          "oxygen_support": "2 L/min oxygen",
+          "status": null
+        }
+      },
+      "clinical_status": {
+        "consciousness": "drowsy but easily arousable",
+        "response": null,
+        "respiratory_exam": "even and unlabored",
+        "urine_output": {
+          "value": null,
+          "unit": "ml_per_hr",
+          "catheter": null,
+          "status": "adequate"
+        },
+        "skin_condition": null
+      },
+      "investigations": {
+        "wbc_count": {
+          "value": null,
+          "unit": "per_mm3",
+          "status": null
+        },
+        "crp": {
+          "status": null
+        },
+        "serum_lactate": {
+          "value": null,
+          "unit": "mmol_per_L",
+          "status": null
+        },
+        "chest_xray": null,
+        "blood_cultures": null
+      },
+      "medications_and_therapies": [],
+      "care_plan": {
+        "monitoring": [],
+        "hemodynamic_goal": {
+          "map_target": null
+        },
+        "respiratory_plan": null,
+        "labs": {
+          "repeat_lactate_in_hours": null
+        },
+        "alert_doctor_if": []
+      }
+    },
+    "timestamp": {
+      "$date": "2026-01-30T10:44:21.891Z"
+    },
+    "handoff_id": "handoff_1769750061"
+  },
+  {
+    "_id": {
+      "$oid": "697c3f0d7c9b389a33147645"
+    },
+    "patient_id": "012",
+    "nurse_id": "nurse_001",
+    "nurse_name": "Hema",
+    "shift": "Day",
+    "transcript": "The patient is a 28-year-old male admitted with acute viral fever. Vitals recorded at 06:30 AM show temperature of 39.1\u00b0C, blood pressure 116/76 mmHg, heart rate 112 bpm, respiratory rate 22/min, and SpO\u2082 97% on room air. The patient is conscious, oriented, and complains of severe body aches, headache, and chills. No cough or breathlessness noted. Skin is warm to touch with no visible rash. Oral intake is poor due to nausea.",
+    "structured_report": {
+      "vitals": {
+        "recorded_time": "06:30 AM",
+        "temperature": {
+          "value": 39.1,
+          "unit": "C",
+          "status": null
+        },
+        "blood_pressure": {
+          "value": "116/76",
+          "unit": "mmHg",
+          "status": null
+        },
+        "heart_rate": {
+          "value": 112,
+          "unit": "bpm",
+          "status": null
+        },
+        "respiratory_rate": {
+          "value": 22,
+          "unit": "per_min",
+          "status": null
+        },
+        "oxygen_saturation": {
+          "value": 97,
+          "unit": "percent",
+          "oxygen_support": "Room Air",
+          "status": null
+        }
+      },
+      "clinical_status": {
+        "consciousness": "conscious, oriented",
+        "response": null,
+        "respiratory_exam": null,
+        "urine_output": {
+          "value": null,
+          "unit": "ml_per_hr",
+          "catheter": null,
+          "status": null
+        },
+        "skin_condition": "warm to touch with no visible rash"
+      },
+      "investigations": {
+        "wbc_count": {
+          "value": null,
+          "unit": "per_mm3",
+          "status": null
+        },
+        "crp": {
+          "status": null
+        },
+        "serum_lactate": {
+          "value": null,
+          "unit": "mmol_per_L",
+          "status": null
+        },
+        "chest_xray": null,
+        "blood_cultures": null
+      },
+      "medications_and_therapies": [],
+      "care_plan": {
+        "monitoring": [],
+        "hemodynamic_goal": {
+          "map_target": null
+        },
+        "respiratory_plan": null,
+        "labs": {
+          "repeat_lactate_in_hours": null
+        },
+        "alert_doctor_if": []
+      }
+    },
+    "timestamp": {
+      "$date": "2026-01-30T10:48:05.030Z"
+    },
+    "handoff_id": "handoff_1769750285"
+  },
+  {
+    "_id": {
+      "$oid": "697c3f1e7c9b389a33147646"
+    },
+    "patient_id": "012",
+    "nurse_id": "nurse_001",
+    "nurse_name": "Hema",
+    "shift": "Evening",
+    "transcript": "During the afternoon assessment, the patient\u2019s vitals show partial response to treatment. Temperature is 38.3\u00b0C, BP 118/78 mmHg, heart rate 102 bpm, respiratory rate 20/min, and SpO\u2082 97% on room air. The patient remains alert but appears fatigued and reports persistent myalgia and mild nausea. No vomiting episodes reported. Intake of fluids remains suboptimal. No respiratory symptoms observed.\n",
+    "structured_report": {
+      "vitals": {
+        "recorded_time": null,
+        "temperature": {
+          "value": 38.3,
+          "unit": "C",
+          "status": null
+        },
+        "blood_pressure": {
+          "value": "118/78",
+          "unit": "mmHg",
+          "status": null
+        },
+        "heart_rate": {
+          "value": 102,
+          "unit": "bpm",
+          "status": null
+        },
+        "respiratory_rate": {
+          "value": 20,
+          "unit": "per_min",
+          "status": null
+        },
+        "oxygen_saturation": {
+          "value": 97,
+          "unit": "percent",
+          "oxygen_support": "Room Air",
+          "status": null
+        }
+      },
+      "clinical_status": {
+        "consciousness": "alert",
+        "response": "partial",
+        "respiratory_exam": "no respiratory symptoms observed",
+        "urine_output": {
+          "value": null,
+          "unit": "ml_per_hr",
+          "catheter": null,
+          "status": "suboptimal fluid intake"
+        },
+        "skin_condition": null
+      },
+      "investigations": {
+        "wbc_count": {
+          "value": null,
+          "unit": "per_mm3",
+          "status": null
+        },
+        "crp": {
+          "status": null
+        },
+        "serum_lactate": {
+          "value": null,
+          "unit": "mmol_per_L",
+          "status": null
+        },
+        "chest_xray": null,
+        "blood_cultures": null
+      },
+      "medications_and_therapies": [],
+      "care_plan": {
+        "monitoring": [],
+        "hemodynamic_goal": {
+          "map_target": null
+        },
+        "respiratory_plan": null,
+        "labs": {
+          "repeat_lactate_in_hours": null
+        },
+        "alert_doctor_if": []
+      }
+    },
+    "timestamp": {
+      "$date": "2026-01-30T10:48:22.652Z"
+    },
+    "handoff_id": "handoff_1769750302"
+  },
+  {
+    "_id": {
+      "$oid": "697c3f2e7c9b389a33147647"
+    },
+    "patient_id": "012",
+    "nurse_id": "nurse_001",
+    "nurse_name": "Hema",
+    "shift": "Night",
+    "transcript": "Evening vitals show further improvement with temperature 37.8\u00b0C, BP 114/72 mmHg, heart rate 96 bpm, respiratory rate 18/min, and SpO\u2082 98% on room air. The patient is stable, resting comfortably, and reports reduced headache and body pain. Appetite is slightly improved. No rash, bleeding, or respiratory distress observed. Laboratory samples were sent earlier as ordered.",
+    "structured_report": {
+      "vitals": {
+        "recorded_time": null,
+        "temperature": {
+          "value": 37.8,
+          "unit": "C",
+          "status": null
+        },
+        "blood_pressure": {
+          "value": "114/72",
+          "unit": "mmHg",
+          "status": null
+        },
+        "heart_rate": {
+          "value": 96,
+          "unit": "bpm",
+          "status": null
+        },
+        "respiratory_rate": {
+          "value": 18,
+          "unit": "per_min",
+          "status": null
+        },
+        "oxygen_saturation": {
+          "value": 98,
+          "unit": "percent",
+          "oxygen_support": "Room Air",
+          "status": null
+        }
+      },
+      "clinical_status": {
+        "consciousness": null,
+        "response": null,
+        "respiratory_exam": null,
+        "urine_output": {
+          "value": null,
+          "unit": "ml_per_hr",
+          "catheter": null,
+          "status": null
+        },
+        "skin_condition": null
+      },
+      "investigations": {
+        "wbc_count": {
+          "value": null,
+          "unit": "per_mm3",
+          "status": null
+        },
+        "crp": {
+          "status": null
+        },
+        "serum_lactate": {
+          "value": null,
+          "unit": "mmol_per_L",
+          "status": null
+        },
+        "chest_xray": null,
+        "blood_cultures": null
+      },
+      "medications_and_therapies": [],
+      "care_plan": {
+        "monitoring": [],
+        "hemodynamic_goal": {
+          "map_target": null
+        },
+        "respiratory_plan": null,
+        "labs": {
+          "repeat_lactate_in_hours": null
+        },
+        "alert_doctor_if": []
+      }
+    },
+    "timestamp": {
+      "$date": "2026-01-30T10:48:38.555Z"
+    },
+    "handoff_id": "handoff_1769750318"
+  },
+  {
+    "_id": {
+      "$oid": "697c3f407c9b389a33147648"
+    },
+    "patient_id": "012",
+    "nurse_id": "nurse_001",
+    "nurse_name": "Hema",
+    "shift": "Day",
+    "transcript": "At night assessment, the patient remains stable. Temperature is 37.4\u00b0C, BP 116/74 mmHg, heart rate 88 bpm, respiratory rate 18/min, and SpO\u2082 98% on room air. The patient is drowsy but easily arousable and denies severe pain or discomfort. No episodes of vomiting or bleeding noted. Urine output is adequate.\n",
+    "structured_report": {
+      "vitals": {
+        "recorded_time": null,
+        "temperature": {
+          "value": 37.4,
+          "unit": "C",
+          "status": null
+        },
+        "blood_pressure": {
+          "value": "116/74",
+          "unit": "mmHg",
+          "status": null
+        },
+        "heart_rate": {
+          "value": 88,
+          "unit": "bpm",
+          "status": null
+        },
+        "respiratory_rate": {
+          "value": 18,
+          "unit": "per_min",
+          "status": null
+        },
+        "oxygen_saturation": {
+          "value": 98,
+          "unit": "percent",
+          "oxygen_support": "Room Air",
+          "status": null
+        }
+      },
+      "clinical_status": {
+        "consciousness": "drowsy but easily arousable",
+        "response": null,
+        "respiratory_exam": null,
+        "urine_output": {
+          "value": null,
+          "unit": "ml_per_hr",
+          "catheter": null,
+          "status": "adequate"
+        },
+        "skin_condition": null
+      },
+      "investigations": {
+        "wbc_count": {
+          "value": null,
+          "unit": "per_mm3",
+          "status": null
+        },
+        "crp": {
+          "status": null
+        },
+        "serum_lactate": {
+          "value": null,
+          "unit": "mmol_per_L",
+          "status": null
+        },
+        "chest_xray": null,
+        "blood_cultures": null
+      },
+      "medications_and_therapies": [],
+      "care_plan": {
+        "monitoring": [],
+        "hemodynamic_goal": {
+          "map_target": null
+        },
+        "respiratory_plan": null,
+        "labs": {
+          "repeat_lactate_in_hours": null
+        },
+        "alert_doctor_if": []
+      }
+    },
+    "timestamp": {
+      "$date": "2026-01-30T10:48:56.206Z"
+    },
+    "handoff_id": "handoff_1769750336"
+  }
+]
