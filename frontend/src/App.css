@@ -2522,3 +2522,8 @@
   color: var(--color-text-muted);
   font-size: 13px;
 }
+
+.MuiStack-root {
+  margin-right: 10px !important;
+  margin-left: 10px !important;
+}

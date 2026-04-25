@@ -761,34 +761,58 @@ class SmartBookingEngine:
         )
 
     def _handle_shift_input(self, sender_id, text, data):
-        """User is picking a shift."""
-        # Button/list selection
+        """User is picking a time period (Morning/Afternoon/Evening/Night)."""
+        # Period boundaries mapping
+        PERIOD_HOURS = {
+            'period_morning':   (6, 12),
+            'period_afternoon': (12, 18),
+            'period_evening':   (18, 24),
+            'period_night':     (0, 6),
+        }
+
+        # New period-based selection (period_morning, period_afternoon, etc.)
+        if text in PERIOD_HOURS:
+            p_start, p_end = PERIOD_HOURS[text]
+            # Get ALL slots for the date, then filter by period hours
+            all_slots = self.appt.get_all_date_slots(data.get('doctor_id', ''), data.get('date', ''))
+            period_slots = [s for s in all_slots if p_start <= int(s['start'].split(':')[0]) < p_end]
+            if period_slots:
+                data['shift_start'] = f"{p_start:02d}:00"
+                data['shift_end'] = f"{p_end:02d}:00" if p_end < 24 else "23:59"
+                data['shift_name'] = text
+                data['booking_state'] = BK_SHOW_SLOTS
+                data['_available_slots'] = [s['start'] for s in period_slots]
+                self.sm.transition_to(sender_id, data)
+                self._show_slots(sender_id, period_slots, data)
+            else:
+                lang = self._get_lang(sender_id)
+                self.notify.send_whatsapp_text(sender_id, LocalizationService.get('no_slots_period', lang))
+            return
+
+        # Legacy: Button/list selection with shift_ prefix
         if text.startswith('shift_'):
             parts = text.replace('shift_', '', 1).split('_')
             if len(parts) == 2:
                 data['shift_start'] = parts[0]
                 data['shift_end'] = parts[1]
                 data['shift_name'] = self.appt._classify_shift(parts[0])
-                # Persist shift selection before advancing
                 self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
-        # Fuzzy match shift name
-        shifts = self.appt.get_available_shifts(data.get('doctor_id', ''), data.get('date', ''))
+        # Fuzzy match period/shift name from text
         text_clean = text.lower().strip()
-        for filler in ['shift', 'slots', 'slot', 'please', 'select']:
-            text_clean = text_clean.replace(filler, '').strip()
+        period_keywords = {
+            'period_morning': ['morning', 'subah', 'udayam', 'beligge', 'kaalai'],
+            'period_afternoon': ['afternoon', 'dopahar', 'madhyahnam', 'madhyahna', 'mathiyam'],
+            'period_evening': ['evening', 'sham', 'sayantram', 'sanje', 'maalai'],
+            'period_night': ['night', 'raat', 'raatri', 'raathri', 'iravu'],
+        }
+        for period_key, keywords in period_keywords.items():
+            if any(kw in text_clean for kw in keywords):
+                return self._handle_shift_input(sender_id, period_key, data)
 
-        for s in shifts:
-            if s['shift_name'].lower() in text_clean or text_clean in s['shift_name'].lower():
-                data['shift_start'] = s['start']
-                data['shift_end'] = s['end']
-                data['shift_name'] = s['shift_name']
-                # Persist shift selection before advancing
-                self.sm.transition_to(sender_id, data)
-                return self._advance_booking(sender_id, data)
-
-        self.notify.send_whatsapp_text(sender_id, "Please pick a shift from the list.")
+        lang = self._get_lang(sender_id)
+        self.notify.send_whatsapp_text(sender_id, LocalizationService.get('select_period', lang))
 
     def _handle_slot_input(self, sender_id, text, data):
         """User is picking a time slot."""
@@ -819,17 +843,8 @@ class SmartBookingEngine:
                 self.sm.transition_to(sender_id, data)
                 return self._advance_booking(sender_id, data)
 
-        # Slot number (1, 2, 3…)
-        num_match = re.match(r'^\s*(\d{1,2})\s*$', text.strip())
-        if num_match:
-            idx = int(num_match.group(1)) - 1
-            if 0 <= idx < len(available):
-                time_str = available[idx]
-                data['time_slot'] = time_str
-                data['end_time'] = self._get_end_time(data, time_str)
-                # Persist slot selection before advancing
-                self.sm.transition_to(sender_id, data)
-                return self._advance_booking(sender_id, data)
+        # Slot number selection (1, 2, 3…) is removed because the numbered list is gone.
+
 
         # Try time parsing (9am, 10:00, etc)
         parsed = _parse_time(text)
@@ -851,11 +866,13 @@ class SmartBookingEngine:
             self.sm.transition_to(sender_id, data)
             return self._advance_booking(sender_id, data)
 
-        # Nothing matched
+        # Nothing matched — re-prompt to use the list
+        lang = self._get_lang(sender_id)
         self.notify.send_whatsapp_text(
             sender_id,
-            "That slot isn't available. Please reply with a *slot number* or time (e.g. '9 AM')."
+            LocalizationService.get('invalid_slot_selection', lang) or "Please select a time slot from the list menu above."
         )
+
 
     def _handle_name_input(self, sender_id, text, data):
         """User entered patient name."""
@@ -1008,10 +1025,10 @@ class SmartBookingEngine:
 
         # Define period boundaries (hour-based)
         PERIODS = [
-            ('period_morning',    5, 12),   # 5:00 AM – 11:59 AM
-            ('period_afternoon', 12, 17),   # 12:00 PM – 4:59 PM
-            ('period_evening',   17, 21),   # 5:00 PM – 8:59 PM
-            ('period_night',     21, 5),    # 9:00 PM – 4:59 AM (wraps)
+            ('period_morning',    6, 12, '6:00 AM – 12:00 PM'),
+            ('period_afternoon', 12, 18, '12:00 PM – 6:00 PM'),
+            ('period_evening',   18, 24, '6:00 PM – 12:00 AM'),
+            ('period_night',      0, 6,  '12:00 AM – 6:00 AM'),
         ]
 
         # Classify each shift's slots into periods
@@ -1019,13 +1036,9 @@ class SmartBookingEngine:
         for s in shifts:
             start_hour = int(s['start'].split(':')[0])
             free = s['free_slots']
-            for key, p_start, p_end in PERIODS:
-                if p_start < p_end:  # Normal range
-                    if p_start <= start_hour < p_end and free > 0:
-                        period_counts[key] = period_counts.get(key, 0) + free
-                else:  # Night wraps around
-                    if (start_hour >= p_start or start_hour < p_end) and free > 0:
-                        period_counts[key] = period_counts.get(key, 0) + free
+            for key, p_start, p_end, time_label in PERIODS:
+                if p_start <= start_hour < p_end and free > 0:
+                    period_counts[key] = period_counts.get(key, 0) + free
 
         if not period_counts:
             self.notify.send_whatsapp_text(sender_id, LocalizationService.get('no_slots_period', lang))
@@ -1036,67 +1049,36 @@ class SmartBookingEngine:
         select_period = LocalizationService.get('select_period', lang)
 
         # Build buttons or list based on count
-        available_periods = [(k, c) for k, c in period_counts.items()]
+        available_periods = []
+        for k, p_s, p_e, t_l in PERIODS:
+            if k in period_counts:
+                available_periods.append((k, period_counts[k], t_l))
+
         if len(available_periods) <= 3:
-            btn_titles = [f"{LocalizationService.get(k, lang)}" for k, c in available_periods]
-            # Use shift start/end matching the period
-            btn_ids = []
-            for k, c in available_periods:
-                # Find the first shift that matches this period
-                for s in shifts:
-                    start_hour = int(s['start'].split(':')[0])
-                    for pk, ps, pe in PERIODS:
-                        if pk == k:
-                            if ps < pe and ps <= start_hour < pe:
-                                btn_ids.append(f"shift_{s['start']}_{s['end']}")
-                                break
-                            elif ps >= pe and (start_hour >= ps or start_hour < pe):
-                                btn_ids.append(f"shift_{s['start']}_{s['end']}")
-                                break
-                    if len(btn_ids) == len([x for x in available_periods if x[0] <= k]):
-                        break
-            # Fallback: use shift_ ids
-            if len(btn_ids) < len(available_periods):
-                btn_ids = [f"shift_{shifts[i]['start']}_{shifts[i]['end']}" for i in range(min(len(shifts), len(available_periods)))]
+            btn_titles = []
+            for k, c, t_l in available_periods:
+                label = LocalizationService.get(k, lang)
+                # Buttons have 20 char limit. Try to fit name + range.
+                # e.g. "Morning 6-12 (10)" -> 17 chars.
+                btn_titles.append(f"{label} {t_l.split(' ')[0]} ({c})") 
+            btn_ids = [k for k, c, t_l in available_periods]
             self.notify.send_whatsapp_buttons(
                 sender_id, f" {localized_date} ({dd_mm_yyyy})\n{select_period}", btn_titles[:3], btn_ids[:3]
             )
         else:
             items = []
-            for k, c in available_periods:
+            for k, c, t_l in available_periods:
                 label = LocalizationService.get(k, lang)
-                for s in shifts:
-                    start_hour = int(s['start'].split(':')[0])
-                    for pk, ps, pe in PERIODS:
-                        if pk == k:
-                            if (ps < pe and ps <= start_hour < pe) or (ps >= pe and (start_hour >= ps or start_hour < pe)):
-                                items.append((f"shift_{s['start']}_{s['end']}", label[:24], f"{c} slots"))
-                                break
-                    if len(items) == len([x for x in available_periods if x[0] <= k]):
-                        break
+                items.append((k, f"{label} ({c})", t_l))
             self.notify.send_whatsapp_list(
-                sender_id, f" {localized_date} ({dd_mm_yyyy})\n{select_period}", items, title="Shifts"
+                sender_id, f" {localized_date} ({dd_mm_yyyy})\n{select_period}", items, title=select_period[:24]
             )
 
     def _show_slots(self, sender_id, slots, bk):
-        """Show available time slots with numbering in AM/PM format."""
+        """Show available time slots using only the interactive list."""
         from services.appointment_service import AppointmentService
         fmt = AppointmentService.format_time_ampm
         lang = self._get_lang(sender_id)
-
-        # ── Text message with ALL slots (no limit) ──
-        dr_display = LocalizationService.get_bilingual_display(f"Dr. {bk.get('doctor_name', '?')}", lang)
-        date_display = LocalizationService.format_date_ddmmyyyy(bk.get('date', '?'))
-        time_slots_label = LocalizationService.get('time_slots', lang)
-        msg_lines = [
-            f" *{time_slots_label} ({len(slots)})*",
-            f"{dr_display} | {date_display}\n",
-        ]
-        for i, slot in enumerate(slots, 1):
-            next_day_tag = ' (next day)' if slot.get('next_day') else ''
-            msg_lines.append(f"  {i}. {fmt(slot['start'])} – {fmt(slot['end'])}{next_day_tag}")
-
-        self.notify.send_whatsapp_text(sender_id, '\n'.join(msg_lines))
 
         # ── Interactive list (WhatsApp max 10 rows) ──
         items = []
@@ -1109,8 +1091,6 @@ class SmartBookingEngine:
         time_slots = LocalizationService.get('time_slots', lang)
 
         list_header = f" {select_time}"
-        if len(slots) > 10:
-            list_header = f" {select_time} (1-10 shown. Reply with a number for others)"
             
         self.notify.send_whatsapp_list(
             sender_id, list_header, items, title=time_slots[:24], button_text=LocalizationService.get('select', lang)[:20]

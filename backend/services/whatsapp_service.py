@@ -370,10 +370,12 @@ class WhatsAppService:
         # ── 2. Get Session ──
         session = self._get_session(sender_id)
         current_state = session.get('state', STATE_INIT)
+        text_lower = str(message_content).lower().strip()
 
         # Ask language first on first interaction before menu/booking flow.
         if current_state == STATE_INIT and not session.get('data', {}).get('language'):
-            self._send_language_selection_prompt(sender_id, flow_type='text_booking', for_voice=False)
+            if text_lower in ['hi', 'hello', 'menu', 'reset', 'start']:
+                self._send_language_selection_prompt(sender_id, flow_type='text_booking', for_voice=False)
             return
 
         # ── 3. Check Registration (skip if mid-registration or language selection) ──
@@ -415,20 +417,14 @@ class WhatsAppService:
                         {'sender_id': sender_id},
                         {'$set': {'data.booking_state': BK_IDLE}}
                     )
-                    self._transition_to(sender_id, STATE_MENU, clear_data=True)
-                    self._send_main_menu(sender_id)
+                    self._send_language_selection_prompt(sender_id, flow_type='text_booking', for_voice=False)
                     return
                 else:
                     # Ignore accidental 'hi'/'hello'/'start' — let the booking flow continue
                     logger.info(f" Ignoring reset command '{text_lower}' during active booking for {sender_id}")
                     return
             else:
-                lang = session.get('data', {}).get('language')
-                if not lang:
-                    self._send_language_selection_prompt(sender_id, flow_type='text_booking', for_voice=False)
-                else:
-                    self._transition_to(sender_id, STATE_MENU, clear_data=True)
-                    self._send_main_menu(sender_id)
+                self._send_language_selection_prompt(sender_id, flow_type='text_booking', for_voice=False)
                 return
 
         # ── 4b. Voice call command — trigger language selection + Sarvam voice flow ──
@@ -498,10 +494,10 @@ class WhatsAppService:
             self._handle_menu(sender_id, input_text)
             return
 
-        # ── INIT ──
+        # ── INIT (Handled at top of handle_incoming_message) ──
         if state == STATE_INIT:
-            self._send_language_selection_prompt(sender_id, flow_type='text_booking', for_voice=False)
             return
+
 
         # ── LANGUAGE SELECTION (for voice flow) ──
         if state == STATE_LANG_SELECT:
@@ -1331,45 +1327,27 @@ class WhatsAppService:
         session = self._get_session(sender_id)
         lang = session.get('data', {}).get('language', 'en')
 
-        menu_more_texts = {
-            'en': {
-                'header': ' How can I help you today?',
-                'title': 'All Options',
-                'btn': 'See all options',
-                'book': ' Book Appointment',
-                'book_desc': 'Book a new appointment',
-                'check': ' Check Appointments',
-                'check_desc': 'View upcoming appointments',
-                'resched': ' Reschedule',
-                'resched_desc': 'Modify your current booking',
-                'services': ' Services',
-                'services_desc': 'Browse available services',
-                'voice': ' Voice Booking',
-                'voice_desc': 'Book via voice in your language',
-            },
-            'hi': {
-                'header': ' आज मैं आपकी कैसे मदद करूँ?',
-                'title': 'सभी विकल्प',
-                'btn': 'सभी विकल्प देखें',
-                'book': ' अपॉइंटमेंट बुक करें',
-                'book_desc': 'नया अपॉइंटमेंट बुक करें',
-                'check': ' अपॉइंटमेंट देखें',
-                'check_desc': 'आने वाले अपॉइंटमेंट देखें',
-                'resched': ' रीशेड्यूल',
-                'resched_desc': 'मौजूदा बुकिंग बदलें',
-                'services': ' सेवाएं',
-                'services_desc': 'उपलब्ध सेवाएं देखें',
-                'voice': ' वॉइस बुकिंग',
-                'voice_desc': 'अपनी भाषा में वॉइस से बुक करें',
-            },
+        mm = {
+            'header': f" {LocalizationService.get('menu_header', lang)}",
+            'title': LocalizationService.get('menu_all_options', lang),
+            'btn': LocalizationService.get('menu_see_all', lang),
+            'book': f" {LocalizationService.get('menu_book', lang)}",
+            'book_desc': LocalizationService.get('menu_book_desc', lang),
+            'check': f" {LocalizationService.get('menu_check', lang)}",
+            'check_desc': LocalizationService.get('menu_check_desc', lang),
+            'resched': f" {LocalizationService.get('menu_resched', lang)}",
+            'resched_desc': LocalizationService.get('menu_resched_desc', lang),
+            'services': f" {LocalizationService.get('menu_services', lang)}",
+            'services_desc': LocalizationService.get('menu_services_desc', lang),
+            'voice': f" {LocalizationService.get('menu_voice', lang)}",
+            'voice_desc': LocalizationService.get('menu_voice_desc', lang),
         }
-        mm = menu_more_texts.get(lang, menu_more_texts['en'])
 
         if action == 'book_appointment':
-            saved_lang = session.get('data', {}).get('language')
-            if not saved_lang:
-                self._send_language_selection_prompt(sender_id, flow_type='text_booking', for_voice=False)
-                return
+            # Language is already enforced at the start of handle_incoming_message.
+            # We can safely use the session language or fallback to 'en'.
+            saved_lang = session.get('data', {}).get('language', 'en')
+
 
             chosen_lang = self._normalize_lang_code(saved_lang)
 
@@ -1992,61 +1970,55 @@ class WhatsAppService:
             self._send_available_dates(sender_id, data['doctor_id'], data.get('doctor_name', ''))
             return
 
-        all_slots = []
-        for s in shifts:
-            block_slots = self.appt_service.get_shift_slots(
-                data['doctor_id'], date_str, s['start'], s['end']
-            )
-            all_slots.extend(block_slots)
+        self._transition_to(sender_id, STATE_SELECT_SHIFT, {'date': date_str})
 
-        if not all_slots:
-            self.notifier.send_whatsapp_text(
-                sender_id,
-                f"{LocalizationService.get('all_slots_booked', lang)} ({date_display})"
-            )
-            self._send_available_dates(sender_id, data['doctor_id'], data.get('doctor_name', ''))
-            return
-
-        self._transition_to(sender_id, STATE_SELECT_TIME, {'date': date_str})
-
-        msg_lines = [
-            f" *{ui['slots_header']} ({len(all_slots)})*",
-            f"Dr. {data.get('doctor_name', '?')} | {date_display}\n",
-        ]
-        for i, slot in enumerate(all_slots, 1):
-            msg_lines.append(
-                f"  {i}. {self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
-            )
-        msg_lines.append(f"\n{ui['reply_hint']}")
-        self.notifier.send_whatsapp_text(sender_id, '\n'.join(msg_lines))
-
-        items = []
-        for slot in all_slots[:10]:
-            items.append((
-                f"time_{slot['start']}",
-                f" {self._format_time_display(slot['start'])}",
-                f"{self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
-            ))
-
-        select_time = LocalizationService.get('select_time', lang)
+        select_period = LocalizationService.get('select_period', lang)
         time_slots = LocalizationService.get('time_slots', lang)
         select_btn = LocalizationService.get('select', lang)
-        dr_bilingual = LocalizationService.get_bilingual_name(f"Dr. {data.get('doctor_name', '?')}", lang)
 
-        list_header = (
-            f" {dr_bilingual}\n"
-            f"{select_time} ({date_display})"
-        )
-        if len(all_slots) > 10:
-            list_header += "\n" + ui['tap_hint'].format(total=len(all_slots))
+        # Define period boundaries (hour-based)
 
-        self.notifier.send_whatsapp_list(
-            sender_id,
-            list_header,
-            items,
-            title=time_slots[:24],
-            button_text=select_btn[:20]
-        )
+        PERIOD_CONFIG = [
+            ('Morning',   6, 12, '6:00 AM – 12:00 PM'),
+            ('Afternoon', 12, 18, '12:00 PM – 6:00 PM'),
+            ('Evening',   18, 24, '6:00 PM – 12:00 AM'),
+            ('Night',     0, 6,  '12:00 AM – 6:00 AM'),
+        ]
+
+        # Group actual shift slots into these 4 periods
+        period_counts = {}
+        for s in shifts:
+            start_hour = int(s['start'].split(':')[0])
+            for name, p_start, p_end, p_label in PERIOD_CONFIG:
+                if p_start <= start_hour < p_end:
+                    period_counts[name] = period_counts.get(name, 0) + s['free_slots']
+
+        available_periods = []
+        for name, p_start, p_end, p_label in PERIOD_CONFIG:
+            if period_counts.get(name, 0) > 0:
+                available_periods.append((name, period_counts[name], p_label))
+
+        if len(available_periods) <= 3:
+            btn_titles = []
+            btn_ids = []
+            for name, count, p_label in available_periods:
+                lbl = LocalizationService.get(name, lang)
+                btn_titles.append(f"{lbl} ({count})")
+                btn_ids.append(f"period_{name.lower()}")
+            self.notifier.send_whatsapp_buttons(sender_id, f"‍️ {select_period}", btn_titles[:3], btn_ids[:3])
+        else:
+            items = []
+            for name, count, p_label in available_periods:
+                lbl = LocalizationService.get(name, lang)
+                items.append((
+                    f"period_{name.lower()}",
+                    f"{lbl} ({count})",
+                    p_label
+                ))
+            self.notifier.send_whatsapp_list(sender_id, f"‍️ {select_period}", items, title=time_slots[:24], button_text=select_btn[:20])
+
+
+
 
     # ═══════════════════════════════════════════
     #  SHIFT SELECTION
@@ -2059,59 +2031,94 @@ class WhatsAppService:
         ui = self._slot_ui_texts(lang)
         shifts = self.appt_service.get_available_shifts(data.get('doctor_id', ''), data.get('date', ''))
 
-        if input_text.startswith('shift_'):
-            # Button/list selection — parse directly
-            pass
-        else:
-            # Fuzzy match text input to a shift name (e.g. "Morning", "Morning slots", "Night")
-            text_clean = input_text.lower().strip()
-            # Remove common filler words
-            for filler in ['slots', 'slot', 'shift', 'please', 'select', 'pick', 'the']:
-                text_clean = text_clean.replace(filler, '').strip()
-
-            if shifts:
-                matched_shift = next(
-                    (s for s in shifts if s['shift_name'].lower() in text_clean or text_clean in s['shift_name'].lower()),
-                    None
-                )
-                if matched_shift:
-                    input_text = f"shift_{matched_shift['start']}_{matched_shift['end']}"
-                    logger.info(f" Fuzzy matched shift '{text_clean}'  {matched_shift['shift_name']}")
-
-            if not input_text.startswith('shift_'):
+        if input_text.startswith('period_'):
+            period_name = input_text.replace('period_', '', 1).capitalize() # e.g. "morning" -> "Morning"
+            # Get all slots for this period
+            all_slots = self.appt_service.get_all_date_slots(data['doctor_id'], data['date'])
+            
+            PERIOD_HOURS = {
+                'Morning': (6, 12),
+                'Afternoon': (12, 18),
+                'Evening': (18, 24),
+                'Night': (0, 6)
+            }
+            p_start, p_end = PERIOD_HOURS.get(period_name, (0, 24))
+            
+            slots = [s for s in all_slots if p_start <= int(s['start'].split(':')[0]) < p_end]
+            shift_name = period_name
+            shift_start = f"{p_start:02d}:00"
+            shift_end = f"{p_end:02d}:00" if p_end < 24 else "23:59"
+        elif input_text.startswith('shift_'):
+            parts = input_text.replace('shift_', '', 1).split('_')
+            if len(parts) != 2:
                 self.notifier.send_whatsapp_text(sender_id, LocalizationService.get('invalid_selection', lang))
                 return
-
-        parts = input_text.replace('shift_', '', 1).split('_')
-        if len(parts) != 2:
+            shift_start, shift_end = parts
+            shift_name = self.appt_service._classify_shift(shift_start)
+            slots = self.appt_service.get_shift_slots(data['doctor_id'], data['date'], shift_start, shift_end)
+        else:
+            # Fuzzy match
+            text_clean = input_text.lower().strip()
+            # ... (keep existing fuzzy logic if needed, but prioritize periods)
+            PERIOD_MAP = {
+                'morning': 'period_morning', 'afternoon': 'period_afternoon',
+                'evening': 'period_evening', 'night': 'period_night',
+                'subah': 'period_morning', 'dopahar': 'period_afternoon', 'sham': 'period_evening', 'raat': 'period_night'
+            }
+            found_key = None
+            for kw, pkey in PERIOD_MAP.items():
+                if kw in text_clean:
+                    found_key = pkey
+                    break
+            
+            if found_key:
+                return self._handle_shift_selection(sender_id, found_key, data)
+            
             self.notifier.send_whatsapp_text(sender_id, LocalizationService.get('invalid_selection', lang))
             return
-
-        shift_start, shift_end = parts
-        shift_name = self.appt_service._classify_shift(shift_start)
-
-        # Get free slots for this shift
-        slots = self.appt_service.get_shift_slots(
-            data['doctor_id'], data['date'], shift_start, shift_end
-        )
 
         if not slots:
             self.notifier.send_whatsapp_text(
                 sender_id,
                 LocalizationService.get('no_slots_period', lang)
             )
+            # Re-send available shifts for this date
+            self._handle_date_selection(sender_id, data['date'], data)
+            return
+
             # Re-send shifts
             select_period = LocalizationService.get('select_period', lang)
             time_slots = LocalizationService.get('time_slots', lang)
             select_btn = LocalizationService.get('select', lang)
 
             if shifts:
+                # Define period boundaries for labeling
+                PERIOD_LABELS = {
+                    'Morning': '6:00 AM – 12:00 PM',
+                    'Afternoon': '12:00 PM – 6:00 PM',
+                    'Evening': '6:00 PM – 12:00 AM',
+                    'Night': '12:00 AM – 6:00 AM'
+                }
+
                 if len(shifts) <= 3:
-                    btn_titles = [f"{LocalizationService.get(s['shift_name'], lang)} ({s['free_slots']})" for s in shifts]
+                    btn_titles = []
+                    for s in shifts:
+                        lbl = LocalizationService.get(s['shift_name'], lang)
+                        range_lbl = PERIOD_LABELS.get(s['shift_name'], '')
+                        # Try to fit name + count. Hour range might be too long for buttons.
+                        btn_titles.append(f"{lbl} ({s['free_slots']})")
                     btn_ids = [f"shift_{s['start']}_{s['end']}" for s in shifts]
                     self.notifier.send_whatsapp_buttons(sender_id, f"‍️ {select_period}", btn_titles[:3], btn_ids[:3])
                 else:
-                    items = [(f"shift_{s['start']}_{s['end']}", LocalizationService.get(s['shift_name'], lang), f"{s['free_slots']}") for s in shifts]
+                    items = []
+                    for s in shifts:
+                        lbl = LocalizationService.get(s['shift_name'], lang)
+                        range_lbl = PERIOD_LABELS.get(s['shift_name'], '')
+                        items.append((
+                            f"shift_{s['start']}_{s['end']}",
+                            f"{lbl} ({s['free_slots']})",
+                            range_lbl
+                        ))
                     self.notifier.send_whatsapp_list(sender_id, f"‍️ {select_period}", items, title=time_slots[:24], button_text=select_btn[:20])
             return
 
@@ -2121,17 +2128,8 @@ class WhatsAppService:
             'shift_end': shift_end
         })
 
-        # ── Text message with ALL slots (no limit) ──
-        msg_lines = [
-            f" *{ui['slots_header']} ({len(slots)}) — {shift_name} {ui['shift_suffix']}*",
-            f"Dr. {data.get('doctor_name', '?')} | {self._format_date_display(data['date'])}\n",
-        ]
-        for i, slot in enumerate(slots, 1):
-            msg_lines.append(
-                f"  {i}. {self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
-            )
-        msg_lines.append(f"\n{ui['reply_hint']}")
-        self.notifier.send_whatsapp_text(sender_id, '\n'.join(msg_lines))
+        # ── Text message list removed ──
+
 
         # ── Interactive list (WhatsApp max 10 rows) ──
         items = []
@@ -2152,7 +2150,7 @@ class WhatsAppService:
             f"{select_time} ({shift_name})"
         )
         if len(slots) > 10:
-            list_header += "\n" + ui['tap_hint'].format(total=len(slots))
+            pass # No hint needed for number selection anymore
 
         self.notifier.send_whatsapp_list(
             sender_id,
@@ -2190,13 +2188,7 @@ class WhatsAppService:
             # Try to extract hour (and optional minutes) from input
             matched_time = None
 
-            # First, check if input is a slot number (1-index based) matching the presented list
-            num_match = re.match(r'^\s*(\d{1,2})\s*$', text_clean)
-            if num_match:
-                idx = int(num_match.group(1)) - 1
-                if 0 <= idx < len(free_times):
-                    matched_time = free_times[idx]
-                    input_text = f"time_{matched_time}"
+            # Numbered list matching is removed because the text-based slot list is gone.
             
             if not matched_time:
                 # Pattern: "7:30 am", "7:30 pm", "7:30"
@@ -2316,16 +2308,17 @@ class WhatsAppService:
 
         # If both match, prefer cancel (explicit cancellation is intentional)
         if is_cancel:
-            self.notifier.send_whatsapp_text(sender_id, "Booking cancelled.")
+            lang = data.get('language', 'en')
+            self.notifier.send_whatsapp_text(sender_id, LocalizationService.get('booking_cancelled', lang))
             self._transition_to(sender_id, STATE_MENU, clear_data=True)
             self._send_main_menu(sender_id)
             return
 
         if not is_confirm:
-            # Unrecognized input — ask again instead of cancelling
+            lang = data.get('language', 'en')
             self.notifier.send_whatsapp_text(
                 sender_id,
-                "Please reply *Confirm* or *Cancel*."
+                LocalizationService.get('reply_confirm_cancel', lang)
             )
             return
 
@@ -2450,11 +2443,13 @@ class WhatsAppService:
 
     def _start_reschedule(self, sender_id):
         """Show the patient's active appointments so they can pick one to reschedule."""
+        session = self._get_session(sender_id)
+        lang = session.get('data', {}).get('language', 'en')
         clean_phone = sender_id.replace('+', '').replace(' ', '')
         patient = self.patient_service.get_patient_by_phone(clean_phone)
 
         if not patient:
-            self.notifier.send_whatsapp_text(sender_id, "No patient record found.")
+            self.notifier.send_whatsapp_text(sender_id, LocalizationService.get('no_appts_reschedule', lang))
             self._send_main_menu(sender_id)
             return
 
@@ -2463,31 +2458,54 @@ class WhatsAppService:
         active = [a for a in appts if a.get('status') in ('pending_doctor_approval', 'confirmed')]
 
         if not active:
-            self.notifier.send_whatsapp_text(sender_id, " No active appointments to reschedule.")
+            self.notifier.send_whatsapp_text(sender_id, f" {LocalizationService.get('no_appts_reschedule', lang)}")
             self._send_main_menu(sender_id)
             return
 
-        self._transition_to(sender_id, STATE_RESCHEDULE, clear_data=True)
+        self._transition_to(sender_id, STATE_RESCHEDULE, {'language': lang}, clear_data=True)
+
+        # Build a doctor_id -> name cache to resolve missing doctor_name
+        doctor_cache = {}
+        for a in active:
+            if not a.get('doctor_name') or a.get('doctor_name') == '?':
+                did = a.get('doctor_id', '')
+                if did and did not in doctor_cache:
+                    try:
+                        doc = self.db.users.find_one({'user_id': did})
+                        doctor_cache[did] = doc.get('full_name', '') if doc else ''
+                    except Exception:
+                        doctor_cache[did] = ''
 
         items = []
         for a in active[:10]:
             appt_id = a['appointment_id']
-            display = f"Dr. {a.get('doctor_name', '?')}"[:24]
+            # Resolve doctor name: from appointment, then from cache
+            doc_name = a.get('doctor_name', '')
+            if not doc_name or doc_name == '?':
+                doc_name = doctor_cache.get(a.get('doctor_id', ''), '')
+            doc_display = f"Dr. {doc_name}" if doc_name else LocalizationService.get('lbl_doctor', lang)
+            display = doc_display[:24]
             desc = f"{a['date']} {self._format_time_display(a['start_time'])}"[:72]
             items.append((f"resched_{appt_id}", display, desc))
 
+        resched_title = LocalizationService.get('reschedule_title', lang)
+        resched_select = LocalizationService.get('reschedule_select', lang)
+        your_appts = LocalizationService.get('your_appointments', lang)
+        select_btn = LocalizationService.get('select', lang)
+
         self.notifier.send_whatsapp_list(
             sender_id,
-            " *Reschedule Appointment*\n\nSelect the appointment you want to modify:",
+            f" *{resched_title}*\n\n{resched_select}",
             items,
-            title="Your Appointments",
-            button_text="Select"
+            title=your_appts[:24],
+            button_text=select_btn[:20]
         )
 
     def _handle_reschedule_selection(self, sender_id, input_text, data):
         """Handle user picking an appointment to reschedule."""
+        lang = data.get('language', 'en')
         if not input_text.startswith('resched_'):
-            self.notifier.send_whatsapp_text(sender_id, "Please select an appointment from the list.")
+            self.notifier.send_whatsapp_text(sender_id, LocalizationService.get('reschedule_select', lang))
             self._start_reschedule(sender_id)
             return
 
@@ -2496,13 +2514,9 @@ class WhatsAppService:
         # Look up the appointment
         clean_phone = sender_id.replace('+', '').replace(' ', '')
         patient = self.patient_service.get_patient_by_phone(clean_phone)
-        user_id = patient.get('user_id', '') if patient else ''
 
-        self.notifier.send_whatsapp_text(
-            sender_id,
-            f" You selected to reschedule appointment *{appt_id}*.\n\n"
-            "Let's book a new slot first. When confirmed, your old appointment will be cancelled."
-        )
+        resched_msg = LocalizationService.get('reschedule_confirm', lang).format(appt_id=appt_id)
+        self.notifier.send_whatsapp_text(sender_id, f" {resched_msg}")
 
         # Redirect into booking flow
         patient_name = patient.get('patient_name', 'You') if patient else 'You'
@@ -2520,45 +2534,16 @@ class WhatsAppService:
     def _send_main_menu(self, sender_id):
         session = self._get_session(sender_id)
         lang = session.get('data', {}).get('language', 'en')
-        menu_texts = {
-            'en': {
-                'prompt': ' How can I help you today?',
-                'book': ' Book Appointment',
-                'check': ' Check Appts',
-                'more': 'More Options',
-            },
-            'hi': {
-                'prompt': ' आज मैं आपकी कैसे मदद करूँ?',
-                'book': ' अपॉइंटमेंट बुक करें',
-                'check': ' अपॉइंटमेंट देखें',
-                'more': 'और विकल्प',
-            },
-            'te': {
-                'prompt': ' నేను మీకు ఎలా సహాయం చేయగలను?',
-                'book': ' అపాయింట్‌మెంట్ బుక్ చేయండి',
-                'check': ' అపాయింట్‌మెంట్లు చూడండి',
-                'more': 'మరిన్ని ఎంపికలు',
-            },
-            'kn': {
-                'prompt': ' ಇಂದು ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?',
-                'book': ' ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಮಾಡಿ',
-                'check': ' ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್‌ಗಳು ನೋಡಿ',
-                'more': 'ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳು',
-            },
-            'ta': {
-                'prompt': ' இன்று நான் எப்படி உதவலாம்?',
-                'book': ' அப்பாயிண்ட்மென்ட் பதிவு',
-                'check': ' அப்பாயிண்ட்மென்ட்கள் பாருங்கள்',
-                'more': 'மேலும் விருப்பங்கள்',
-            },
-        }
-        t = menu_texts.get(lang, menu_texts['en'])
+        prompt = f" {LocalizationService.get('menu_header', lang)}"
+        book = f" {LocalizationService.get('menu_book', lang)}"
+        check = f" {LocalizationService.get('menu_check', lang)}"
+        more = LocalizationService.get('menu_more', lang)
 
         # Step 1: Show top 2 actions as buttons + "More Options"
         self.notifier.send_whatsapp_buttons(
             sender_id,
-            t['prompt'],
-            [t['book'][:20], t['check'][:20], t['more'][:20]],
+            prompt,
+            [book[:20], check[:20], more[:20]],
             ["book_appointment", "check_appointments", "menu_more"]
         )
 
@@ -2875,20 +2860,11 @@ class WhatsAppService:
         flow_type = session_data.get('flow_type', 'voice_booking')
 
         if flow_type == 'text_booking':
-            self._transition_to(sender_id, STATE_BOOKING_FOR, {'language': lang_code}, clear_data=True)
+            self._transition_to(sender_id, STATE_MENU, {'language': lang_code}, clear_data=True)
             self.notifier.send_whatsapp_text(
                 sender_id, f" Language set to *{lang_display} ({lang_name})*"
             )
-            book_who = LocalizationService.get('book_who', lang_code)
-            btn_myself = LocalizationService.get('btn_myself', lang_code)
-            btn_someone_else = LocalizationService.get('btn_someone_else', lang_code)
-            
-            self.notifier.send_whatsapp_buttons(
-                sender_id,
-                book_who,
-                [btn_myself[:20], btn_someone_else[:20]],
-                ["book_self", "book_other"]
-            )
+            self._send_main_menu(sender_id)
         else:
             # Save language selection and transition to voice chat
             self._transition_to(sender_id, STATE_VOICE_CHAT, {
@@ -4106,15 +4082,35 @@ class WhatsAppService:
                 'title': 'Shifts', 'btn': 'View Shifts'
             })
 
-            if len(shifts) <= 3:
+            # Define period boundaries (hour-based)
+            PERIOD_CONFIG = [
+                ('Morning',   6, 12, '6:00 AM – 12:00 PM'),
+                ('Afternoon', 12, 18, '12:00 PM – 6:00 PM'),
+                ('Evening',   18, 24, '6:00 PM – 12:00 AM'),
+                ('Night',     0, 6,  '12:00 AM – 6:00 AM'),
+            ]
+
+            # Group actual shift slots into these 4 periods
+            period_counts = {}
+            for s in shifts:
+                start_hour = int(s['start'].split(':')[0])
+                for name, p_start, p_end, p_label in PERIOD_CONFIG:
+                    if p_start <= start_hour < p_end:
+                        period_counts[name] = period_counts.get(name, 0) + s['free_slots']
+
+            available_periods = []
+            for name, p_start, p_end, p_label in PERIOD_CONFIG:
+                if period_counts.get(name, 0) > 0:
+                    available_periods.append((name, period_counts[name], p_label))
+
+            if len(available_periods) <= 3:
                 # Use buttons
                 btn_titles = []
                 btn_ids = []
-                for s in shifts:
-                    start_spoken = self.appt_service._time_to_spoken(s['start'])
-                    end_spoken = self.appt_service._time_to_spoken(s['end'])
-                    btn_titles.append(f"{s['shift_name']} {start_spoken}")
-                    btn_ids.append(f"shift_{s['start']}_{s['end']}")
+                for name, count, p_label in available_periods:
+                    lbl = LocalizationService.get(name, lang_code)
+                    btn_titles.append(f"{lbl} ({count})")
+                    btn_ids.append(f"period_{name.lower()}")
 
                 self.notifier.send_whatsapp_buttons(
                     sender_id,
@@ -4124,22 +4120,22 @@ class WhatsAppService:
                 )
             else:
                 items = []
-                for s in shifts:
-                    start_spoken = self.appt_service._time_to_spoken(s['start'])
-                    end_spoken = self.appt_service._time_to_spoken(s['end'])
+                for name, count, p_label in available_periods:
+                    lbl = LocalizationService.get(name, lang_code)
                     items.append((
-                        f"shift_{s['start']}_{s['end']}",
-                        f"{s['shift_name']}",
-                        f"{start_spoken} – {end_spoken} ({s['free_slots']} slots)"
+                        f"period_{name.lower()}",
+                        f"{lbl} ({count})",
+                        p_label
                     ))
 
                 self.notifier.send_whatsapp_list(
                     sender_id,
-                    f" Dr. {doctor_name} — {date_display}\n{_sl['title']}:",
+                    _sl['header'],
                     items,
-                    title=_sl['title'],
-                    button_text=_sl['btn']
+                    title=_sl['title'][:24],
+                    button_text=_sl['btn'][:20]
                 )
+
 
             logger.info(f" Hybrid: Sent shift list to {sender_id} for {doctor_name} on {date_display}")
 
@@ -4192,19 +4188,8 @@ class WhatsAppService:
                     'slot_map': slot_map
                 }
 
-            # 1) Send complete slot list in text (all slots, not limited to 10)
-            lines = [
-                _sll['header'].replace('{count}', str(len(slots_ordered))),
-                f"Dr. {doctor_name} | {date_display} | {shift_name}",
-                ""
-            ]
-            for idx, slot in enumerate(slots_ordered, 1):
-                lines.append(
-                    f"{idx}. {self._format_time_display(slot['start'])} – {self._format_time_display(slot['end'])}"
-                )
-            lines.append("")
-            lines.append(_sll['footer'])
-            self.notifier.send_whatsapp_text(sender_id, '\n'.join(lines))
+            # 1) Text slot list REMOVED
+
 
             items = []
             for slot in slots_ordered[:10]:

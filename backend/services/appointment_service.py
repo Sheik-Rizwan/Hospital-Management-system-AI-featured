@@ -206,40 +206,53 @@ class AppointmentService:
         if not schedules:
             return []
 
-        available_shifts = []
+        # Define period boundaries
+        PERIOD_CONFIG = [
+            ('Morning',   6, 12, '06:00', '12:00'),
+            ('Afternoon', 12, 18, '12:00', '18:00'),
+            ('Evening',   18, 24, '18:00', '23:59'),
+            ('Night',     0, 6,  '00:00', '06:00'),
+        ]
+
+        # Group actual slots into these 4 periods
+        period_data = {} # { 'Morning': { 'count': N, 'start': '06:00', 'end': '12:00' } }
         for schedule in schedules:
             start_time = schedule['start_time']
             end_time = schedule['end_time']
-
-            # Determine shift name from time range
             shift_name = self._classify_shift(start_time)
+            
+            # Find the config for this shift name
+            p_config = next((p for p in PERIOD_CONFIG if p[0] == shift_name), None)
+            if not p_config: continue
 
-            # Use the SAME function that later lists individual slots
-            # so the count is always consistent with what the user sees.
             free_slots = self.get_shift_slots(doctor_id, date_str, start_time, end_time)
             free_count = len(free_slots)
 
             if free_count > 0:
-                available_shifts.append({
-                    'shift_name': shift_name,
-                    'start': start_time,
-                    'end': end_time,
-                    'free_slots': free_count
-                })
+                if shift_name not in period_data:
+                    period_data[shift_name] = {
+                        'shift_name': shift_name,
+                        'start': p_config[3],
+                        'end': p_config[4],
+                        'free_slots': 0
+                    }
+                period_data[shift_name]['free_slots'] += free_count
 
-        return available_shifts
+        return sorted(list(period_data.values()), key=lambda x: [p[0] for p in PERIOD_CONFIG].index(x['shift_name']))
+
 
     def _classify_shift(self, start_time):
-        """Classify a shift based on start time."""
+        """Classify a shift based on start time hours."""
         hour = int(start_time.split(':')[0])
-        if 7 <= hour < 12:
+        if 6 <= hour < 12:
             return "Morning"
-        elif 12 <= hour < 17:
+        elif 12 <= hour < 18:
             return "Afternoon"
-        elif 17 <= hour < 22:
+        elif 18 <= hour < 24:
             return "Evening"
         else:
             return "Night"
+
 
     @staticmethod
     def format_time_ampm(time_str):
@@ -270,24 +283,42 @@ class AppointmentService:
         except ValueError:
             return []
 
-        # Find the matching schedule
+        # Find all matching schedules for this period/range
         day_of_week = calendar.day_name[date_obj.weekday()]
-        schedule = self.db.doctor_schedules.find_one({
+        
+        query = {
             'doctor_id': doctor_id,
             'day_of_week': day_of_week,
-            'start_time': shift_start,
-            'end_time': shift_end,
             'is_available': True
-        })
+        }
+        
+        # If it's a period-based query (e.g. 06:00 to 12:00)
+        # find all schedules that START within this range
+        query['start_time'] = {'$gte': shift_start, '$lt': shift_end}
+        
+        schedules = list(self.db.doctor_schedules.find(query))
 
-        if not schedule:
+        if not schedules:
             return []
 
-        slot_duration = schedule.get('slot_duration', 30)
-        all_slots = DoctorSchedule.generate_time_slots(shift_start, shift_end, slot_duration)
+        all_slots = []
+        for schedule in schedules:
+            slot_duration = schedule.get('slot_duration', 30)
+            block_slots = DoctorSchedule.generate_time_slots(
+                schedule['start_time'], schedule['end_time'], slot_duration
+            )
+            all_slots.extend(block_slots)
+        
+        # Deduplicate slots (in case of overlapping blocks)
+        unique_slots = {}
+        for s in all_slots:
+            unique_slots[s['start']] = s
+        all_slots = sorted(unique_slots.values(), key=lambda x: x['start'])
+
 
         # Get booked slots
         booked = list(self.db.appointments.find({
+
             'doctor_id': doctor_id,
             'date': date_str,
             'status': {'$in': ['pending', 'approved', 'pending_doctor_approval', 'confirmed']}
