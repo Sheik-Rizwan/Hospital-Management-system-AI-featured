@@ -26,9 +26,23 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max upload
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 jwt = JWTManager(app)
 
-# Database (singleton — initialized once)
+# Database — MongoDB (legacy) + PostgreSQL (new)
 from mongodb_config import MongoDatabase
 db = MongoDatabase()
+
+# PostgreSQL — initialize engine + create tables + seed roles
+try:
+    from db import init_db, get_session_factory
+    init_db()
+    from db.seeds.seed_roles import seed_roles_and_permissions
+    from db.seeds.seed_admin import seed_default_admin
+    _session = get_session_factory()()
+    seed_roles_and_permissions(_session)
+    seed_default_admin(_session)
+    _session.close()
+    print('  PostgreSQL: initialized + seeded')
+except Exception as pg_err:
+    print(f'  PostgreSQL: init failed — {pg_err}')
 
 # Socket.IO for real-time events
 from services.socket_service import init_socketio
@@ -58,6 +72,10 @@ from routes.vendor_routes import vendor_bp
 from routes.procurement_routes import procurement_bp
 from routes.chat_routes import chat_bp
 from routes.voice_routes import voice_bp
+from routes.manager_routes import manager_bp
+from routes.lab_routes import lab_bp
+from routes.pharmacist_routes import pharmacist_bp
+from routes.front_desk_routes import front_desk_bp
 
 app.register_blueprint(admin_bp, url_prefix='/api/admin')
 app.register_blueprint(doctor_bp, url_prefix='/api/doctor')
@@ -68,6 +86,10 @@ app.register_blueprint(vendor_bp, url_prefix='/api/vendor')
 app.register_blueprint(procurement_bp, url_prefix='/api/procurement')
 app.register_blueprint(chat_bp, url_prefix='/api/chat')
 app.register_blueprint(voice_bp, url_prefix='/api/voice')
+app.register_blueprint(manager_bp, url_prefix='/api/manager')
+app.register_blueprint(lab_bp, url_prefix='/api/lab')
+app.register_blueprint(pharmacist_bp, url_prefix='/api/pharmacist')
+app.register_blueprint(front_desk_bp, url_prefix='/api/frontdesk')
 
 # WebSocket for Twilio Media Streams (real-time voice bot)
 try:
@@ -112,6 +134,23 @@ app.add_url_rule('/api/auth/vendor/signup', 'vendor_signup', vendor_signup, meth
 app.add_url_rule('/api/signup/patient', 'patient_signup_legacy', patient_signup, methods=['POST'])
 app.add_url_rule('/api/auth/patient/signup', 'patient_signup', patient_signup, methods=['POST'])
 
+# ── New Role Auth (PostgreSQL) ──
+from controllers.pg_auth_controller import make_login, make_signup, pg_get_profile, pg_update_profile
+
+app.add_url_rule('/api/auth/manager/login',     'pg_manager_login',     make_login('hospital_manager'),  methods=['POST'])
+app.add_url_rule('/api/auth/lab/login',          'pg_lab_login',         make_login('lab_technician'),    methods=['POST'])
+app.add_url_rule('/api/auth/pharmacist/login',   'pg_pharmacist_login',  make_login('pharmacist'),        methods=['POST'])
+app.add_url_rule('/api/auth/frontdesk/login',    'pg_frontdesk_login',   make_login('front_desk'),        methods=['POST'])
+
+app.add_url_rule('/api/auth/manager/signup',     'pg_manager_signup',    make_signup('hospital_manager'), methods=['POST'])
+app.add_url_rule('/api/auth/lab/signup',          'pg_lab_signup',        make_signup('lab_technician'),   methods=['POST'])
+app.add_url_rule('/api/auth/pharmacist/signup',   'pg_pharmacist_signup', make_signup('pharmacist'),       methods=['POST'])
+app.add_url_rule('/api/auth/frontdesk/signup',    'pg_frontdesk_signup',  make_signup('front_desk'),       methods=['POST'])
+
+# PostgreSQL profile routes
+app.add_url_rule('/api/pg/user/profile', 'pg_get_profile',    pg_get_profile,    methods=['GET'])
+app.add_url_rule('/api/pg/user/profile', 'pg_update_profile', pg_update_profile, methods=['PUT'])
+
 # Profile routes require JWT
 @app.route('/api/user/profile', methods=['GET'])
 @jwt_required()
@@ -154,6 +193,7 @@ if __name__ == '__main__':
     print(f"  Environment: {env}")
     print(f"  Debug: {debug}")
     print(f"  MongoDB: {os.getenv('MONGODB_URI', 'mongodb://127.0.0.1:27017/')}")
+    print(f"  PostgreSQL: {os.getenv('DATABASE_URL', 'postgresql://localhost:5432/hospital_db')}")
     print(f"  Socket.IO: Enabled")
     print(f"  Voice Bot: WebSocket at /api/voice/stream")
     print(f"\n  API: http://localhost:{port}/api/")

@@ -63,13 +63,24 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import BusinessIcon from '@mui/icons-material/Business';
+import ScienceIcon from '@mui/icons-material/Science';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 
 const ROLES = [
-    { key: 'nurse', title: 'Nurse', desc: 'Clinical Care & Vitals', icon: <MedicalServicesIcon />, color: '#3B82F6' },
-    { key: 'doctor', title: 'Doctor', desc: 'Expert Clinical Overview', icon: <LocalHospitalIcon />, color: '#8B5CF6' },
-    { key: 'patient', title: 'Patient', desc: 'Access Your Health Records', icon: <PeopleIcon />, color: '#10B981' },
-    { key: 'super_admin', title: 'Admin', desc: 'Environment Management', icon: <AdminPanelSettingsIcon />, color: '#EF4444' },
-    { key: 'vendor', title: 'Vendor', desc: 'Supply Chain Operations', icon: <LocalShippingIcon />, color: '#F59E0B' }
+    // Clinical
+    { key: 'doctor', title: 'Doctor', desc: 'Expert Clinical Overview', icon: <LocalHospitalIcon />, color: '#8B5CF6', category: 'Clinical' },
+    { key: 'nurse', title: 'Nurse', desc: 'Clinical Care & Vitals', icon: <MedicalServicesIcon />, color: '#3B82F6', category: 'Clinical' },
+    { key: 'lab_technician', title: 'Lab Tech', desc: 'Lab Tests & Results', icon: <ScienceIcon />, color: '#06B6D4', category: 'Clinical' },
+    { key: 'pharmacist', title: 'Pharmacist', desc: 'Prescriptions & Inventory', icon: <MedicationOutlinedIcon />, color: '#14B8A6', category: 'Clinical' },
+    // Admin
+    { key: 'super_admin', title: 'Admin', desc: 'Environment Management', icon: <AdminPanelSettingsIcon />, color: '#EF4444', category: 'Admin' },
+    { key: 'hospital_manager', title: 'Manager', desc: 'Analytics & Dashboards', icon: <BusinessIcon />, color: '#F97316', category: 'Admin' },
+    // Operations
+    { key: 'front_desk', title: 'Front Desk', desc: 'Registration & Billing', icon: <SupportAgentIcon />, color: '#EC4899', category: 'Operations' },
+    // Portal
+    { key: 'patient', title: 'Patient', desc: 'Access Your Health Records', icon: <PeopleIcon />, color: '#10B981', category: 'Portal' },
+    { key: 'vendor', title: 'Vendor', desc: 'Supply Chain Operations', icon: <LocalShippingIcon />, color: '#F59E0B', category: 'Portal' },
 ];
 
 const Login = () => {
@@ -111,6 +122,22 @@ const Login = () => {
                 endpoint = '/vendor/login';
                 payload = { email: formData.email, password: formData.password };
                 break;
+            case 'hospital_manager':
+                endpoint = '/auth/manager/login';
+                payload = { email: formData.email, password: formData.password };
+                break;
+            case 'lab_technician':
+                endpoint = '/auth/lab/login';
+                payload = { email: formData.email, password: formData.password };
+                break;
+            case 'pharmacist':
+                endpoint = '/auth/pharmacist/login';
+                payload = { email: formData.email, password: formData.password };
+                break;
+            case 'front_desk':
+                endpoint = '/auth/frontdesk/login';
+                payload = { email: formData.email, password: formData.password };
+                break;
             default:
                 setLoading(false);
                 return;
@@ -125,14 +152,30 @@ const Login = () => {
             const data = await res.json();
 
             if (data.success) {
-                setRoleAuth(data.user.role, data.access_token, data.user);
+                setRoleAuth(data.user.role, data.access_token || data.token, data.user);
                 
                 const dashboardMap = {
                     'nurse': '/nurse-dashboard',
                     'patient': '/patient-dashboard',
                     'doctor': '/doctor-dashboard',
                     'super_admin': '/admin-dashboard',
-                    'vendor': '/vendor-dashboard'
+                    'vendor': '/vendor-dashboard',
+                    'hospital_manager': '/manager-dashboard',
+                    'lab_technician': '/lab-dashboard',
+                    'pharmacist': '/pharmacist-dashboard',
+                    'front_desk': '/frontdesk-dashboard',
+                };
+                
+                const signupMap = {
+                    'super_admin': '/admin-signup',
+                    'hospital_manager': '/manager-signup',
+                    'lab_technician': '/labtech-signup',
+                    'pharmacist': '/pharmacist-signup',
+                    'front_desk': '/frontdesk-signup',
+                    'doctor': '/doctor-signup',
+                    'nurse': '/nurse-signup',
+                    'patient': '/patient-signup',
+                    'vendor': '/vendor-signup'
                 };
                 navigate(dashboardMap[data.user.role] || '/');
             } else {
@@ -319,7 +362,7 @@ const Login = () => {
                     <Box sx={{ mt: 3, textAlign: 'center' }}>
                         <Typography variant="body2" sx={{ mb: 1 }}>
                             Don't have an account?{' '}
-                            <Link component={RouterLink} to={`/${selectedRole?.key}-signup`} sx={{ fontWeight: 700, color: selectedRole?.color }}>Sign up now</Link>
+                            <Link component={RouterLink} to={selectedRole?.key === 'super_admin' ? '/admin-signup' : selectedRole?.key === 'hospital_manager' ? '/manager-signup' : selectedRole?.key === 'lab_technician' ? '/labtech-signup' : selectedRole?.key === 'front_desk' ? '/frontdesk-signup' : `/${selectedRole?.key}-signup`} sx={{ fontWeight: 700, color: selectedRole?.color }}>Sign up now</Link>
                         </Typography>
                         {selectedRole?.key === 'patient' && (
                             <Button 

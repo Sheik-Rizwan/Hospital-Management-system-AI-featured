@@ -12,6 +12,14 @@ import SuperAdminSignup from './pages/SuperAdminSignup';
 import VendorSignup from './pages/VendorSignup';
 import VendorLogin from './pages/VendorLogin';
 import VendorDashboard from './pages/VendorDashboard';
+import ManagerDashboard from './pages/ManagerDashboard';
+import LabDashboard from './pages/LabDashboard';
+import PharmacistDashboard from './pages/PharmacistDashboard';
+import FrontDeskDashboard from './pages/FrontDeskDashboard';
+import ManagerSignup from './pages/ManagerSignup';
+import LabTechSignup from './pages/LabTechSignup';
+import PharmacistSignup from './pages/PharmacistSignup';
+import FrontDeskSignup from './pages/FrontDeskSignup';
 import './App.css';
 
 // Protected Route Component — checks role-specific token first, then generic
@@ -49,6 +57,16 @@ const App = () => {
                 <Route path="/doctor-signup" element={<DoctorSignup />} />
                 <Route path="/admin-signup" element={<SuperAdminSignup />} />
                 <Route path="/vendor-signup" element={<VendorSignup />} />
+                <Route path="/manager-signup" element={<ManagerSignup />} />
+                <Route path="/hospital_manager_signup" element={<ManagerSignup />} />
+                <Route path="/hospital_manager-signup" element={<ManagerSignup />} />
+                <Route path="/labtech-signup" element={<LabTechSignup />} />
+                <Route path="/lab_technician_signup" element={<LabTechSignup />} />
+                <Route path="/lab_technician-signup" element={<LabTechSignup />} />
+                <Route path="/pharmacist-signup" element={<PharmacistSignup />} />
+                <Route path="/frontdesk-signup" element={<FrontDeskSignup />} />
+                <Route path="/front_desk_signup" element={<FrontDeskSignup />} />
+                <Route path="/front_desk-signup" element={<FrontDeskSignup />} />
 
                 {/* Super Admin Dashboard */}
                 <Route path="/admin-dashboard" element={
@@ -85,6 +103,37 @@ const App = () => {
                         <VendorDashboard />
                     </PrivateRoute>
                 } />
+
+                {/* Hospital Manager Dashboard */}
+                <Route path="/manager-dashboard" element={
+                    <PrivateRoute allowedRoles="hospital_manager">
+                        <ManagerDashboard />
+                    </PrivateRoute>
+                } />
+
+                {/* Lab Technician Dashboard */}
+                <Route path="/lab-dashboard" element={
+                    <PrivateRoute allowedRoles="lab_technician">
+                        <LabDashboard />
+                    </PrivateRoute>
+                } />
+
+                {/* Pharmacist Dashboard */}
+                <Route path="/pharmacist-dashboard" element={
+                    <PrivateRoute allowedRoles="pharmacist">
+                        <PharmacistDashboard />
+                    </PrivateRoute>
+                } />
+
+                {/* Front Desk Dashboard */}
+                <Route path="/frontdesk-dashboard" element={
+                    <PrivateRoute allowedRoles="front_desk">
+                        <FrontDeskDashboard />
+                    </PrivateRoute>
+                } />
+
+                {/* Catch-all route to prevent blank screens */}
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Router>
     );
